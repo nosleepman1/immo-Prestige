@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Agency;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -17,6 +18,8 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->enum('role', ['admin', 'agent', 'user']);
+            $table->boolean('is_active')->default(false);
             $table->rememberToken();
             $table->timestamps();
         });
@@ -46,4 +49,7 @@ return new class extends Migration
         Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
     }
+
+
+
 };

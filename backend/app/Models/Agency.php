@@ -9,4 +9,20 @@ class Agency extends Model
 {
     /** @use HasFactory<\Database\Factories\AgencyFactory> */
     use HasFactory;
+
+    protected $fillable = [
+        'name',
+        'description',
+        'address',
+        'city',
+        'phone',
+        'email',
+        'id_card',
+        'user_id',
+    ];
+
+    public function users()
+    {
+        return $this->belongsTo(User::class);
+    }
 }
