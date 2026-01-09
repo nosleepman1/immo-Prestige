@@ -11,7 +11,7 @@ class StoreAgencyRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,13 @@ class StoreAgencyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'address' => 'required|string|max:255',
+            'city' => 'required|string|max:100',
+            'phone' => 'required|string|max:20',
+            'id_card' => 'required|string|unique:agencies,id_card',
+            'user_id' => 'required|exists:users,id',
         ];
     }
 }

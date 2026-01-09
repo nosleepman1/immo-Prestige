@@ -9,6 +9,7 @@ use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Auth;
 
 class UserController extends Controller
 {
@@ -18,7 +19,7 @@ class UserController extends Controller
     public function index()
     {
         
-        return UserResource::collection(\App\Models\User::all());
+        return UserResource::collection(User::all());
     }
 
     /**
@@ -28,7 +29,7 @@ class UserController extends Controller
     {
         $data = $request->validated();
         $data['password'] = bcrypt($data['password']);
-        $user = \App\Models\User::create($data);
+        $user = User::create($data);
         return new UserResource($user);
     }
 
@@ -37,17 +38,23 @@ class UserController extends Controller
         $credentials = $request->validated();
 
         $user = User::where('email', $credentials['email'])->first();
+        
         if (!$user || !Hash::check($credentials['password'], $user['password'])) {
             return response()->json(['message' => 'Invalid login credentials'], 401);
         }
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+        $token = $user->createToken(env('TOKEN_SECRET'))->plainTextToken;
 
         return response()->json([
             'user' => new UserResource($user),
             'access_token' => $token,
             'token_type' => 'Bearer',
         ]);
+    }
+
+    public function logout(){
+        auth()->user()->tokens()->delete();
+        return response()->json(['message' => 'Logged out successfully']);
     }
 
     /**
@@ -71,6 +78,6 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        
     }
 }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AgencyController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
@@ -12,6 +13,15 @@ Route::get('/user', function (Request $request) {
 
 Route::apiResource('posts', PostController::class);
 
+
+Route::group(['prefix' => 'agency'], function () {
+    Route::get('/', [AgencyController::class, 'index'])->middleware('auth:sanctum');
+    Route::post('/new', [AgencyController::class, 'store'])->middleware('auth:sanctum');
+    Route::get('/{agency}', [AgencyController::class, 'show'])->middleware('auth:sanctum');
+    Route::put('/{agency}', [AgencyController::class, 'update'])->middleware('auth:sanctum');
+});
+
+
 Route::group(['prefix' => 'users'], function () {
     Route::get('/', [UserController::class, 'index']);
     Route::get('/{user}', [UserController::class, 'show']);
@@ -19,4 +29,5 @@ Route::group(['prefix' => 'users'], function () {
     Route::post('/login', [UserController::class, 'login']);
     Route::put('/{user}', [UserController::class, 'update']);
     Route::delete('/{user}', [UserController::class, 'destroy']);
-})->middleware('auth:sanctum');
+    Route::post('/logout', [UserController::class, 'logout']);
+});
