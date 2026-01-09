@@ -14,7 +14,7 @@ return new class extends Migration
     {
         Schema::create('agencies', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string( column: 'company_name')->unique();
             $table->text('description');
             $table->string('address');
             $table->string('city');

@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreAgencyRequest;
 use App\Http\Requests\StoreLoginRequest;
 use App\Http\Requests\StoreUserRequest;
+use App\Http\Resources\AgencyResource;
 use App\Http\Resources\UserResource;
+use App\Models\Agency;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -25,13 +28,18 @@ class UserController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreUserRequest $request)
+    public function store(StoreUserRequest $request )
     {
         $data = $request->validated();
         $data['password'] = bcrypt($data['password']);
         $user = User::create($data);
+
         return new UserResource($user);
     }
+
+   
+
+
 
     public function login(StoreLoginRequest $request)
     {

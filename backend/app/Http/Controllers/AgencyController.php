@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Agency;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreAgencyRequest;
+use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateAgencyRequest;
 use App\Http\Resources\AgencyResource;
+use App\Http\Resources\UserResource;
 use App\Models\User;
 
 class AgencyController extends Controller
@@ -22,12 +24,25 @@ class AgencyController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreAgencyRequest $request,)
+    public function store(StoreUserRequest $request, StoreAgencyRequest $AgencyRequest)
     {
-        $agency = Agency::create($request->validated());
-        return new AgencyResource($agency);
-    }
+        $data = $request->validated();
+        $data['password'] = bcrypt($data['password']);
+        $user = User::create($data);
 
+        if ($user->role != 'agency') {
+            $user->delete();
+            return response()->json(['message' => 'User role must be agency to create an agency'], 400);
+        }
+
+        $agencyData = $AgencyRequest->validated();
+        $agencyData['user_id'] = $user->id;
+        $agency = Agency::create($agencyData);
+        return [
+            new UserResource($user),
+            new AgencyResource($agency)
+        ];
+    }
     /**
      * Display the specified resource.
      */
