@@ -13,14 +13,21 @@ return new class extends Migration
     {
         Schema::create('properties', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->text('description')->nullable();
-            $table->string('address');
-            $table->decimal('price', 10, 2);
             $table->foreignId('property_type_id')->constrained()->onDelete('cascade');
             $table->foreignId('agency_id')->constrained()->onDelete('cascade');
+            $table->string('name');
+            $table->text('description')->nullable();
+            $table->double('surface');
+            $table->double('rooms');
+            $table->double('bedrooms')->nullable();
+            $table->integer('floor')->nullable();
+            $table->boolean('furnished')->default(false);
+            $table->decimal('price', 10, 2);
+            $table->string('country');
+            $table->string('region');
             $table->string('city');
-            
+            $table->string('address');
+            $table->boolean('sold')->default(false);     
             $table->boolean('is_active')->default(false);
             $table->timestamps();
         });
