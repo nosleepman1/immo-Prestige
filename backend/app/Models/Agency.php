@@ -25,4 +25,11 @@ class Agency extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function properties()
+    {
+        return $this->hasMany(Property::class);
+    }
+
+    
 }

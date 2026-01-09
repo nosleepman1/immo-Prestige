@@ -15,4 +15,14 @@ class Property extends Model
     {
         return $this->belongsTo(PropertyType::class);
     }
+
+    public function agency()
+    {
+        return $this->belongsTo(Agency::class);
+    }
+
+    public function devise()
+    {
+        return $this->belongsTo(Devise::class);
+    }
 }

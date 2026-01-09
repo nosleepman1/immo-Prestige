@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreDeviseRequest extends FormRequest
+class UpdatePropertyImageRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,9 +22,7 @@ class StoreDeviseRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
-            'symbol' => 'required|string|max:10',
-            'code' => 'required|string|max:10|unique:devises,code',
+            //
         ];
     }
 }

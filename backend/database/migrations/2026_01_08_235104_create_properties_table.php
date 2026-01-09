@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('property_type_id')->constrained()->onDelete('cascade');
             $table->foreignId('agency_id')->constrained()->onDelete('cascade');
+            $table->foreignId('devise_id')->constrained()->onDelete('cascade');
             $table->string('name');
             $table->text('description')->nullable();
             $table->double('surface');
@@ -27,6 +28,8 @@ return new class extends Migration
             $table->string('region');
             $table->string('city');
             $table->string('address');
+            $table->string('longitude')->nullable();
+            $table->string('latitude')->nullable();
             $table->boolean('sold')->default(false);     
             $table->boolean('is_active')->default(false);
             $table->timestamps();

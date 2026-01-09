@@ -9,4 +9,15 @@ class Devise extends Model
 {
     /** @use HasFactory<\Database\Factories\DeviseFactory> */
     use HasFactory;
+
+    protected $fillable = [
+        'name',
+        'symbol',
+        'code',
+    ];
+
+    public function properties()
+    {
+        return $this->hasMany(Property::class);
+    }
 }
