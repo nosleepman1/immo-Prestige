@@ -9,4 +9,10 @@ class Property extends Model
 {
     /** @use HasFactory<\Database\Factories\PropertyFactory> */
     use HasFactory;
+
+
+    public function propertyType()
+    {
+        return $this->belongsTo(PropertyType::class);
+    }
 }

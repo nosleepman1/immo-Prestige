@@ -15,7 +15,8 @@ class Post extends Model
         'content',
     ];
 
-    public function likes()
+   
+    public function likes() 
     {
         return $this->hasMany(Like::class);
     }
