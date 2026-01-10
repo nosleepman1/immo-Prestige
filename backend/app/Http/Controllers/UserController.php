@@ -44,7 +44,7 @@ class UserController extends Controller
     public function login(StoreLoginRequest $request)
     {
         $credentials = $request->validated();
-
+        
         $user = User::where('email', $credentials['email'])->first();
         
         if (!$user || !Hash::check($credentials['password'], $user['password'])) {
@@ -61,7 +61,7 @@ class UserController extends Controller
     }
 
     public function logout(){
-        auth()->user()->tokens()->delete();
+        Auth::user()->tokens()->delete();
         return response()->json(['message' => 'Logged out successfully']);
     }
 

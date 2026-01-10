@@ -22,13 +22,13 @@ class UpdateAgencyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'sometimes|required|string|max:255',
-            'description' => 'sometimes|required|string',
-            'address' => 'sometimes|required|string|max:255',
-            'city' => 'sometimes|required|string|max:100',
-            'phone' => 'sometimes|required|string|max:20',
-            'id_card' => 'sometimes|required|string|unique:agencies,id_card,' . $this->agency->id,
-            'user_id' => 'sometimes|required|exists:users,id',
+            'name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'address' => 'required|string|max:255',
+            'city' => 'required|string|max:100',
+            'phone' => 'required|string|max:20',
+            'id_card' => 'required|string|unique:agencies,id_card,' . $this->agency->id,
+            'user_id' => 'required|exists:users,id',
         ];
     }
 }
