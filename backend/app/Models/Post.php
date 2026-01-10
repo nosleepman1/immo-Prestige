@@ -11,18 +11,22 @@ class Post extends Model
     use HasFactory;
 
     protected $fillable = [
-        'title',
-        'content',
+        'propery_id'
     ];
 
    
-    public function likes() 
+    public function like() 
     {
         return $this->hasMany(Like::class);
     }
 
-    public function comments()
+    public function comment()
     {
         return $this->hasMany(Comment::class);
+    }
+
+    public function property() {
+        return $this->belongsTo(Property::class);
+    
     }
 }

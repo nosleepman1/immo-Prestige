@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('address');
             $table->string('city');
             $table->string('phone');
-            $table->string(column: 'id_card')->unique();
+            $table->string( 'id_card')->unique();
             $table->boolean('is_active')->default(false);
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->timestamps();

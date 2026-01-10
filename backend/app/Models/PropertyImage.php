@@ -9,4 +9,10 @@ class PropertyImage extends Model
 {
     /** @use HasFactory<\Database\Factories\PropertyImageFactory> */
     use HasFactory;
+
+    protected $fillable = [
+        'property'
+    ];
+
+    
 }

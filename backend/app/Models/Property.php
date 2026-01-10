@@ -10,6 +10,28 @@ class Property extends Model
     /** @use HasFactory<\Database\Factories\PropertyFactory> */
     use HasFactory;
 
+    protected $fillable = [
+        'property_type_id',
+        'agency_id',
+        'devise_id',
+        'name',
+        'description',
+        'surface',
+        'rooms',
+        'bedrooms',
+        'floor',
+        'funished',
+        'price',
+        'country',
+        'region',
+        'city',
+        'address',
+        'longitude',
+        'latitude',
+        'sold',
+        'is_active'
+    ];
+
 
     public function propertyType()
     {
@@ -25,4 +47,17 @@ class Property extends Model
     {
         return $this->belongsTo(Devise::class);
     }
+
+    public function images()
+    {
+        return $this->hasMany(PropertyImage::class);
+    }
+
+    public function post() {
+        return $this->hasOne(Post::class);
+    }
+
+
+
+    
 }
