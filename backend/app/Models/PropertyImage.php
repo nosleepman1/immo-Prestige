@@ -11,8 +11,14 @@ class PropertyImage extends Model
     use HasFactory;
 
     protected $fillable = [
-        'property'
+        'property_id',
+        'image_path',
+        'is_cover'
     ];
 
-    
+    public function property()
+    {
+        return $this->belongsTo(Property::class);
+    }
 }
+    

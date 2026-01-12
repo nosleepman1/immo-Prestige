@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
 use App\Http\Resources\PostResource;
+use App\Models\Agency;
 
 class PostController extends Controller
 {
@@ -17,6 +18,12 @@ class PostController extends Controller
     {
         //all post using resource
         return PostResource::collection(Post::all());
+    }
+
+
+    public function agencyPosts(Agency $agency)
+    {
+        return PostResource::collection(Post::where('agency_id', $agency->id));
     }
 
     /**

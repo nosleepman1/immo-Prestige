@@ -1,0 +1,43 @@
+<?php
+
+namespace App\Http\Resources;
+
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class PropertyResource extends JsonResource
+{
+    /**
+     * Transform the resource into an array.
+     *
+     * @return array<string, mixed>
+     */
+    public function toArray(Request $request): array
+    {
+        return [
+            'id' => $this->id,
+            'property_type_id' => $this->property_type_id,
+            'agency_id' => $this->agency_id,
+            'devise_id' => $this->devise_id,
+            'name' => $this->name,
+            'description' => $this->description,
+            'surface' => $this->surface,
+            'rooms' => $this->rooms,
+            'bedrooms' => $this->bedrooms,
+            'floor' => $this->floor,
+            'furnished' => $this->furnished,
+            'price' => $this->price,
+            'country' => $this->country,
+            'region' => $this->region,
+            'city' => $this->city,
+            'address' => $this->address,
+            'longitude' => $this->longitude,
+            'latitude' => $this->latitude,
+            'sold' => $this->sold,
+            'is_active' => $this->is_active,
+            'created_at' => $this->createdAt,
+            'updated_at' => $this->updatedAt     
+
+        ];
+    }
+}
