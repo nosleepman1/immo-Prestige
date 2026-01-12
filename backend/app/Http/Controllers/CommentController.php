@@ -6,15 +6,21 @@ use App\Models\Comment;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreCommentRequest;
 use App\Http\Requests\UpdateCommentRequest;
+use App\Http\Resources\CommentResource;
+use App\Models\Post;
+use Illuminate\Support\Facades\Auth;
 
 class CommentController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        //
+    public function myComments(){
+        return CommentResource::collection(Comment::where('user_id', Auth::user()->id));
+    }
+
+    public function postComments(Post $post){
+        return CommentResource::collection(Comment::where('post_id', $post->id));
     }
 
     /**
@@ -22,8 +28,15 @@ class CommentController extends Controller
      */
     public function store(StoreCommentRequest $request)
     {
-        //
-    }
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        $data = $request->validated();
+        $data['user_id'] = $user->id;
+        $comment = Comment::create($data);
+
+        return response()->json(['message' => 'Comment created successfully'], 201);
+        }
+        Auth::user()->agencies()->pos
 
     /**
      * Display the specified resource.
