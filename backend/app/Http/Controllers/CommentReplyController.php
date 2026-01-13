@@ -22,7 +22,7 @@ class CommentReplyController extends Controller
      */
     public function store(StoreCommentReplyRequest $request)
     {
-        //
+        
     }
 
     /**
