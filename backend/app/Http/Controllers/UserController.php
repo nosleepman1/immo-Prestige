@@ -12,7 +12,7 @@ use App\Models\Agency;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Auth;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -61,7 +61,7 @@ class UserController extends Controller
     }
 
     public function logout(){
-        Auth::user()->tokens()->delete();
+       Auth::user()->tokens()->delete();
         return response()->json(['message' => 'Logged out successfully']);
     }
 

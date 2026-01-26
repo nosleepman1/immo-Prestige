@@ -35,7 +35,7 @@ class StorePropertyRequest extends FormRequest
             'longitude' => 'nullable|string|max:50',
             'latitude' => 'nullable|string|max:50',
             'sold' => 'boolean',
-            'is_active' => 'boolean',
+            'is_active' => 'boolean'
         ];
     }
 }

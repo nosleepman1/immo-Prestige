@@ -23,7 +23,9 @@ class PropertyController extends Controller
      */
     public function store(StorePropertyRequest $request)
     {
-        //
+        // property creation logic here
+        $data = $request->validated();
+        $property = Property::create($data);
     }
 
     /**
