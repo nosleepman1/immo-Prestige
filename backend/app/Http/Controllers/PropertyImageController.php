@@ -14,7 +14,8 @@ class PropertyImageController extends Controller
      */
     public function index()
     {
-        //
+        // property images listing logic here
+        return response()->json(PropertyImage::all());
     }
 
     /**
@@ -22,7 +23,15 @@ class PropertyImageController extends Controller
      */
     public function store(StorePropertyImageRequest $request)
     {
-        //
+        // property image creation logic here
+        $data = $request->validated();
+        $propertyImage = PropertyImage::create($data);
+
+        return response()->json(
+            [
+                ['message' => 'Property image created successfully'],
+                'data' => $propertyImage
+            ], 201);
     }
 
     /**
@@ -30,7 +39,7 @@ class PropertyImageController extends Controller
      */
     public function show(PropertyImage $propertyImage)
     {
-        //
+        return response()->json($propertyImage);
     }
 
     /**
@@ -38,7 +47,15 @@ class PropertyImageController extends Controller
      */
     public function update(UpdatePropertyImageRequest $request, PropertyImage $propertyImage)
     {
-        //
+        // property image update logic here
+        $data = $request->validated();
+        $propertyImage->update($data);
+
+        return response()->json(
+            [
+                ['message' => 'Property image updated successfully'],
+                'data' => $propertyImage
+            ], 200);
     }
 
     /**
@@ -46,6 +63,11 @@ class PropertyImageController extends Controller
      */
     public function destroy(PropertyImage $propertyImage)
     {
-        //
+        // property image deletion logic here
+        $propertyImage->delete();
+        return response()->json(
+            [
+                ['message' => 'Property image deleted successfully']
+            ], 200);
     }
 }

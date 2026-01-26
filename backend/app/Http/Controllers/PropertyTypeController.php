@@ -14,7 +14,8 @@ class PropertyTypeController extends Controller
      */
     public function index()
     {
-        //
+        // property types listing logic here
+        return response()->json(PropertyType::all());
     }
 
     /**
@@ -22,7 +23,15 @@ class PropertyTypeController extends Controller
      */
     public function store(StorePropertyTypeRequest $request)
     {
-        //
+        // property type creation logic here
+        $data = $request->validated();
+        $propertyType = PropertyType::create($data);
+
+        return response()->json(
+            [
+                ['message' => 'Property type created successfully'],
+                'data' => $propertyType
+            ], 201);
     }
 
     /**
@@ -30,7 +39,7 @@ class PropertyTypeController extends Controller
      */
     public function show(PropertyType $propertyType)
     {
-        //
+        return response()->json($propertyType);
     }
 
     /**
@@ -38,7 +47,15 @@ class PropertyTypeController extends Controller
      */
     public function update(UpdatePropertyTypeRequest $request, PropertyType $propertyType)
     {
-        //
+        // property type update logic here
+        $data = $request->validated();
+        $propertyType->update($data);
+
+        return response()->json(
+            [
+                ['message' => 'Property type updated successfully'],
+                'data' => $propertyType
+            ], 200);
     }
 
     /**
@@ -46,6 +63,11 @@ class PropertyTypeController extends Controller
      */
     public function destroy(PropertyType $propertyType)
     {
-        //
+        // property type deletion logic here
+        $propertyType->delete();
+        return response()->json(
+            [
+                ['message' => 'Property type deleted successfully']
+            ], 200);
     }
 }
