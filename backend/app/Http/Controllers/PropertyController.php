@@ -14,7 +14,8 @@ class PropertyController extends Controller
      */
     public function index()
     {
-        //
+        // show all properties for an agency
+        return response()->json(Property::all());
     }
 
     /**

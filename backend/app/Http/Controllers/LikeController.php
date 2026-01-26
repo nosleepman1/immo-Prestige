@@ -6,6 +6,7 @@ use App\Models\Like;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreLikeRequest;
 use App\Http\Requests\UpdateLikeRequest;
+use Illuminate\Support\Facades\Request;
 
 class LikeController extends Controller
 {
@@ -14,7 +15,10 @@ class LikeController extends Controller
      */
     public function index()
     {
-        //
+        // retur count of likes for a specific post or post
+        return response()->json(Like::all());
+        
+
     }
 
     /**
@@ -22,7 +26,9 @@ class LikeController extends Controller
      */
     public function store(StoreLikeRequest $request)
     {
-        //
+        // like creation logic here
+        $data = $request->validated();
+        $like = Like::create($data);
     }
 
     /**
@@ -30,13 +36,13 @@ class LikeController extends Controller
      */
     public function show(Like $like)
     {
-        //
+
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateLikeRequest $request, Like $like)
+    public function update(Request $request, Like $like)
     {
         //
     }
@@ -46,6 +52,11 @@ class LikeController extends Controller
      */
     public function destroy(Like $like)
     {
-        //
+        // like deletion logic here
+        $like->delete();
+        return response()->json(
+            [
+                ['message' => 'Like deleted successfully']
+            ], 200);
     }
 }

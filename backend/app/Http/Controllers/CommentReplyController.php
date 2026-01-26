@@ -63,6 +63,12 @@ class CommentReplyController extends Controller
      */
     public function destroy(CommentReply $commentReply)
     {
-        //
+        // comment reply deletion logic here
+        $commentReply->delete();
+
+        return response()->json(
+            [
+                ['message' => 'Comment reply deleted successfully']
+            ], 200);
     }
 }
