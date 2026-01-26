@@ -60,32 +60,51 @@ class UserController extends Controller
         ]);
     }
 
-    public function logout(){
-       Auth::user()->tokens()->delete();
-        return response()->json(['message' => 'Logged out successfully']);
-    }
-
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(User $user)
     {
-        //
+        return new UserResource($user);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, User $user)
     {
-        //
+       // update simple user info not agency so check if !agency
+         $data = $request->only(['name', 'email', 'password', 'role']);     
+            if (isset($data['password'])) {
+                $data['password'] = bcrypt($data['password']);
+            }
+            $user->update($data);
+            return new UserResource($user);
+    
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(User $user)
     {
-        
+        $user->delete();
+        return response()->json([
+            'message' => 'User deleted successfully.'
+        ], 200);
+    }
+
+    public function me(Request $request)
+    {
+        return new UserResource($request->user());
+    }
+
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json([
+            'message' => 'Logged out successfully.'
+        ], 200);
     }
 }
