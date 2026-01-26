@@ -26,6 +26,7 @@ class PropertyController extends Controller
         // property creation logic here
         $data = $request->validated();
         $property = Property::create($data);
+        return response()->json($property, 201);
     }
 
     /**
@@ -45,11 +46,10 @@ class PropertyController extends Controller
         $data = $request->validated();
         $property->update($data);
 
-        return response()->json(
-            [
-                ['message' => 'Property updated successfully'],
-                'data' => $property
-            ], 200);
+        return response()->json([
+            'message' => 'Property updated successfully',
+            'data' => $property
+        ], 200);
     }
 
     /**
@@ -59,9 +59,8 @@ class PropertyController extends Controller
     {
         // property deletion logic here
         $property->delete();
-        return response()->json(
-            [
-                ['message' => 'Property deleted successfully']
-            ], 200);
+        return response()->json([
+            'message' => 'Property deleted successfully'
+        ], 200);
     }
 }

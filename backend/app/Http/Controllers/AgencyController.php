@@ -24,7 +24,7 @@ class AgencyController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreUserRequest $request, StoreAgencyRequest $AgencyRequest)
+    public function store(StoreUserRequest $request, StoreAgencyRequest $agencyRequest)
     {
         $data = $request->validated();
         $data['password'] = bcrypt($data['password']);
@@ -35,7 +35,7 @@ class AgencyController extends Controller
             return response()->json(['message' => 'User role must be agency to create an agency'], 400);
         }
 
-        $agencyData = $AgencyRequest->validated();
+        $agencyData = $agencyRequest->validated();
         $agencyData['user_id'] = $user->id;
         $agency = Agency::create($agencyData);
         return [

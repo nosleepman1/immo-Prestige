@@ -23,7 +23,7 @@ class PostController extends Controller
 
     public function agencyPosts(Agency $agency)
     {
-        return PostResource::collection(Post::where('agency_id', $agency->id));
+        return PostResource::collection(Post::where('agency_id', $agency->id)->get());
     }
 
     
