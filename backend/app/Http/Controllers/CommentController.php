@@ -52,7 +52,7 @@ class CommentController extends Controller
      */
     public function show(Comment $comment)
     {
-        //
+        return new CommentResource($comment);
     }
 
     /**
@@ -60,7 +60,14 @@ class CommentController extends Controller
      */
     public function update(UpdateCommentRequest $request, Comment $comment)
     {
-        //
+        $data = $request->validated();
+        $comment->update($data);
+
+        return response()->json(
+            [
+                ['message' => 'Comment updated successfully'],
+                'data' => $comment
+            ], 200);
     }
 
     /**

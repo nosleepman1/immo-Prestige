@@ -14,7 +14,8 @@ class CommentReplyController extends Controller
      */
     public function index()
     {
-        //
+        // commeent replies listing logic here
+        return response()->json(CommentReply::all());
     }
 
     /**
@@ -22,7 +23,15 @@ class CommentReplyController extends Controller
      */
     public function store(StoreCommentReplyRequest $request)
     {
-        
+        // comment reply creation logic here
+        $data = $request->validated();
+        $commentReply = CommentReply::create($data);
+
+        return response()->json(
+            [
+                ['message' => 'Comment reply created successfully'],
+                'data' => $commentReply
+            ], 201);
     }
 
     /**
@@ -30,7 +39,7 @@ class CommentReplyController extends Controller
      */
     public function show(CommentReply $commentReply)
     {
-        //
+        return response()->json($commentReply);
     }
 
     /**
@@ -38,7 +47,15 @@ class CommentReplyController extends Controller
      */
     public function update(UpdateCommentReplyRequest $request, CommentReply $commentReply)
     {
-        //
+        // comment reply update logic here
+        $data = $request->validated();
+        $commentReply->update($data);
+
+        return response()->json(
+            [
+                ['message' => 'Comment reply updated successfully'],
+                'data' => $commentReply
+            ], 200);
     }
 
     /**
