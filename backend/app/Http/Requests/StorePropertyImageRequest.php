@@ -27,4 +27,16 @@ class StorePropertyImageRequest extends FormRequest
             'is_cover' => 'required|boolean',
         ];
     }
+
+    // messages in french
+    public function messages(): array
+    {
+        return [
+            'property_id.required' => 'L\'ID de la propriété est requis.',
+            'property_id.exists' => 'La propriété spécifiée n\'existe pas.',
+            'image_path.required' => 'Le chemin de l\'image est requis.',
+            'is_cover.required' => 'Le statut de l\'image de couverture est requis.',
+            'is_cover.boolean' => 'Le statut de l\'image de couverture doit être vrai ou faux.',
+        ];
+    }
 }

@@ -28,6 +28,22 @@ class StoreUserRequest extends FormRequest
             'role' => 'required|in:admin,agency,user',
         ];
     }
+    
+    public function messages(): array
+    {
+        return [
+            // message in french
+            'name.required' => 'Le nom est obligatoire.',
+            'name.string' => 'Le nom doit être une chaîne de caractères.',
+            'name.max' => 'Le nom ne doit pas dépasser 255 caractères.',
+            'email.required' => 'L\'adresse e-mail est obligatoire.',
+            'email.string' => 'L\'adresse e-mail doit être une chaîne de caractères.',
+            'email.email' => 'L\'adresse e-mail doit être une adresse e-mail valide.',
+            'email.max' => 'L\'adresse e-mail ne doit pas dépasser 255 caractères.',
+            'email.unique' => 'Une adresse e-mail avec cette valeur existe déjà.'
+        ];
+    }
+}
+    
 
     
-}

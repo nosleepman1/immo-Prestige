@@ -27,4 +27,18 @@ class StoreCommentRequest extends FormRequest
             'content' => 'required|string'
         ];
     }
+
+    // messages in french
+    public function messages(): array
+    {
+        return [
+            'post_id.required' => 'L\'ID du post est requis.',
+            'post_id.integer' => 'L\'ID du post doit être un entier.',
+            'post_id.exists' => 'Le post spécifié n\'existe pas.',
+            'user_id.required' => 'L\'ID de l\'utilisateur est requis.',
+            'user_id.integer' => 'L\'ID de l\'utilisateur doit être un entier.',
+            'user_id.exists' => 'L\'utilisateur spécifié n\'existe pas.',
+            'content.required' => 'Le contenu est requis.',
+        ];
+    }
 }

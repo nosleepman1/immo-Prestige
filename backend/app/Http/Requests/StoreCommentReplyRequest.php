@@ -27,4 +27,17 @@ class StoreCommentReplyRequest extends FormRequest
             'user_id' => 'required|exists:users,id',
         ];
     }
+
+
+    // messages in french
+    public function messages(): array
+    {
+        return [
+            'content.required' => 'Le contenu est requis.',
+            'comment_id.required' => 'L\'ID du commentaire est requis.',
+            'comment_id.exists' => 'Le commentaire spécifié n\'existe pas.',
+            'user_id.required' => 'L\'ID de l\'utilisateur est requis.',
+            'user_id.exists' => 'L\'utilisateur spécifié n\'existe pas.',
+        ];
+    }
 }
