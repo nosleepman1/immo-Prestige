@@ -33,7 +33,7 @@ class PropertyController extends Controller
      */
     public function show(Property $property)
     {
-        //
+        return response()->json($property);
     }
 
     /**
@@ -41,7 +41,15 @@ class PropertyController extends Controller
      */
     public function update(UpdatePropertyRequest $request, Property $property)
     {
-        //
+        // property update logic here
+        $data = $request->validated();
+        $property->update($data);
+
+        return response()->json(
+            [
+                ['message' => 'Property updated successfully'],
+                'data' => $property
+            ], 200);
     }
 
     /**
@@ -49,6 +57,11 @@ class PropertyController extends Controller
      */
     public function destroy(Property $property)
     {
-        //
+        // property deletion logic here
+        $property->delete();
+        return response()->json(
+            [
+                ['message' => 'Property deleted successfully']
+            ], 200);
     }
 }

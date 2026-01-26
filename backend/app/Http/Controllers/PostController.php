@@ -26,6 +26,7 @@ class PostController extends Controller
         return PostResource::collection(Post::where('agency_id', $agency->id));
     }
 
+    
     /**
      * Store a newly created resource in storage.
      */
