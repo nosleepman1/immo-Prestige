@@ -17,7 +17,7 @@ Route::apiResource('posts', PostController::class);
 Route::group(['prefix' => 'agency'], function () {
     Route::get('/', [AgencyController::class, 'index']);
     Route::post('/store', [AgencyController::class, 'store']);
-    Route::get('/{agency}', [AgencyController::class, 'show']);
+    Route::get('/{agency}', [AgencyController::class, 'show'])->middleware('auth:sanctum');
     Route::put('/{agency}', [AgencyController::class, 'update']);
 });
 

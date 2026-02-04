@@ -13,6 +13,11 @@ use App\Models\User;
 
 class AgencyController extends Controller
 {
+    public function __construct()
+    {
+        
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -48,6 +53,7 @@ class AgencyController extends Controller
      */
     public function show(Agency $agency)
     {
+        
         return new AgencyResource($agency);
     }
 

@@ -5,6 +5,8 @@ namespace App\Policies;
 use Illuminate\Auth\Access\Response;
 use App\Models\Agency;
 use App\Models\User;
+use Illuminate\Container\Attributes\Auth;
+use Illuminate\Support\Facades\Auth as FacadesAuth;
 
 class AgencyPolicy
 {
@@ -20,9 +22,8 @@ class AgencyPolicy
      * Determine whether the user can view the model.
      */
     public function view(User $user, Agency $agency): bool
-    {
-        return $user->role === 'agency' || $user->role === 'admin';
-        
+    {   
+        return $user->id == $agency->user_id || $user->role === 'admin';   
     }
 
     /**
@@ -30,8 +31,7 @@ class AgencyPolicy
      */
     public function create(User $user): bool
     {
-                return $user->role === 'agency';
-
+        return $user->role === 'agency';
     }
 
     /**
