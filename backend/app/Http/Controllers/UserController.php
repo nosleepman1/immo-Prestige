@@ -101,10 +101,24 @@ class UserController extends Controller
 
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
+        $user = $request->user();
 
-        return response()->json([
+        if (!$user) {
+            return response()->json(['message' => 'Unauthenticated.'], 401);
+        }
+
+        $token = $user->currentAccessToken();
+
+        if ($token) {
+            $token->delete();
+
+             return response()->json([
             'message' => 'Logged out successfully.'
         ], 200);
+        }
+
+        return response()->json(['message' => 'No active token found.'], 400);
+
+       
     }
 }
