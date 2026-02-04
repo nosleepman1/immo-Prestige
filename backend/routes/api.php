@@ -16,11 +16,10 @@ Route::apiResource('posts', PostController::class);
 
 Route::group(['prefix' => 'agency'], function () {
     Route::get('/', [AgencyController::class, 'index']);
-    Route::post('/new', [AgencyController::class, 'store']);
+    Route::post('/store', [AgencyController::class, 'store']);
     Route::get('/{agency}', [AgencyController::class, 'show']);
     Route::put('/{agency}', [AgencyController::class, 'update']);
 });
-
 
 Route::group(['prefix' => 'users'], function () {
     Route::get('/', [UserController::class, 'index']);
