@@ -25,6 +25,7 @@ class StorePropertyImageRequest extends FormRequest
             'property_id' => 'required|exists:properties,id',
             'image_path' => 'required|string',
             'is_cover' => 'required|boolean',
+            //'image.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ];
     }
 

@@ -6,6 +6,7 @@ use App\Models\PropertyImage;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePropertyImageRequest;
 use App\Http\Requests\UpdatePropertyImageRequest;
+use App\Models\Property;
 
 class PropertyImageController extends Controller
 {
@@ -23,14 +24,27 @@ class PropertyImageController extends Controller
      */
     public function store(StorePropertyImageRequest $request)
     {
-        // property image creation logic here
-        $data = $request->validated();
-        $propertyImage = PropertyImage::create($data);
+        $property = Property::find($request->property_id);
+        if (!$property) {
+            return response()->json(['message' => 'Property not found'], 404);
+        }
 
+        if($request->hasFile('image')) {
+            foreach($request->file('image') as $imageFile) {
+              
+                $imagePath = $imageFile->store('property_images', 'public');
+
+                PropertyImage::create([
+                    'property_id' => $request->property_id,
+                    'image_path' => $imagePath,
+                    'is_cover' => $request->is_cover,
+                ]);
+            }
+        }
         return response()->json(
             [
-                ['message' => 'Property image created successfully'],
-                'data' => $propertyImage
+                ['message' => 'Property image(s) created successfully'],
+                'data' => PropertyImage::where('property_id', $request->property_id)->get()
             ], 201);
     }
 
