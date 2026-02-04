@@ -13,7 +13,7 @@ class AgencyPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return $user->role === 'agency' || $user->role === 'admin';
     }
 
     /**
@@ -21,7 +21,8 @@ class AgencyPolicy
      */
     public function view(User $user, Agency $agency): bool
     {
-        return false;
+        return $user->role === 'agency' || $user->role === 'admin';
+        
     }
 
     /**
@@ -29,7 +30,8 @@ class AgencyPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+                return $user->role === 'agency';
+
     }
 
     /**
@@ -37,7 +39,7 @@ class AgencyPolicy
      */
     public function update(User $user, Agency $agency): bool
     {
-        return false;
+        return $user->role === 'agency' || $user->role === 'admin';
     }
 
     /**
@@ -45,7 +47,8 @@ class AgencyPolicy
      */
     public function delete(User $user, Agency $agency): bool
     {
-        return false;
+        return $user->role === 'agency' || $user->role === 'admin';
+
     }
 
     /**
