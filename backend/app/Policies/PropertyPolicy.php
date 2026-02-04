@@ -13,7 +13,7 @@ class PropertyPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return $user->role === 'agency';
     }
 
     /**
@@ -21,7 +21,7 @@ class PropertyPolicy
      */
     public function view(User $user, Property $property): bool
     {
-        return false;
+        return $user->role === 'agency';
     }
 
     /**
@@ -29,7 +29,7 @@ class PropertyPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return $user->role === 'agency';
     }
 
     /**
@@ -37,7 +37,7 @@ class PropertyPolicy
      */
     public function update(User $user, Property $property): bool
     {
-        return false;
+        return $user->role === 'agency';
     }
 
     /**
@@ -45,7 +45,7 @@ class PropertyPolicy
      */
     public function delete(User $user, Property $property): bool
     {
-        return false;
+        return $user->role === 'agency';
     }
 
     /**
