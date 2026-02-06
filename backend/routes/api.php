@@ -43,4 +43,5 @@ Route::group(['prefix' => 'properties'], function () {
 });
 
 
-Route::post('/device/new', [DeviseController::class, 'store']);
+Route::post('devise/new', [DeviseController::class, 'store']);
+Route::get('devises', [DeviseController::class, 'index']);

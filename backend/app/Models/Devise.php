@@ -13,7 +13,7 @@ class Devise extends Model
     protected $fillable = [
         'name',
         'symbol',
-        'code',
+     //   'code',
     ];
 
     public function properties()
