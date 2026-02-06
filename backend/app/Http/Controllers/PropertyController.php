@@ -27,10 +27,17 @@ class PropertyController extends Controller
     {
         $agency = Agency::where('user_id', Auth::user()->id)->first();
 
+        if (!$agency) {
+            return response()->json(['message' => 'No agency found for the authenticated user.'], 404);
+        }
+
         $data = $request->validated();
-        $data['agency_id'] = $agency ? $agency->id : null;
+
+        $data['agency_id'] = $agency->id;
+
         $property = Property::create($data);
-        return response()->json($property, 201);
+
+        return new PropertyResource($property);
     }
 
     /**
@@ -38,7 +45,11 @@ class PropertyController extends Controller
      */
     public function show(Property $property)
     {
-        return response()->json($property);
+        if(Auth::user()->id !== $property->agency->user_id) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        return new PropertyResource($property);
     }
 
     /**

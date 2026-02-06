@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\AgencyController;
+use App\Http\Controllers\DeviseController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -31,3 +33,14 @@ Route::group(['prefix' => 'users'], function () {
     Route::post('/logout', [UserController::class, 'logout'])->middleware('auth:sanctum');
 });
 
+
+Route::group(['prefix' => 'properties'], function () {
+    Route::get('/', [PropertyController::class, 'index']);
+    Route::post('/store', [PropertyController::class, 'store'])->middleware('auth:sanctum');
+    Route::get('/{property}', [PropertyController::class, 'show'])->middleware('auth:sanctum');
+    Route::put('/{property}', [PropertyController::class, 'update'])->middleware('auth:sanctum');
+    Route::delete('/{property}', [PropertyController::class, 'destroy'])->middleware('auth:sanctum');
+});
+
+
+Route::post('/device/new', [DeviseController::class, 'store']);
