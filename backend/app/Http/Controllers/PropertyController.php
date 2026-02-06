@@ -6,6 +6,9 @@ use App\Models\Property;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePropertyRequest;
 use App\Http\Requests\UpdatePropertyRequest;
+use App\Http\Resources\PropertyResource;
+use App\Models\Agency;
+use Illuminate\Support\Facades\Auth;
 
 class PropertyController extends Controller
 {
@@ -14,8 +17,7 @@ class PropertyController extends Controller
      */
     public function index()
     {
-        // show all properties for an agency
-        return response()->json(Property::all());
+        return PropertyResource::collection(Property::all());
     }
 
     /**
@@ -23,8 +25,10 @@ class PropertyController extends Controller
      */
     public function store(StorePropertyRequest $request)
     {
-        // property creation logic here
+        $agency = Agency::where('user_id', Auth::user()->id)->first();
+
         $data = $request->validated();
+        $data['agency_id'] = $agency ? $agency->id : null;
         $property = Property::create($data);
         return response()->json($property, 201);
     }

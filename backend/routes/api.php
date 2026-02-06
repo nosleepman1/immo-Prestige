@@ -30,3 +30,4 @@ Route::group(['prefix' => 'users'], function () {
     Route::delete('/{user}', [UserController::class, 'destroy'])->middleware('auth:sanctum');
     Route::post('/logout', [UserController::class, 'logout'])->middleware('auth:sanctum');
 });
+
