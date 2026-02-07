@@ -23,8 +23,7 @@ class StoreDeviseRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'symbol' => 'required|string|max:10',
-           // 'code' => 'required|string|max:10|unique:devises,code',
+            'code' => 'required|string|max:10|unique:devises,code',
         ];
     }
 
