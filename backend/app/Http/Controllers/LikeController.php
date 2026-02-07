@@ -6,6 +6,7 @@ use App\Models\Like;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreLikeRequest;
 use App\Http\Requests\UpdateLikeRequest;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
 
 class LikeController extends Controller
@@ -26,8 +27,8 @@ class LikeController extends Controller
      */
     public function store(StoreLikeRequest $request)
     {
-        // like creation logic here
         $data = $request->validated();
+        $data['user_id'] = Auth::user()->id;
         $like = Like::create($data);
     }
 

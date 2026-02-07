@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AgencyController;
 use App\Http\Controllers\DeviseController;
+use App\Http\Controllers\LikeController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\PropertyTypeController;
@@ -49,3 +50,6 @@ Route::get('devises', [DeviseController::class, 'index']);
 
 Route::post('propertytype/new', [PropertyTypeController::class, 'store']);
 Route::get('propertytype', [PropertyTypeController::class, 'index']);
+
+
+Route::post('like/new', [LikeController::class, 'store']);

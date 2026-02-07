@@ -22,12 +22,12 @@ class PostController extends Controller
     }
 
 
-    // public function agencyPosts(Agency $agency)
-    // {
-    //     if(Auth::user()->id == $agency->user_id){
-    //         return PostResource::collection(Post::where('agency_id', $agency->id)->get());
-    //     }  
-    // }
+    public function agencyPosts(Agency $agency)
+    {
+        if(Auth::user()->id == $agency->user_id){
+            return PostResource::collection(Post::where('agency_id', $agency->id)->get());
+        }  
+    }
 
     
     /**
