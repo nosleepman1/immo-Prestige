@@ -50,6 +50,7 @@ Route::apiResource('posts', PostController::class)->middleware('auth:sanctum');
 Route::group(['prefix' => 'posts'], function () {
     Route::get('/{post}/comments', [CommentController::class, 'postComments']);
     Route::post('/{post}/like', [LikeController::class, 'store'])->middleware('auth:sanctum');
+    Route::post('/{post}/comment', [CommentController::class, 'store'])->middleware('auth:sanctum');
     Route::get('/{post}/likes', [LikeController::class, 'postLikes']);
     Route::get('/{post}/likes', [LikeController::class, 'postLikes']);  
 });

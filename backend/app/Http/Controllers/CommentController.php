@@ -20,7 +20,15 @@ class CommentController extends Controller
     }
 
     public function postComments(Post $post){
-        return CommentResource::collection(Comment::where('post_id', $post->id));
+        $comments = Comment::where('post_id', $post->id)->get();
+
+        if($comments->isEmpty()){
+            return response()->json(
+                [
+                    'message' => 'No comments found for this post'
+                ], 404);
+        }
+        return CommentResource::collection($comments);
     }
 
     /**
