@@ -4,6 +4,7 @@ use App\Http\Controllers\AgencyController;
 use App\Http\Controllers\DeviseController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\PropertyController;
+use App\Http\Controllers\PropertyTypeController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -45,3 +46,6 @@ Route::group(['prefix' => 'properties'], function () {
 
 Route::post('devise/new', [DeviseController::class, 'store']);
 Route::get('devises', [DeviseController::class, 'index']);
+
+Route::post('propertytype/new', [PropertyTypeController::class, 'store']);
+Route::get('propertytype', [PropertyTypeController::class, 'index']);

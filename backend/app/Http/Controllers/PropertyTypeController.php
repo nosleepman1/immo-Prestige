@@ -6,6 +6,7 @@ use App\Models\PropertyType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePropertyTypeRequest;
 use App\Http\Requests\UpdatePropertyTypeRequest;
+use App\Http\Resources\PropertyTypeResource;
 
 class PropertyTypeController extends Controller
 {
@@ -14,8 +15,7 @@ class PropertyTypeController extends Controller
      */
     public function index()
     {
-        // property types listing logic here
-        return response()->json(PropertyType::all());
+        return PropertyTypeResource::collection(PropertyType::all());
     }
 
     /**
