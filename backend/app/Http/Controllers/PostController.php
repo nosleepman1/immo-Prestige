@@ -60,14 +60,7 @@ class PostController extends Controller
         return new PostResource($post);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdatePostRequest $request, Post $post)
-    {
-        $post->update($request->validated());
-        return new PostResource($post);
-    }
+
 
     /**
      * Remove the specified resource from storage.

@@ -28,22 +28,12 @@ class CommentController extends Controller
      */
     public function store(StoreCommentRequest $request)
     {
-        /** 
-         * @var \App\Models\User $user 
-         * */
-
-        
-        $user = Auth::user();
+  
         $data = $request->validated();
-        $data['user_id'] = $user->id;
-        $data['post_id'] = $request->post_id;
+        $data['user_id'] = Auth::user()->id;
         $comment = Comment::create($data);
 
-        return response()->json(
-            [
-                ['message' => 'Comment created successfully'],
-                'data' => $comment
-            ], 201);
+        return new CommentResource($comment);
     }
         
 
@@ -75,6 +65,10 @@ class CommentController extends Controller
      */
     public function destroy(Comment $comment)
     {
-        //
+        $comment->delete();
+        return response()->json(
+            [
+                ['message' => 'Comment deleted successfully']
+            ], 200);
     }
 }

@@ -6,6 +6,7 @@ use App\Models\Like;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreLikeRequest;
 use App\Http\Requests\UpdateLikeRequest;
+use App\Models\Post;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
 
@@ -18,7 +19,11 @@ class LikeController extends Controller
     {
         // retur count of likes for a specific post or post
         return response()->json(Like::all());
-        
+    }
+
+    public function postLikes( Post $post)
+    {
+        return response()->json(Like::where('post_id', $post->id)->count());
 
     }
 
