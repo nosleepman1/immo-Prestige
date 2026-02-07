@@ -40,7 +40,7 @@ class DeviseController extends Controller
      */
     public function update(UpdateDeviseRequest $request, Devise $devise)
     {
-        //
+        
     }
 
     /**
