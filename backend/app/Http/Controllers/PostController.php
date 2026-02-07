@@ -22,12 +22,12 @@ class PostController extends Controller
     }
 
 
-    public function agencyPosts(Agency $agency)
-    {
-        if(Auth::user()->id == $agency->user_id){
-            return PostResource::collection(Post::where('agency_id', $agency->id)->get());
-        }  
-    }
+    // public function agencyPosts(Agency $agency)
+    // {
+    //     if(Auth::user()->id == $agency->user_id){
+    //         return PostResource::collection(Post::where('agency_id', $agency->id)->get());
+    //     }  
+    // }
 
     
     /**
@@ -35,8 +35,21 @@ class PostController extends Controller
      */
     public function store(StorePostRequest $request)
     {
-        $post = Post::create($request->validated());
+        if(Auth::user()->role !== 'agency'){
+             return response()->json(
+                [
+                    'error' => 'unAuthorize'
+                ],
+                403
+             );
+        }
+
+        $data = $request->validated();
+        $data['user_id'] = Auth::user()->id;
+        
+        $post = Post::create($data);
         return new PostResource($post);
+       
     }
 
     /**

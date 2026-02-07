@@ -22,11 +22,9 @@ class StorePostRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'required|string|max:255',
-            'content' => 'required|string',
             'property_id' => 'required|exists:properties,id',
-            'user_id' => 'required|exists:users,id',
-            'agency_id' => 'required|exists:agencies,id',
+            //'user_id' => 'required|exists:users,id',
+
             
         ];
     }
