@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AgencyController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\DeviseController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\PostController;
@@ -15,7 +16,7 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 
-Route::apiResource('posts', PostController::class)->middleware('auth:sanctum');
+
 
 
 Route::group(['prefix' => 'agency'], function () {
@@ -44,6 +45,14 @@ Route::group(['prefix' => 'properties'], function () {
     Route::delete('/{property}', [PropertyController::class, 'destroy'])->middleware('auth:sanctum');
 });
 
+Route::apiResource('posts', PostController::class)->middleware('auth:sanctum');
+
+Route::group(['prefix' => 'posts'], function () {
+    Route::get('/{post}/comments', [CommentController::class, 'postComments']);
+    Route::post('/{post}/like', [LikeController::class, 'store'])->middleware('auth:sanctum');
+    Route::get('/{post}/likes', [LikeController::class, 'postLikes']);
+    Route::get('/{post}/likes', [LikeController::class, 'postLikes']);  
+});
 
 Route::post('devise/new', [DeviseController::class, 'store']);
 Route::get('devises', [DeviseController::class, 'index']);
