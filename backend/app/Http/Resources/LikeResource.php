@@ -25,7 +25,7 @@ class LikeResource extends JsonResource
                     'name' => $this->user->name
                 ];
             }),
-            'likes_count' => $this->whenCounted('likes')
+            'likes_count' => $this->post()->count()
         ];
     }
 }

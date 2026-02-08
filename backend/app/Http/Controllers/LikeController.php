@@ -25,8 +25,22 @@ class LikeController extends Controller
     public function postLikes( Post $post)
     {
         $likes = Like::where('post_id', $post->id)
-            ->with('user:id,name')
-            ->with;
+            ->with(['user:id,name'])
+            ->get();
+        
+        
+        if($likes->isEmpty()){
+            return response()->json(
+                [
+                    'message' => 'No likes found for this post'
+                ], 404);
+        }
+
+        $nomberLikes = $likes->count();
+        return response()->json([
+            'likes_count' => $nomberLikes,
+            'likes' => LikeResource::collection($likes)
+        ]);
     }
 
     /**
