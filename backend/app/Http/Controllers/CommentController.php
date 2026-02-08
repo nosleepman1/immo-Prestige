@@ -59,6 +59,8 @@ class CommentController extends Controller
     public function update(UpdateCommentRequest $request, Comment $comment)
     {
         $data = $request->validated();
+        $data['user_id'] = Auth::user()->id;
+
         $comment->update($data);
 
         return response()->json(
@@ -73,6 +75,14 @@ class CommentController extends Controller
      */
     public function destroy(Comment $comment)
     {
+
+       if($comment->user_id !== Auth::user()->id){
+            return response()->json(
+                [
+                    'message' => 'Unauthorized'
+                ], 403);
+        }
+
         $comment->delete();
         return response()->json(
             [

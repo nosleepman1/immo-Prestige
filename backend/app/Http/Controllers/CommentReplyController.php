@@ -6,6 +6,9 @@ use App\Models\CommentReply;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreCommentReplyRequest;
 use App\Http\Requests\UpdateCommentReplyRequest;
+use App\Http\Resources\CommentReplyResource;
+use Dom\Comment;
+use Illuminate\Support\Facades\Auth;
 
 class CommentReplyController extends Controller
 {
@@ -14,8 +17,14 @@ class CommentReplyController extends Controller
      */
     public function index()
     {
-        // commeent replies listing logic here
-        return response()->json(CommentReply::all());
+        $commentReplies = CommentReply::all();
+        if($commentReplies->isEmpty()){
+            return response()->json(
+                [
+                    'message' => 'No comment replies found'
+                ], 404);
+        }
+        return CommentReplyResource::collection($commentReplies);
     }
 
     /**
@@ -23,14 +32,15 @@ class CommentReplyController extends Controller
      */
     public function store(StoreCommentReplyRequest $request)
     {
-        // comment reply creation logic here
+       
         $data = $request->validated();
+        $data['user_id'] = Auth::user()->id;
         $commentReply = CommentReply::create($data);
 
         return response()->json(
             [
                 ['message' => 'Comment reply created successfully'],
-                'data' => $commentReply
+                'data' => new CommentReplyResource($commentReply)
             ], 201);
     }
 
@@ -39,7 +49,7 @@ class CommentReplyController extends Controller
      */
     public function show(CommentReply $commentReply)
     {
-        return response()->json($commentReply);
+        return new CommentReplyResource($commentReply);
     }
 
     /**
@@ -49,12 +59,14 @@ class CommentReplyController extends Controller
     {
         // comment reply update logic here
         $data = $request->validated();
+        $data['user_id'] = Auth::user()->id;
+       
         $commentReply->update($data);
 
         return response()->json(
             [
                 ['message' => 'Comment reply updated successfully'],
-                'data' => $commentReply
+                'data' => new CommentReplyResource($commentReply)
             ], 200);
     }
 
@@ -63,7 +75,6 @@ class CommentReplyController extends Controller
      */
     public function destroy(CommentReply $commentReply)
     {
-        // comment reply deletion logic here
         $commentReply->delete();
 
         return response()->json(

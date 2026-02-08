@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth ;
 
 class StoreCommentReplyRequest extends FormRequest
 {
@@ -11,7 +12,7 @@ class StoreCommentReplyRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return Auth::check(); // Only allow authenticated users to create comment replies
     }
 
     /**
@@ -24,7 +25,7 @@ class StoreCommentReplyRequest extends FormRequest
         return [
             'content' => 'required|string',
             'comment_id' => 'required|exists:comments,id',
-            'user_id' => 'required|exists:users,id',
+            //'user_id' => 'required|exists:users,id',
         ];
     }
 

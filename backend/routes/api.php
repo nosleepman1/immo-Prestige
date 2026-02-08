@@ -48,11 +48,17 @@ Route::group(['prefix' => 'properties'], function () {
 Route::apiResource('posts', PostController::class)->middleware('auth:sanctum');
 
 Route::group(['prefix' => 'posts'], function () {
-    Route::get('/{post}/comments', [CommentController::class, 'postComments']);
+
     Route::post('/{post}/like', [LikeController::class, 'store'])->middleware('auth:sanctum');
-    Route::post('/{post}/comment', [CommentController::class, 'store'])->middleware('auth:sanctum');
     Route::get('/{post}/likes', [LikeController::class, 'postLikes']);
-    Route::get('/{post}/likes', [LikeController::class, 'postLikes']);  
+    Route::delete('/{post}/unlike', [LikeController::class, 'destroy'])->middleware('auth:sanctum');
+
+
+    Route::get('/{post}/comments', [CommentController::class, 'postComments']);
+    Route::post('/{post}/comment', [CommentController::class, 'store'])->middleware('auth:sanctum');
+    Route::update('/{post}/comment/{comment}', [CommentController::class, 'update'])->middleware('auth:sanctum');
+    Route::delete('/{post}/comment/{comment}', [CommentController::class, 'destroy'])->middleware('auth:sanctum');
+     
 });
 
 Route::post('devise/new', [DeviseController::class, 'store']);
