@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Message;
 use App\Http\Requests\StoreMessageRequest;
 use App\Http\Requests\UpdateMessageRequest;
+use Illuminate\Support\Facades\Auth;
 
 class MessageController extends Controller
 {
@@ -13,7 +14,7 @@ class MessageController extends Controller
      */
     public function index()
     {
-        //
+        
     }
 
     /**
@@ -30,7 +31,7 @@ class MessageController extends Controller
     public function store(StoreMessageRequest $request)
     {
         $data = $request->validated();
-        $data['sender_id'] = auth()->id(); // Set the sender_id to the authenticated user's ID
+        $data['sender_id'] = Auth::user()->id; // Set the sender_id to the authenticated user's ID
         $message = Message::create($data);
 
         return response()->json([
