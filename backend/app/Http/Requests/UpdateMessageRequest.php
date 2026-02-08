@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
 class UpdateMessageRequest extends FormRequest
 {
@@ -11,7 +12,7 @@ class UpdateMessageRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return Auth::check();
     }
 
     /**
@@ -22,7 +23,16 @@ class UpdateMessageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'content' => 'required|string|max:10000',
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'content.required' => 'Le contenu du message est requis.',
+            'content.string' => 'Le contenu du message doit être une chaîne de caractères.',
+            'content.max' => 'Le contenu du message ne peut pas dépasser 1000 caractères.',
         ];
     }
 }
