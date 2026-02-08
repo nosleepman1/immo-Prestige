@@ -23,8 +23,9 @@ class LikeController extends Controller
 
     public function postLikes( Post $post)
     {
-        return response()->json(Like::where('post_id', $post->id)->count());
-
+        $likes = Like::where('post_id', $post->id)
+            ->with('user:id,name')
+            ->withCount();
     }
 
     /**

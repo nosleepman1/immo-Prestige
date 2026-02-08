@@ -14,6 +14,18 @@ class LikeResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->id,
+            'post_id' => $this->post_id,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+            'user' => $this->whenLoaded('user', function() {
+                return [
+                    'id' => $this->user->id,
+                    'name' => $this->user->name
+                ];
+            }),
+            'likes_count' => $this->whenCounted('likes')
+        ];
     }
 }
