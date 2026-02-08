@@ -6,6 +6,7 @@ use App\Models\Like;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreLikeRequest;
 use App\Http\Requests\UpdateLikeRequest;
+use App\Http\Resources\LikeResource;
 use App\Models\Post;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
@@ -25,17 +26,21 @@ class LikeController extends Controller
     {
         $likes = Like::where('post_id', $post->id)
             ->with('user:id,name')
-            ->withCount();
+            ->with;
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreLikeRequest $request)
+
+    public function store(StoreLikeRequest $request, Post $post)
     {
         $data = $request->validated();
         $data['user_id'] = Auth::user()->id;
+        $data['post_id'] = $post->id;
         $like = Like::create($data);
+
+        return new LikeResource($like);
     }
 
     /**
