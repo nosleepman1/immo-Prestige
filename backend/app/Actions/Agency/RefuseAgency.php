@@ -1,0 +1,32 @@
+<?php
+
+namespace App\Actions\Agency;
+
+use App\Enums\AgencyStatus;
+use App\Exceptions\AgencyAlreadyReviewedException;
+use App\Models\Agency;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
+
+class RefuseAgency
+{
+    public function handle(Agency $agency, User $admin, string $reason): Agency
+    {
+        return DB::transaction(function () use ($agency, $admin, $reason) {
+            $locked = Agency::whereKey($agency->getKey())->lockForUpdate()->first();
+
+            if ($locked->isReviewed()) {
+                throw new AgencyAlreadyReviewedException();
+            }
+
+            $locked->update([
+                'status' => AgencyStatus::Refused,
+                'refusal_reason' => $reason,
+                'reviewed_by' => $admin->id,
+                'reviewed_at' => now(),
+            ]);
+
+            return $locked;
+        });
+    }
+}
