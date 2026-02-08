@@ -14,6 +14,24 @@ class MessageResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->id,
+            'receiver_id' => $this->receiver_id,
+            'content' => $this->content,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+            'sender' => $this->whenLoaded('sender', function() {
+                return [
+                    'id' => $this->sender->id,
+                    'name' => $this->sender->name
+                ];
+            }),
+            'receiver' => $this->whenLoaded('receiver', function() {
+                return [
+                    'id' => $this->receiver->id,
+                    'name' => $this->receiver->name
+                ];
+            })
+        ];
     }
 }
