@@ -20,7 +20,11 @@ class CommentController extends Controller
     }
 
     public function postComments(Post $post){
-        $comments = Comment::where('post_id', $post->id)->get();
+        $comments = Comment::where('post_id', $post->id)
+            ->with([ 'user:id,name'])
+            ->with(['replies.user:id,name'])
+            ->withCount('replies')
+            ->get();
 
         if($comments->isEmpty()){
             return response()->json(

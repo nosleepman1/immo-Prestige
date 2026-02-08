@@ -7,7 +7,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreCommentReplyRequest;
 use App\Http\Requests\UpdateCommentReplyRequest;
 use App\Http\Resources\CommentReplyResource;
-use Dom\Comment;
+use App\Models\Post;
+use App\Models\Comment;
 use Illuminate\Support\Facades\Auth;
 
 class CommentReplyController extends Controller
@@ -15,31 +16,27 @@ class CommentReplyController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Post $post)
     {
-        $commentReplies = CommentReply::all();
-        if($commentReplies->isEmpty()){
-            return response()->json(
-                [
-                    'message' => 'No comment replies found'
-                ], 404);
-        }
-        return CommentReplyResource::collection($commentReplies);
+        $commentReplies = CommentReply::where('post_id', $post->id)
+            ->with(['user:id,name'])
+            ->get();
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreCommentReplyRequest $request)
+    public function store(StoreCommentReplyRequest $request, Comment $comment)
     {
        
         $data = $request->validated();
         $data['user_id'] = Auth::user()->id;
+        $data['comment_id'] = $comment->id;
         $commentReply = CommentReply::create($data);
 
         return response()->json(
             [
-                ['message' => 'Comment reply created successfully'],
+                'message' => 'Comment reply created successfully',
                 'data' => new CommentReplyResource($commentReply)
             ], 201);
     }

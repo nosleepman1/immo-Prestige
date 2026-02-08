@@ -24,7 +24,7 @@ class StoreCommentReplyRequest extends FormRequest
     {
         return [
             'content' => 'required|string',
-            'comment_id' => 'required|exists:comments,id',
+            //'comment_id' => 'required|exists:comments,id',
             //'user_id' => 'required|exists:users,id',
         ];
     }

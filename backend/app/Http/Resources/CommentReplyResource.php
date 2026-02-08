@@ -20,8 +20,12 @@ class CommentReplyResource extends JsonResource
             'content' => $this->content,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'comment' => $this->comment()->get(),
-            'user' => $this->user()->get()
+            'user' => $this->whenLoaded('user', function() {
+                return [
+                    'id' => $this->user->id,
+                    'name' => $this->user->name,
+                ];
+            })
         ];
     }
 }

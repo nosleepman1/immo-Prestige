@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AgencyController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\CommentReplyController;
 use App\Http\Controllers\DeviseController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\PostController;
@@ -56,9 +57,19 @@ Route::group(['prefix' => 'posts'], function () {
 
     Route::get('/{post}/comments', [CommentController::class, 'postComments']);
     Route::post('/{post}/comment', [CommentController::class, 'store'])->middleware('auth:sanctum');
-    Route::update('/{post}/comment/{comment}', [CommentController::class, 'update'])->middleware('auth:sanctum');
+    Route::put('/{post}/comment/{comment}', [CommentController::class, 'update'])->middleware('auth:sanctum');
     Route::delete('/{post}/comment/{comment}', [CommentController::class, 'destroy'])->middleware('auth:sanctum');
      
+});
+
+Route::prefix('comments')->group(function () {
+    Route::get('/my', [CommentController::class, 'myComments'])->middleware('auth:sanctum');
+    Route::get('/{comment}', [CommentController::class, 'show']);
+    Route::post('/{comment}/reply', [CommentReplyController::class, 'store'])->middleware('auth:sanctum');
+    Route::put('/reply/{commentReply}', [CommentReplyController::class, 'update'])->middleware('auth:sanctum');
+    Route::delete('/reply/{commentReply}', [CommentReplyController::class, 'destroy'])->middleware('auth:sanctum');
+    Route::get('/reply/{commentReply}', [CommentReplyController::class, 'show']);
+    Route::get('/{comment}/replies', [CommentReplyController::class, 'index']);
 });
 
 Route::post('devise/new', [DeviseController::class, 'store']);
