@@ -21,7 +21,7 @@ class MessageController extends Controller
      */
     public function create()
     {
-        //
+        
     }
 
     /**
@@ -29,7 +29,14 @@ class MessageController extends Controller
      */
     public function store(StoreMessageRequest $request)
     {
-        //
+        $data = $request->validated();
+        $data['sender_id'] = auth()->id(); // Set the sender_id to the authenticated user's ID
+        $message = Message::create($data);
+
+        return response()->json([
+            'message' => 'Message sent successfully',
+            'data' => $message
+        ], 201);
     }
 
     /**
