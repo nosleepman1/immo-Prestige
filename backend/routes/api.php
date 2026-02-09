@@ -17,6 +17,24 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 
+Route::group(['prefix' => 'users'], function () {
+        Route::get('/', [UserController::class, 'index']);
+        Route::get('/{user}', [UserController::class, 'show']);
+        Route::post('/register', [UserController::class, 'store']);
+        Route::post('/login', [UserController::class, 'login']);
+        Route::put('/{user}', [UserController::class, 'update'])->middleware('auth:sanctum');
+        Route::delete('/{user}', [UserController::class, 'destroy'])->middleware('auth:sanctum');
+        Route::post('/logout', [UserController::class, 'logout'])->middleware('auth:sanctum');
+    });
+
+Route::get('/email/verify/{id}/{hash}', [UserController::class, 'verify'])
+    ->middleware(['signed'])
+    ->name('verification.verify');
+
+Route::post('/email/verification-notification', [UserController::class, 'resend'])
+    ->middleware(['auth:sanctum', 'throttle:6,1'])
+    ->name('verification.send');
+
 
 
 
@@ -30,15 +48,6 @@ Route::group(['prefix' => 'agency'], function () {
 
 
 
-Route::group(['prefix' => 'users'], function () {
-    Route::get('/', [UserController::class, 'index']);
-    Route::get('/{user}', [UserController::class, 'show']);
-    Route::post('/register', [UserController::class, 'store']);
-    Route::post('/login', [UserController::class, 'login']);
-    Route::put('/{user}', [UserController::class, 'update'])->middleware('auth:sanctum');
-    Route::delete('/{user}', [UserController::class, 'destroy'])->middleware('auth:sanctum');
-    Route::post('/logout', [UserController::class, 'logout'])->middleware('auth:sanctum');
-});
 
 
 Route::group(['prefix' => 'properties'], function () {

@@ -11,6 +11,7 @@ use App\Http\Resources\UserResource;
 use App\Mail\WelcomeMail;
 use App\Models\Agency;
 use App\Models\User;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -39,9 +40,38 @@ class UserController extends Controller
 
         $user->sendEmailVerificationNotification();
 
+
         return response()->json([
             'message'=> 'inscription reussie, un mail d activation vous a ete envoyé',
             'user' => new UserResource($user)
+        ],200);
+    }
+
+    public function verify(Request $request, $id, $hash)
+    {
+        $user = User::findOrFail($id);
+
+        if (!hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
+            return response()->json(['message' => 'Hash invalide'], 400);
+        }
+
+        if ($user->hasVerifiedEmail()) {
+            return response()->json(['message' => 'Email déjà vérifié'], 200);
+        }
+
+        $user->markEmailAsVerified();
+
+        return response()->json([
+            'message'=> 'email verifié avec succes'
+        ],200);
+    }
+
+    public function resend(Request $request)
+    {
+        $request->user()->sendEmailVerificationNotification();
+
+        return response()->json([
+            'message'=> 'un nouveau mail d activation vous a ete envoyé'
         ],200);
     }
 
