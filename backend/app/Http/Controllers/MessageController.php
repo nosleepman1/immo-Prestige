@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Message;
 use App\Http\Requests\StoreMessageRequest;
 use App\Http\Requests\UpdateMessageRequest;
+use App\Http\Resources\MessageResource;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
 class MessageController extends Controller
@@ -15,6 +17,26 @@ class MessageController extends Controller
     public function index()
     {
         
+    }
+
+    public function Myconversation(User $user){
+
+        $authUser = Auth::id();
+        $reciever = $user->id;
+
+        $message = Message::where(function($query) use ($authUser, $reciever){
+            $query->where("sender_id", $authUser)
+                  ->where("reciever_id", $reciever);
+           
+                })->orWhere(function($query) use ($authUser, $reciever){
+                $query->where("sender_id", $authUser)
+                ->where("reciever_id", $reciever);
+
+            })
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        return MessageResource::collection($message);
     }
 
     /**
@@ -31,12 +53,14 @@ class MessageController extends Controller
     public function store(StoreMessageRequest $request)
     {
         $data = $request->validated();
+
         $data['sender_id'] = Auth::user()->id; // Set the sender_id to the authenticated user's ID
+        
         $message = Message::create($data);
 
         return response()->json([
             'message' => 'Message sent successfully',
-            'data' => $message
+            'data' => new MessageResource($message)
         ], 201);
     }
 
@@ -53,7 +77,7 @@ class MessageController extends Controller
      */
     public function edit(Message $message)
     {
-        //
+        
     }
 
     /**
@@ -61,7 +85,14 @@ class MessageController extends Controller
      */
     public function update(UpdateMessageRequest $request, Message $message)
     {
-        //
+        $message = $request->validated();
+        $message['sender_id'] = Auth::user()->id; // Ensure the sender_id is set to the authenticated user's ID
+        
+        $message->update($message);
+        return response()->json([
+            'message' => 'Message updated successfully',
+            'data' => new MessageResource($message)
+        ], 200);
     }
 
     /**
