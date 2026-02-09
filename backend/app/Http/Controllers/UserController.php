@@ -60,9 +60,13 @@ class UserController extends Controller
         }
 
         $user->markEmailAsVerified();
-
+        
+        Mail::to($user->getEmailForVerification())->send(new WelcomeMail($user->name, $user->email));
+        
         return response()->json([
-            'message'=> 'email verifié avec succes'
+            'message'=> 'email verifié avec succes',
+            'user'=> new UserResource($user)
+            
         ],200);
     }
 
