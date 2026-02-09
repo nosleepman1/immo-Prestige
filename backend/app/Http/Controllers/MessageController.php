@@ -26,25 +26,17 @@ class MessageController extends Controller
 
         $message = Message::where(function($query) use ($authUser, $reciever){
             $query->where("sender_id", $authUser)
-                  ->where("reciever_id", $reciever);
+                  ->where("receiver", $reciever);
            
                 })->orWhere(function($query) use ($authUser, $reciever){
                 $query->where("sender_id", $authUser)
-                ->where("reciever_id", $reciever);
+                ->where("receiver_id", $reciever);
 
             })
             ->orderBy('created_at', 'asc')
             ->get();
 
         return MessageResource::collection($message);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        
     }
 
     /**
