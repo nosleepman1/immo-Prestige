@@ -41,8 +41,6 @@ Route::group(['prefix' => 'users'], function () {
 });
 
 
-
-
 Route::group(['prefix' => 'properties'], function () {
     Route::get('/', [PropertyController::class, 'index']);
     Route::post('/store', [PropertyController::class, 'store'])->middleware('auth:sanctum');
