@@ -19,7 +19,7 @@ class MessageController extends Controller
         
     }
 
-    public function Myconversation(User $user){
+    public function MyConversation(User $user){
 
         $authUser = Auth::id();
         $reciever = $user->id;

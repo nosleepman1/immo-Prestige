@@ -27,6 +27,9 @@ Route::group(['prefix' => 'agency'], function () {
     Route::put('/{agency}', [AgencyController::class, 'update']);
 });
 
+
+
+
 Route::group(['prefix' => 'users'], function () {
     Route::get('/', [UserController::class, 'index']);
     Route::get('/{user}', [UserController::class, 'show']);
@@ -38,6 +41,8 @@ Route::group(['prefix' => 'users'], function () {
 });
 
 
+
+
 Route::group(['prefix' => 'properties'], function () {
     Route::get('/', [PropertyController::class, 'index']);
     Route::post('/store', [PropertyController::class, 'store'])->middleware('auth:sanctum');
@@ -46,7 +51,24 @@ Route::group(['prefix' => 'properties'], function () {
     Route::delete('/{property}', [PropertyController::class, 'destroy'])->middleware('auth:sanctum');
 });
 
+
+
+
+Route::group(['prefix'=> 'messages'], function () {
+    Route::get('/', [PropertyController::class,'index'])->middleware('auth-sanctum');
+    Route::get('/conversation/{user}', [PropertyController::class,'MyConversation'])->middleware('auth-sanctum');
+    Route::post('/new', [PropertyController::class,'store'])->middleware('auth-sanctum');
+    Route::put('/set{message}', [PropertyController::class,'update'])->middleware('auth-sanctum');
+    Route::delete('', [PropertyController::class,'destroy'])->middleware('');
+});
+
+
+
+
 Route::apiResource('posts', PostController::class)->middleware('auth:sanctum');
+
+
+
 
 Route::group(['prefix' => 'posts'], function () {
 
@@ -62,6 +84,9 @@ Route::group(['prefix' => 'posts'], function () {
      
 });
 
+
+
+
 Route::prefix('comments')->group(function () {
     Route::get('/my', [CommentController::class, 'myComments'])->middleware('auth:sanctum');
     Route::get('/{comment}', [CommentController::class, 'show']);
@@ -72,9 +97,11 @@ Route::prefix('comments')->group(function () {
     Route::get('/{comment}/replies', [CommentReplyController::class, 'index']);
 });
 
+
+
+
 Route::post('devise/new', [DeviseController::class, 'store']);
 Route::get('devises', [DeviseController::class, 'index']);
-
 Route::post('propertytype/new', [PropertyTypeController::class, 'store']);
 Route::get('propertytype', [PropertyTypeController::class, 'index']);
 
