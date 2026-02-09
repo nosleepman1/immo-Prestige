@@ -8,11 +8,13 @@ use App\Http\Requests\StoreLoginRequest;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Resources\AgencyResource;
 use App\Http\Resources\UserResource;
+use App\Mail\WelcomeMail;
 use App\Models\Agency;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class UserController extends Controller
 {
@@ -34,6 +36,7 @@ class UserController extends Controller
         $data['password'] = bcrypt($data['password']);
     
         $user = User::create($data);
+        Mail::to($user->email)->send(new WelcomeMail($user->name,env('MAIL_FROM_ADDRESS')));
 
         return new UserResource($user);
     }
