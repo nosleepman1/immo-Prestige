@@ -36,9 +36,13 @@ class UserController extends Controller
         $data['password'] = bcrypt($data['password']);
     
         $user = User::create($data);
-        Mail::to($user->email)->send(new WelcomeMail($user->name,env('MAIL_FROM_ADDRESS')));
 
-        return new UserResource($user);
+        $user->sendEmailVerificationNotification();
+
+        return response()->json([
+            'message'=> 'inscription reussie, un mail d activation vous a ete envoyé',
+            'user' => new UserResource($user)
+        ],200);
     }
 
    
