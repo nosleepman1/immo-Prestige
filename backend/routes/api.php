@@ -55,45 +55,91 @@ Route::group(['prefix' => 'properties'], function () {
 
 
 Route::group(['prefix'=> 'messages'], function () {
-    Route::get('/', [PropertyController::class,'index'])->middleware('auth-sanctum');
-    Route::get('/conversation/{user}', [PropertyController::class,'MyConversation'])->middleware('auth-sanctum');
-    Route::post('/new', [PropertyController::class,'store'])->middleware('auth-sanctum');
-    Route::put('/set{message}', [PropertyController::class,'update'])->middleware('auth-sanctum');
-    Route::delete('', [PropertyController::class,'destroy'])->middleware('');
+    Route::get('/', [PropertyController::class,'index'])
+            ->middleware('auth-sanctum');
+    
+
+    Route::get('/conversation/{user}', [PropertyController::class,'MyConversation'])
+            ->middleware('auth-sanctum');
+    
+
+    Route::post('/new', [PropertyController::class,'store'])
+            ->middleware('auth-sanctum');
+    
+
+    Route::put('/set{message}', [PropertyController::class,'update'])
+            ->middleware('auth-sanctum');
+    
+
+    Route::delete('', [PropertyController::class,'destroy'])
+            ->middleware('');
 });
 
 
 
 
-Route::apiResource('posts', PostController::class)->middleware('auth:sanctum');
+Route::apiResource('posts', PostController::class)
+        ->middleware('auth:sanctum');
 
 
 
 
 Route::group(['prefix' => 'posts'], function () {
 
-    Route::post('/{post}/like', [LikeController::class, 'store'])->middleware('auth:sanctum');
+    Route::post('/{post}/like', [LikeController::class, 'store'])
+            ->middleware('auth:sanctum');
+
+            
     Route::get('/{post}/likes', [LikeController::class, 'postLikes']);
-    Route::delete('/{post}/unlike', [LikeController::class, 'destroy'])->middleware('auth:sanctum');
+
+
+    Route::delete('/{post}/unlike', [LikeController::class, 'destroy'])
+            ->middleware('auth:sanctum');
 
 
     Route::get('/{post}/comments', [CommentController::class, 'postComments']);
-    Route::post('/{post}/comment', [CommentController::class, 'store'])->middleware('auth:sanctum');
-    Route::put('/{post}/comment/{comment}', [CommentController::class, 'update'])->middleware('auth:sanctum');
-    Route::delete('/{post}/comment/{comment}', [CommentController::class, 'destroy'])->middleware('auth:sanctum');
-     
+
+
+    Route::post('/{post}/comment', [CommentController::class, 'store'])
+            ->middleware('auth:sanctum');
+
+
+    Route::put('/{post}/comment/{comment}', [CommentController::class, 'update'])
+            ->middleware('auth:sanctum');
+
+
+    Route::delete('/{post}/comment/{comment}', [CommentController::class, 'destroy'])
+            ->middleware('auth:sanctum');  
 });
 
 
 
 
 Route::prefix('comments')->group(function () {
-    Route::get('/my', [CommentController::class, 'myComments'])->middleware('auth:sanctum');
+    
+
+    Route::get('/my', [CommentController::class, 'myComments'])
+            ->middleware('auth:sanctum');
+
+
     Route::get('/{comment}', [CommentController::class, 'show']);
-    Route::post('/{comment}/reply', [CommentReplyController::class, 'store'])->middleware('auth:sanctum');
-    Route::put('/reply/{commentReply}', [CommentReplyController::class, 'update'])->middleware('auth:sanctum');
-    Route::delete('/reply/{commentReply}', [CommentReplyController::class, 'destroy'])->middleware('auth:sanctum');
+
+
+    Route::post('/{comment}/reply', [CommentReplyController::class, 'store'])
+            ->middleware('auth:sanctum');
+
+
+    Route::put('/reply/{commentReply}', [CommentReplyController::class, 'update'])
+            ->middleware('auth:sanctum');
+
+
+    Route::delete('/reply/{commentReply}', [CommentReplyController::class, 'destroy'])
+            ->middleware('auth:sanctum');
+
+
     Route::get('/reply/{commentReply}', [CommentReplyController::class, 'show']);
+
+
     Route::get('/{comment}/replies', [CommentReplyController::class, 'index']);
 });
 
@@ -104,6 +150,3 @@ Route::post('devise/new', [DeviseController::class, 'store']);
 Route::get('devises', [DeviseController::class, 'index']);
 Route::post('propertytype/new', [PropertyTypeController::class, 'store']);
 Route::get('propertytype', [PropertyTypeController::class, 'index']);
-
-
-Route::post('like/new', [LikeController::class, 'store']);
