@@ -27,6 +27,8 @@ Route::group(['prefix' => 'users'], function () {
         Route::post('/logout', [UserController::class, 'logout'])->middleware(['auth:sanctum', 'verified']);
     });
 
+    Route::get('/verify/{id}/{hash}', [UserController::class,'verify'])->name('verification.verify');
+
 
 
 Route::group(['prefix' => 'agency'], function () {

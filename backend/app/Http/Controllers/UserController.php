@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\RegisterUser;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreLoginRequest;
 use App\Http\Requests\StoreUserRequest;
@@ -33,7 +34,7 @@ class UserController extends Controller
     
         $user = User::create($data);
 
-        $user->sendEmailVerificationNotification();
+        event(new RegisterUser( $user ));
 
 
         return response()->json([
