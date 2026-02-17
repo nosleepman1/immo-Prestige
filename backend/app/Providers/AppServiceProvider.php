@@ -2,11 +2,15 @@
 
 namespace App\Providers;
 
+use App\Events\RegisterUser;
+use App\Listeners\RegisterUserListener;
 use App\Models\Agency;
 use App\Policies\AgencyPolicy;
-use Illuminate\Auth\Access\Gate;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate as FacadesGate;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Gate;
+
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -15,7 +19,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        
     }
 
     /**
@@ -23,6 +26,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        FacadesGate::policy(Agency::class, AgencyPolicy::class);
+        Event::listen(
+            RegisterUser::class,
+            RegisterUserListener::class
+        );
     }
 }
