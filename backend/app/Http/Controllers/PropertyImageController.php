@@ -6,6 +6,7 @@ use App\Models\PropertyImage;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePropertyImageRequest;
 use App\Http\Requests\UpdatePropertyImageRequest;
+use App\Http\Resources\PropertyImagesResource;
 use App\Models\Property;
 
 class PropertyImageController extends Controller
@@ -15,8 +16,13 @@ class PropertyImageController extends Controller
      */
     public function index()
     {
-        // property images listing logic here
-        return response()->json(PropertyImage::all());
+        
+    }
+
+
+    public function showPropertyImage(Property $property){
+        
+        return PropertyImagesResource::collection($property->images);
     }
 
     /**
@@ -25,6 +31,7 @@ class PropertyImageController extends Controller
     public function store(StorePropertyImageRequest $request)
     {
         $property = Property::find($request->property_id);
+
         if (!$property) {
             return response()->json(['message' => 'Property not found'], 404);
         }
