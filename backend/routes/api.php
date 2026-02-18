@@ -7,6 +7,7 @@ use App\Http\Controllers\DeviseController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\PropertyController;
+use App\Http\Controllers\PropertyImageController;
 use App\Http\Controllers\PropertyTypeController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
@@ -27,7 +28,7 @@ Route::group(['prefix' => 'users'], function () {
         Route::post('/logout', [UserController::class, 'logout'])->middleware(['auth:sanctum', 'verified']);
     });
 
-    Route::get('/verify/{id}/{hash}', [UserController::class,'verify'])->name('verification.verify');
+Route::get('/verify/{id}/{hash}', [UserController::class,'verify'])->name('verification.verify');
 
 
 
@@ -45,10 +46,11 @@ Route::group(['prefix' => 'properties'], function () {
     Route::get('/{property}', [PropertyController::class, 'show'])->middleware(['auth:sanctum', 'verified']);
     Route::put('/{property}', [PropertyController::class, 'update'])->middleware(['auth:sanctum', 'verified']);
     Route::delete('/{property}', [PropertyController::class, 'destroy'])->middleware(['auth:sanctum', 'verified']);
-Route::group(['prefix'=> 'messages'], function () {
-    Route::get('/', [PropertyController::class,'index'])
-            ->middleware(['auth:sanctum', 'verified']);
-    
+    Route::group(['prefix'=> 'messages'], function () {
+    Route::get('/', [PropertyController::class,'index'])->middleware(['auth:sanctum', 'verified']);
+    Route::post('/image/{property}', [PropertyImageController::class,'store'])->middleware(['auth-sanctum','verified']);
+    Route::post('/images/{property}', [PropertyImageController::class, 'showPropertyImage'])->middleware(['auth-sanctum', 'verified']);
+    });
 
     Route::get('/conversation/{user}', [PropertyController::class,'MyConversation'])
             ->middleware(['auth:sanctum', 'verified']);
@@ -172,5 +174,4 @@ Route::group(['prefix' => 'propertytypes'], function () {
    
             Route::delete('{propertytype}', [PropertyTypeController::class, 'destroy'])
             ->middleware(['auth:sanctum', 'verified']);
-});
 });

@@ -28,9 +28,9 @@ class PropertyImageController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StorePropertyImageRequest $request)
+    public function store(StorePropertyImageRequest $request, Property $property)
     {
-        $property = Property::find($request->property_id);
+        // $property = Property::find($request->property_id);
 
         if (!$property) {
             return response()->json(['message' => 'Property not found'], 404);
@@ -42,9 +42,8 @@ class PropertyImageController extends Controller
                 $imagePath = $imageFile->store('property_images', 'public');
 
                 PropertyImage::create([
-                    'property_id' => $request->property_id,
-                    'image_path' => $imagePath,
-                    'is_cover' => $request->is_cover,
+                    'property_id' =>$property->id,
+                    'image_path' => $imagePath
                 ]);
             }
         }
@@ -54,7 +53,6 @@ class PropertyImageController extends Controller
                 'data' => PropertyImage::where('property_id', $request->property_id)->get()
             ], 201);
     }
-
     /**
      * Display the specified resource.
      */
