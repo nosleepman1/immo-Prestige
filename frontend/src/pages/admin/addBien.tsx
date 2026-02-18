@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import  { useState } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Building2, MapPin, DollarSign, Home, Bed, Maximize, Layers, Upload, X, Check } from 'lucide-react';
+import { Building2, MapPin, Home, Maximize, Layers, Upload, X, Check } from 'lucide-react';
 
 function PropertyForm() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -55,7 +55,8 @@ function PropertyForm() {
   //usefect API call 
 
 
-  const handleChange = (e) => {
+  const handleChange = (e : any) => {
+    e.preventDefault()
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -63,12 +64,12 @@ function PropertyForm() {
     }));
   };
 
-  const handleImageChange = (e) => {
+  const handleImageChange = (e : any|null) => {
     const files = Array.from(e.target.files);
     setImages(prev => [...prev, ...files]);
   };
 
-  const removeImage = (index) => {
+  const removeImage = (index : number) => {
     setImages(prev => prev.filter((_, i) => i !== index));
   };
 
@@ -79,7 +80,7 @@ function PropertyForm() {
     
 
     Object.keys(formData).forEach(key => {
-      submitData.append(key, formData[key]);
+      submitData.append(key, formData[key] );
     });
     
     // Ajouter les images
@@ -136,7 +137,7 @@ function PropertyForm() {
 
           {/* Steps */}
           <div className="grid grid-cols-4 gap-4">
-            {steps.map((step, index) => {
+            {steps.map((step) => {
               const Icon = step.icon;
               return (
                 <div key={step.id} className="flex items-center gap-3">

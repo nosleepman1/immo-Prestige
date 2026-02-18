@@ -13,8 +13,26 @@ export default function AuthComponent() {
     password: ''
   });
 
+  const RegisterUserFetchApi = async () => {
+    const url = "127.0.0.1:8000";
+
+    const res = await fetch(url, {
+      method: 'post',
+      headers: {
+      },
+    })
+
+    if(!res.ok) throw new Error
+
+    const data = await res.json()
+
+    console.log(data)
+  }
+
+
+
   const handleSubmit = () => {
-    console.log('Form submitted:', formData);
+      RegisterUserFetchApi()
   };
 
   const handleGoogleAuth = () => {
