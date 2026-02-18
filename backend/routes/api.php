@@ -40,33 +40,35 @@ Route::group(['prefix' => 'agency'], function () {
     Route::delete('/{agency}', [AgencyController::class, 'destroy'])->middleware(['auth:sanctum', 'verified']);
 });
 
+Route::apiResource('properties', PropertyController::class);
+
 Route::group(['prefix' => 'properties'], function () {
     Route::get('/', [PropertyController::class, 'index'])->middleware(['auth:sanctum', 'verified']);
     Route::post('/store', [PropertyController::class, 'store'])->middleware(['auth:sanctum', 'verified']);
     Route::get('/{property}', [PropertyController::class, 'show'])->middleware(['auth:sanctum', 'verified']);
     Route::put('/{property}', [PropertyController::class, 'update'])->middleware(['auth:sanctum', 'verified']);
     Route::delete('/{property}', [PropertyController::class, 'destroy'])->middleware(['auth:sanctum', 'verified']);
-    Route::group(['prefix'=> 'messages'], function () {
-    Route::get('/', [PropertyController::class,'index'])->middleware(['auth:sanctum', 'verified']);
     Route::post('/image/{property}', [PropertyImageController::class,'store'])->middleware(['auth-sanctum','verified']);
-    Route::post('/images/{property}', [PropertyImageController::class, 'showPropertyImage'])->middleware(['auth-sanctum', 'verified']);
+    Route::get('/images/{property}', [PropertyImageController::class, 'showPropertyImage'])->middleware(['auth-sanctum', 'verified']);
     });
 
-    Route::get('/conversation/{user}', [PropertyController::class,'MyConversation'])
+   Route::group(['prefix','messages'], function() {
+         Route::get('/conversation/{user}', [PropertyController::class,'MyConversation'])
             ->middleware(['auth:sanctum', 'verified']);
     
 
-    Route::post('/new', [PropertyController::class,'store'])
-            ->middleware(['auth:sanctum', 'verified']);
-    
+        Route::post('/new', [PropertyController::class,'store'])
+                ->middleware(['auth:sanctum', 'verified']);
+        
 
-    Route::put('/set{message}', [PropertyController::class,'update'])
-            ->middleware(['auth:sanctum', 'verified']);
-    
+        Route::put('/set{message}', [PropertyController::class,'update'])
+                ->middleware(['auth:sanctum', 'verified']);
+        
 
-    Route::delete('', [PropertyController::class,'destroy'])
-            ->middleware(['auth:sanctum', 'verified']);
-});
+        Route::delete('', [PropertyController::class,'destroy'])
+                ->middleware(['auth:sanctum', 'verified']);
+   });
+
 
 
 
