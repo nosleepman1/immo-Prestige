@@ -6,17 +6,6 @@ import Register from "./pages/auth/Register"
 
 function App() {
   
-  //route + theme context
-
-  /**
-   *  const pages = [
-        { name: "Home", href: "/" },
-        { name: "Properties", href: "/properties" },
-        { name: "Agents", href: "/agents" },
-        { name: "Contact", href: "/contact" }
-    ]
-
-   */
 
   return (
     <ThemeProvider>
