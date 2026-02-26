@@ -1,6 +1,7 @@
 import { useState } from "react";
 import {FcGoogle} from 'react-icons/fc'
-import {useNavigate} from 'react-router-dom'
+import {Link} from 'react-router-dom'
+import {useRegister} from '../../hooks/useRegister'
 
 const EyeIcon = ({ open }) => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -20,23 +21,36 @@ const EyeIcon = ({ open }) => (
 );
 
 const Register = () => {
-    const [showPass, setShowPass] = useState(false);
-    const [showConfirm, setShowConfirm] = useState(false);
- 
-    const navigate = useNavigate();
 
+    const { register, loading, error, success } = useRegister()
 
-  const [form, setForm] = useState({ username: "", email: "", password: "", confirm: "" });
+    const [form, setForm] = useState({ name: "", email: "", password: "", password_confirmation: "", role: "user" });
 
+    const handleChange = (e) => {
+        setForm({ ...form, [e.target.name]: e.target.value });
+    }
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        
+        const response = await register(form)
+        if (response && response.success) {
+            console.log("Registration successful:", response);
+        } else {
+            console.error("Registration failed:", response);
+        }
+    }
   
 
   return (
+
+
     <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-stone-100 dark:bg-slate-950 transition-colors duration-300">
 
-      {/* Card */}
+      
       <div className="w-full max-w-md bg-white dark:bg-slate-900 border border-stone-200 dark:border-slate-700 rounded-2xl shadow-xl dark:shadow-slate-900/60 p-9">
 
-        {/* Header */}
+      
         <div className="text-center mb-7">
         
           <h1 className="text-2xl font-bold tracking-tight text-stone-900 dark:text-white">
@@ -46,25 +60,21 @@ const Register = () => {
         </div>
 
         
+        <form className="space-y-4" onSubmit={handleSubmit}>
 
-       
-
-        {/* Form */}
-        <form className="space-y-4">
-
-          
           <div>
-            <label className="block text-sm font-medium mb-1.5 text-stone-700 dark:text-slate-300">
-              Nom complet
-            </label>
-            <input
-              type="text"
-              placeholder="johndoe"
-              value={form.username}
-              onChange={(e) => setForm({ ...form, username: e.target.value })}
-              required
-              className="w-full px-3.5 py-2.5 rounded-xl text-sm border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent bg-stone-50 dark:bg-slate-800 border-stone-200 dark:border-slate-700 text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-slate-600"
-            />
+                <label className="block text-sm font-medium mb-1.5 text-stone-700 dark:text-slate-300">
+                Nom complet
+                </label>
+                <input
+                    type="text"
+                    name="name"
+                    placeholder="johndoe"
+                    //value={form.username}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-3.5 py-2.5 rounded-xl text-sm border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent bg-stone-50 dark:bg-slate-800 border-stone-200 dark:border-slate-700 text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-slate-600"
+                />
           </div>
 
           {/* Email */}
@@ -74,9 +84,10 @@ const Register = () => {
             </label>
             <input
               type="email"
+              name="email"
               placeholder="john@example.com"
-              value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              //value={form.email}
+              onChange={handleChange}
               required
               className="w-full px-3.5 py-2.5 rounded-xl text-sm border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent bg-stone-50 dark:bg-slate-800 border-stone-200 dark:border-slate-700 text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-slate-600"
             />
@@ -89,10 +100,11 @@ const Register = () => {
             </label>
             <div className="relative">
               <input
-                type={showPass ? "text" : "password"}
+                type="password"
+                name="password"
                 placeholder="••••••••"
-                value={form.password}
-                onChange={(e) => setForm({ ...form, password: e.target.value })}
+                //value={form.password}
+                onChange={handleChange}
                 required
                 className="w-full px-3.5 py-2.5 pr-11 rounded-xl text-sm border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent bg-stone-50 dark:bg-slate-800 border-stone-200 dark:border-slate-700 text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-slate-600"
               />
@@ -107,10 +119,11 @@ const Register = () => {
             </label>
             <div className="relative">
               <input
-                type={showConfirm ? "text" : "password"}
+                type="password"
+                name="password_confirmation"
                 placeholder="••••••••"
-                value={form.confirm}
-                onChange={(e) => setForm({ ...form, confirm: e.target.value })}
+                //value={form.confirm}
+                onChange={handleChange}
                 required
                 className="w-full px-3.5 py-2.5 pr-11 rounded-xl text-sm border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent bg-stone-50 dark:bg-slate-800 border-stone-200 dark:border-slate-700 text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-slate-600"
               />
@@ -118,24 +131,38 @@ const Register = () => {
             </div>
           </div>
 
+          <div>
+            {error && (
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg p-3 mt-2">
+                <p className="text-red-700 dark:text-red-300 text-sm">{error}</p>
+              </div>
+            )}
+            {success && (
+              <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg p-3 mt-2">
+                <p className="text-green-700 dark:text-green-300 text-sm">Inscription réussie! Un email de confirmation vous a été envoyé.</p>
+              </div>
+            )}
+          </div>
+
           {/* Submit */}
           <button
             type="submit"
-            className={`mt-2 w-full py-3 rounded-xl text-sm font-semibold text-white transition-all duration-200 active:scale-95 hover:-translate-y-0.5 shadow-lg  bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-900`}
+            disabled={loading}
+            className={`mt-2 w-full py-3 rounded-xl text-sm font-semibold text-white transition-all duration-200 active:scale-95 hover:-translate-y-0.5 shadow-lg  bg-blue-700 cursor-pointer hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-900 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
-            Creer un compte
+            {loading ? "Création en cours..." : "Créer un compte"}
           </button>
         </form>
 
         {/* Footer */}
         <p className="mt-6 text-center text-sm text-stone-500 dark:text-slate-400">
           Vous avez déjà un compte ?{" "}
-          <a
-            href="#"
+          <Link
+            to="/login"
             className="font-semibold text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 underline underline-offset-2 decoration-transparent hover:decoration-current transition-all duration-150"
           >
             Se connecter
-          </a>
+          </Link>
         </p>
       </div>
     </div>
