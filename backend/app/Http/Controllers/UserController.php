@@ -20,7 +20,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        
+
         return UserResource::collection(User::all());
     }
 
@@ -31,10 +31,10 @@ class UserController extends Controller
     {
         $data = $request->validated();
         $data['password'] = bcrypt($data['password']);
-    
+
         $user = User::create($data);
 
-        event(new RegisterUser( $user ));
+        //event(new RegisterUser( $user ));
 
 
         return response()->json([
@@ -56,13 +56,13 @@ class UserController extends Controller
         }
 
         $user->markEmailAsVerified();
-        
+
         Mail::to($user->getEmailForVerification())->send(new WelcomeMail($user->name, $user->email));
-        
+
         return response()->json([
             'message'=> 'email verifié avec succes',
             'user'=> new UserResource($user)
-            
+
         ],200);
     }
 
@@ -75,16 +75,16 @@ class UserController extends Controller
         ],200);
     }
 
-   
+
 
 
 
     public function login(StoreLoginRequest $request)
     {
         $credentials = $request->validated();
-        
+
         $user = User::where('email', $credentials['email'])->first();
-        
+
         if (!$user || !Hash::check($credentials['password'], $user['password'])) {
             return response()->json(['message' => 'Invalid login credentials'], 401);
         }
@@ -112,13 +112,13 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
        // update simple user info not agency so check if !agency
-         $data = $request->only(['name', 'email', 'password', 'role']);     
+         $data = $request->only(['name', 'email', 'password', 'role']);
             if (isset($data['password'])) {
                 $data['password'] = bcrypt($data['password']);
             }
             $user->update($data);
             return new UserResource($user);
-    
+
     }
 
     /**
@@ -157,6 +157,6 @@ class UserController extends Controller
 
         return response()->json(['message' => 'No active token found.'], 400);
 
-       
+
     }
 }
