@@ -32,6 +32,7 @@ class UserController extends Controller
     {
         $data = $request->validated();
         $data['password'] = bcrypt($data['password']);
+        $data['email'] = strtolower($data['email']);
 
         $user = User::create($data);
 

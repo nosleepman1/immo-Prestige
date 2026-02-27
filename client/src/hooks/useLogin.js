@@ -24,9 +24,15 @@ const useLogin = () => {
             navigate('/profile')
 
         } catch (err) {
-
-            setErrors(err.response?.data?.errors)
-    
+            // Priorité: message > errors > message générique
+            if (err.response?.data?.message) {
+                setErrors({ general: err.response.data.message })
+            } else if (err.response?.data?.errors) {
+                setErrors(err.response.data.errors)
+            } else {
+                setErrors({ general: 'Une erreur est survenue lors de la connexion' })
+            }
+           throw err
         } finally {
             setLoading(false)
         }

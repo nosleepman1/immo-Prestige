@@ -2,8 +2,20 @@ import React from 'react'
 
 export default function RegisterAgency() {
 
+    const [loading, setLoading] = React.useState(false)
 
+    const [form, setForm] = React.useState({
+        name: '',
+        email: '',
+        password: '',
+        password_confirmation: ''
+    })
 
+    const handleChange = (e) => {
+        setLoading(false)
+        setForm({...form, [e.target.name]: e.target.value})
+        
+    }
 
     return (
         <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-stone-100 dark:bg-slate-950 transition-colors duration-300">
@@ -21,7 +33,7 @@ export default function RegisterAgency() {
         </div>
 
         
-        <form className="space-y-4" onSubmit={handleSubmit}>
+        <form className="space-y-4" >
 
           <div>
                 <label className="block text-sm font-medium mb-1.5 text-stone-700 dark:text-slate-300">
@@ -36,7 +48,6 @@ export default function RegisterAgency() {
                     
                     className="w-full px-3.5 py-2.5 rounded-xl text-sm border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent bg-stone-50 dark:bg-slate-800 border-stone-200 dark:border-slate-700 text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-slate-600"
                 />
-                {errors.name && <p className="text-red-600 text-sm mt-1">{errors.name[0]}</p>}
           </div>
 
           {/* Email */}
@@ -53,7 +64,6 @@ export default function RegisterAgency() {
               
               className="w-full px-3.5 py-2.5 rounded-xl text-sm border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent bg-stone-50 dark:bg-slate-800 border-stone-200 dark:border-slate-700 text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-slate-600"
             />
-            {errors.email && <p className="text-red-600 text-sm mt-1">{errors.email[0]}</p>}
           </div>
 
           {/* Password */}
@@ -71,7 +81,6 @@ export default function RegisterAgency() {
                 
                 className="w-full px-3.5 py-2.5 pr-11 rounded-xl text-sm border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent bg-stone-50 dark:bg-slate-800 border-stone-200 dark:border-slate-700 text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-slate-600"
               />
-              {errors.password && <p className="text-red-600 text-sm mt-1">{errors.password[0]}</p>}
             </div>
           </div>
 
@@ -90,7 +99,6 @@ export default function RegisterAgency() {
                 
                 className="w-full px-3.5 py-2.5 pr-11 rounded-xl text-sm border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent bg-stone-50 dark:bg-slate-800 border-stone-200 dark:border-slate-700 text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-slate-600"
               />
-              {errors.password_confirmation && <p className="text-red-600 text-sm mt-1">{errors.password_confirmation[0]}</p>}
             </div>
           </div>
 
@@ -121,12 +129,12 @@ export default function RegisterAgency() {
         </p>
 
         <p className="mt-6 text-center text-sm text-stone-500 dark:text-slate-400">
-          Vous etes un agence ?{" "}
+          Vous etes un client ?{" "}
           <Link
-            to="/register-agency" 
+            to="/register" 
             className="font-semibold text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 underline underline-offset-2 decoration-transparent hover:decoration-current transition-all duration-150"
           >
-            S'inscrire en tant qu'agence
+            S'inscrire en tant que client
           </Link>
         </p>
 

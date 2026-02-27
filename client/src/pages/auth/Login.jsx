@@ -18,9 +18,6 @@ const Login = () => {
           .then(() => {
             navigate('/profile')
           })
-          .catch((err) => {
-            console.error("Login failed:  ", err)
-          });
     }
 
     return (
@@ -45,6 +42,18 @@ const Login = () => {
         {/* Form */}
         <form className="space-y-4" onSubmit={handleSubmit}>
 
+          
+          
+          {errors.general && (
+            <div className="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg dark:bg-red-200 dark:text-red-800" role="alert">
+              <p className="text-red-700 dark:text-red-300 text-sm font-medium">
+                {errors.general}
+              </p>
+            </div>
+          )}
+
+          
+
 
           {/* Email */}
           <div>
@@ -55,11 +64,11 @@ const Login = () => {
               type="email"
               placeholder="john@example.com"
               value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value.toLowerCase() })}
               required
               className="w-full px-3.5 py-2.5 rounded-xl text-sm border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent bg-stone-50 dark:bg-slate-800 border-stone-200 dark:border-slate-700 text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-slate-600"
             />
-            {errors.email && <p className="text-red-600 text-sm mt-1">{errors.email[0]}</p>}
+            
           </div>
 
           {/* Password */}
@@ -76,7 +85,7 @@ const Login = () => {
                 required
                 className="w-full px-3.5 py-2.5 pr-11 rounded-xl text-sm border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent bg-stone-50 dark:bg-slate-800 border-stone-200 dark:border-slate-700 text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-slate-600"
               />
-              {errors.password && <p className="text-red-600 text-sm mt-1">{errors.password[0]}</p>}
+             
             </div>
           </div>
 

@@ -6,6 +6,7 @@ import AddProperty from "./pages/properties/AddProperty"
 import Loader from "./components/Loader"
 import Profile from "./pages/auth/Profile"
 import PrivateRoute from "./routes/PrivateRoutes"
+import RegisterAgency from "./pages/auth/RegisterAgency"
 
 function App() {
   
