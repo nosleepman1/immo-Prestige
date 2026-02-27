@@ -10,11 +10,12 @@ use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\PropertyImageController;
 use App\Http\Controllers\PropertyTypeController;
 use App\Http\Controllers\UserController;
+use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/user', function (Request $request) {
-    return $request->user();
+    return new UserResource($request->user());
 })->middleware('auth:sanctum');
 
 
@@ -25,7 +26,7 @@ Route::group(['prefix' => 'users'], function () {
         Route::post('/login', [UserController::class, 'login']);
         Route::put('/{user}', [UserController::class, 'update'])->middleware(['auth:sanctum', 'verified ']);
         Route::delete('/{user}', [UserController::class, 'destroy'])->middleware(['auth:sanctum', 'verified']);
-        Route::post('/logout', [UserController::class, 'logout'])->middleware(['auth:sanctum', 'verified']);
+        Route::post('/logout', [UserController::class, 'logout'])->middleware(['auth:sanctum']);
     });
 
 Route::get('/verify/{id}/{hash}', [UserController::class,'verify'])->name('verification.verify');
@@ -33,8 +34,8 @@ Route::get('/verify/{id}/{hash}', [UserController::class,'verify'])->name('verif
 
 
 Route::group(['prefix' => 'agency'], function () {
-    Route::get('/', [AgencyController::class, 'index'])->middleware(['auth:sanctum', 'verified']);      
-    Route::post('/store', [AgencyController::class, 'store'])->middleware(['auth:sanctum', 'verified']);
+    Route::get('/', [AgencyController::class, 'index'])->middleware(['auth:sanctum', 'verified']);
+    Route::post('/store', [AgencyController::class, 'store']);
     Route::get('/{agency}', [AgencyController::class, 'show'])->middleware(['auth:sanctum', 'verified']);
     Route::put('/{agency}', [AgencyController::class, 'update'])->middleware(['auth:sanctum', 'verified']);
     Route::delete('/{agency}', [AgencyController::class, 'destroy'])->middleware(['auth:sanctum', 'verified']);
@@ -55,15 +56,15 @@ Route::group(['prefix' => 'properties'], function () {
    Route::group(['prefix','messages'], function() {
          Route::get('/conversation/{user}', [PropertyController::class,'MyConversation'])
             ->middleware(['auth:sanctum', 'verified']);
-    
+
 
         Route::post('/new', [PropertyController::class,'store'])
                 ->middleware(['auth:sanctum', 'verified']);
-        
+
 
         Route::put('/set{message}', [PropertyController::class,'update'])
                 ->middleware(['auth:sanctum', 'verified']);
-        
+
 
         Route::delete('', [PropertyController::class,'destroy'])
                 ->middleware(['auth:sanctum', 'verified']);
@@ -84,7 +85,7 @@ Route::group(['prefix' => 'posts'], function () {
     Route::post('/{post}/like', [LikeController::class, 'store'])
             ->middleware(['auth:sanctum', 'verified']);
 
-            
+
     Route::get('/{post}/likes', [LikeController::class, 'postLikes']);
 
 
@@ -104,14 +105,14 @@ Route::group(['prefix' => 'posts'], function () {
 
 
     Route::delete('/{post}/comment/{comment}', [CommentController::class, 'destroy'])
-            ->middleware(['auth:sanctum', 'verified']);  
+            ->middleware(['auth:sanctum', 'verified']);
 });
 
 
 
 
 Route::prefix('comments')->group(function () {
-    
+
 
     Route::get('/my', [CommentController::class, 'myComments'])
             ->middleware(['auth:sanctum', 'verified']);
@@ -144,16 +145,16 @@ Route::prefix('comments')->group(function () {
 Route::group(['prefix' => 'devises'], function () {
     Route::post('store', [DeviseController::class, 'store'])
             ->middleware(['auth:sanctum', 'verified']);
-   
+
             Route::get('index', [DeviseController::class, 'index'])
             ->middleware(['auth:sanctum', 'verified']);
-   
+
             Route::get('{devise}', [DeviseController::class, 'show'])
-            ->middleware(['auth:sanctum', 'verified']); 
-    
+            ->middleware(['auth:sanctum', 'verified']);
+
             Route::put('{devise}', [DeviseController::class, 'update'])
             ->middleware(['auth:sanctum', 'verified']);
-   
+
             Route::delete('{devise}', [DeviseController::class, 'destroy'])
             ->middleware(['auth:sanctum', 'verified']);
 });
@@ -161,19 +162,19 @@ Route::group(['prefix' => 'devises'], function () {
 
 
 Route::group(['prefix' => 'propertytypes'], function () {
-   
+
         Route::post('store', [PropertyTypeController::class, 'store'])
             ->middleware(['auth:sanctum', 'verified']);
-   
+
             Route::get('index', [PropertyTypeController::class, 'index'])
             ->middleware(['auth:sanctum', 'verified']);
-   
+
             Route::get('{propertytype}', [PropertyTypeController::class, 'show'])
             ->middleware(['auth:sanctum', 'verified']);
-   
+
             Route::put('{propertytype}', [PropertyTypeController::class, 'update'])
             ->middleware(['auth:sanctum', 'verified']);
-   
+
             Route::delete('{propertytype}', [PropertyTypeController::class, 'destroy'])
             ->middleware(['auth:sanctum', 'verified']);
 });
