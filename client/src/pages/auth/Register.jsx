@@ -157,7 +157,7 @@ const Register = () => {
         <p className="mt-6 text-center text-sm text-stone-500 dark:text-slate-400">
           Vous etes un agence ?{" "}
           <Link
-            to="/register" 
+            to="/register-agency" 
             className="font-semibold text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 underline underline-offset-2 decoration-transparent hover:decoration-current transition-all duration-150"
           >
             S'inscrire en tant qu'agence

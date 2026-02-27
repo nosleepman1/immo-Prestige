@@ -1,18 +1,22 @@
 import React from 'react'
 
 export default function RegisterAgency() {
-  return (
-     <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-stone-100 dark:bg-slate-950 transition-colors duration-300">
+
+
+
+
+    return (
+        <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-stone-100 dark:bg-slate-950 transition-colors duration-300">
 
       
-      <div className="w-full max-w-md bg-white dark:bg-slate-900 border border-stone-200 dark:border-slate-700 rounded-2xl shadow-xl dark:shadow-slate-900/60 p-9">
+        <div className="w-full max-w-md bg-white dark:bg-slate-900 border border-stone-200 dark:border-slate-700 rounded-2xl shadow-xl dark:shadow-slate-900/60 p-9">
 
       
         <div className="text-center mb-7">
         
-          <h1 className="text-2xl font-bold tracking-tight text-stone-900 dark:text-white">
+            <h1 className="text-2xl font-bold tracking-tight text-stone-900 dark:text-white">
             Créer un compte
-          </h1>
+            </h1>
     
         </div>
 

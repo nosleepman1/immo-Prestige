@@ -13,9 +13,6 @@ use Illuminate\Support\Facades\Auth;
 
 class CommentReplyController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Post $post)
     {
         $commentReplies = CommentReply::where('post_id', $post->id)
@@ -23,12 +20,9 @@ class CommentReplyController extends Controller
             ->get();
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(StoreCommentReplyRequest $request, Comment $comment)
     {
-       
+
         $data = $request->validated();
         $data['user_id'] = Auth::user()->id;
         $data['comment_id'] = $comment->id;
@@ -41,9 +35,6 @@ class CommentReplyController extends Controller
             ], 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(CommentReply $commentReply)
     {
         return new CommentReplyResource($commentReply);
@@ -57,7 +48,7 @@ class CommentReplyController extends Controller
         // comment reply update logic here
         $data = $request->validated();
         $data['user_id'] = Auth::user()->id;
-       
+
         $commentReply->update($data);
 
         return response()->json(
