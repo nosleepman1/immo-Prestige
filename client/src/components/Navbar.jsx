@@ -1,10 +1,14 @@
-import { useState } from "react"
-import { NavLink } from "react-router-dom"
+import { useContext, useState } from "react"
 import { useTheme } from "../context/ThemeContext"
+import { AuthContext } from "../context/AuthContext"
+import { NavLink } from "react-router-dom"
 
 const Navbar = () => {
     const { theme, toggleTheme } = useTheme()
     const [menuOpen, setMenuOpen] = useState(false)
+    
+
+
 
     const navLinks = [
         { name: "Accueil", href: "/" },
@@ -12,6 +16,12 @@ const Navbar = () => {
         { name: "Agents", href: "/agents" },
         { name: "Contact", href: "/contact" },
     ]
+
+
+    const {isAuthenticated, logout} = useContext(AuthContext)
+
+
+
 
     const navLinkClass = ({ isActive }) =>
         isActive
@@ -24,7 +34,7 @@ const Navbar = () => {
                 <div className="flex items-center justify-between h-16">
 
                     {/* Logo */}
-                    <div className="flex-shrink-0">
+                    <div className="shrink-0">
                         <span className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">
                             Immo <span className="text-blue-600">Prestige</span>
                         </span>
@@ -65,21 +75,40 @@ const Navbar = () => {
                         {/* Divider */}
                         <div className="w-px h-6 bg-gray-200 dark:bg-gray-600" />
 
-                        {/* Login */}
-                        <NavLink
-                            to="/login"
-                            className="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150"
-                        >
-                            Connexion
-                        </NavLink>
+                        
+                        {isAuthenticated ? (
+                            <>  
+                                <NavLink to="/profile" className="px-3 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                                    Profil
+                                </NavLink>
+                                
+                                <button 
+                                    className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors duration-150"
+                                    onClick={logout}
+                                    >
+                                    Deconnexion
+                                </button>
 
-                        {/* Register */}
-                        <NavLink
-                            to="/register"
-                            className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-150"
-                        >
-                            S'inscrire
-                        </NavLink>
+                            </>) :  (
+
+                            <>
+                                <NavLink
+                                    to="/login"
+                                    className="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150"
+                                >
+                                    Connexion
+                                </NavLink>
+
+                            
+                                <NavLink
+                                    to="/register"
+                                    className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-150"
+                                >
+                                    S'inscrire
+                                </NavLink>
+                            </>
+                                
+                            )}
                     </div>
 
                     {/* Mobile: theme + hamburger */}
@@ -125,7 +154,7 @@ const Navbar = () => {
 
             {/* Mobile Menu */}
             {menuOpen && (
-                <div className="md:hidden border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 pt-3 pb-4 space-y-1">
+                <div className="md:hidden absolute w-full border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 pt-3 pb-4 space-y-1">
                     {navLinks.map((page) => (
                         <NavLink
                             key={page.name}
@@ -142,7 +171,22 @@ const Navbar = () => {
                     ))}
 
                     <div className="pt-2 border-t border-gray-100 dark:border-gray-700 flex flex-col space-y-2">
-                        <NavLink
+                        {isAuthenticated ? (
+                            <>
+                                <NavLink to="/profile" className="px-3 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                                    Profil
+                                </NavLink>
+                                
+                                <button 
+                                    className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors duration-150"
+                                    onClick={logout}
+                                    >
+                                    Deconnexion
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                            <NavLink
                             to="/login"
                             onClick={() => setMenuOpen(false)}
                             className="block px-3 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
@@ -156,6 +200,8 @@ const Navbar = () => {
                         >
                             S'inscrire
                         </NavLink>
+                            </>
+                        )}
                     </div>
                 </div>
             )}
