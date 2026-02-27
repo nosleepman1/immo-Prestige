@@ -2,49 +2,30 @@ import API from './api'
 
 
 const REGISTER = async (userData) => {
-    try {
-        const response = await API.post('/users/register', userData)
-
-        
-        return response.data
-
-    }catch (error) {
-        console.error("Registration error:   ", error)
-        throw error
-    }
+    const response = await API.post('/users/register', userData)
+    return response.data
 }
 
 const LOGIN = async (credentials) => {
-    try {
-        const response = await API.post('/users/login', credentials)
-        return response.data
-
-    }catch (error) {
-        console.error("Login error:   ", error)
-        throw error
-    }
+    const response = await API.post('/users/login', credentials)
+    return response.data
 }
 
-const LOGOUT = async () => {
-    try {
-        const response = await API.post('/users/logout')
-        return response.data
-
-    }catch (error) {
-        console.error("Logout error:   ", error)
-        throw error
+    const LOGOUT = async () => {
+        localStorage.removeItem('token')
     }
-}
 
-const CURRENT_USER = async (id) => {
-    try {
-        const response = await API.get(`/users/${id}`)
-        return response.data
+const CURRENT_USER = async (token) => {
+  
+    const response = await API.get(`/user`,
+        {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }
+    );
 
-    }catch (error) {
-        console.error("Fetch current user error:   ", error)
-        throw error
-    }
+    return response.data
 }
 
 
