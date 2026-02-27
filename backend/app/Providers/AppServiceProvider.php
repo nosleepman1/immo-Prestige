@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use App\Events\RegisterUser;
+use App\Events\UserRegistered;
 use App\Listeners\RegisterUserListener;
+use App\Listeners\UserRegisteredListener;
 use App\Models\Agency;
 use App\Policies\AgencyPolicy;
 use Illuminate\Support\Facades\Event;
@@ -27,8 +29,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Event::listen(
-            RegisterUser::class,
-            RegisterUserListener::class
+            UserRegistered::class,
+            UserRegisteredListener::class
         );
     }
 }

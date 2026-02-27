@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Events\RegisterUser;
+use App\Events\UserRegistered;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreLoginRequest;
 use App\Http\Requests\StoreUserRequest;
@@ -34,13 +35,14 @@ class UserController extends Controller
 
         $user = User::create($data);
 
-        //event(new RegisterUser( $user ));
+        event(new UserRegistered( $user ));
 
 
         return response()->json([
             'message'=> 'inscription reussie, un mail d activation vous a ete envoyé',
+            'status' => 201,
             'user' => new UserResource($user)
-        ],200);
+        ],201);
     }
 
     public function verify(Request $request, $id, $hash)
@@ -86,16 +88,15 @@ class UserController extends Controller
         $user = User::where('email', $credentials['email'])->first();
 
         if (!$user || !Hash::check($credentials['password'], $user['password'])) {
-            return response()->json(['message' => 'Invalid login credentials'], 401);
+            return response()->json(['message' => 'addresse email ou mot de passe incorrect'], 401);
         }
 
         $token = $user->createToken(env('TOKEN_SECRET'))->plainTextToken;
 
         return response()->json([
-            'user' => new UserResource($user),
             'access_token' => $token,
-            'token_type' => 'Bearer',
-        ]);
+            'token_type' => 'Bearer ',
+        ], 200)->cookie('token', $token, 60 * 24 * 30);
     }
 
     /**

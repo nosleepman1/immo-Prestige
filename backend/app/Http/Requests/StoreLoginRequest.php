@@ -28,14 +28,15 @@ class StoreLoginRequest extends FormRequest
     }
 
     // messages in french
-    
+
     public function messages(): array
     {
         return [
             'email.required' => 'L\'email est requis.',
             'email.email' => 'Le format de l\'email est invalide.',
-            'email.exists' => 'L\'email spécifié n\'existe pas.',
+            'email.exists' => 'addresse email ou mot de passe incorrect.',
             'password.required' => 'Le mot de passe est requis.',
+
         ];
     }
 }
