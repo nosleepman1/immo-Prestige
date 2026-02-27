@@ -1,19 +1,29 @@
 import { useState } from "react";
-import {FcGoogle} from 'react-icons/fc'
-import {Link} from 'react-router-dom'
+import {Link, useNavigate} from 'react-router-dom'
+import useLogin from "../../hooks/useLogin";
 
 
 
-const Register = () => {
+const Login = () => {
    
+    const {handleLogin, loading, errors} = useLogin()
+    const navigate = useNavigate()
 
+    const [formData, setFormData] = useState({ email: "", password: ""});
 
+    const handleSubmit = async (e) => {
+        e.preventDefault();
 
-  const [formData, setFormData] = useState({ email: "", password: ""});
+        await handleLogin(formData)
+          .then(() => {
+            navigate('/profile')
+          })
+          .catch((err) => {
+            console.error("Login failed:  ", err)
+          });
+    }
 
-  
-
-  return (
+    return (
     <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-stone-100 dark:bg-slate-950 transition-colors duration-300">
 
       {/* Card */}
@@ -33,9 +43,8 @@ const Register = () => {
        
 
         {/* Form */}
-        <form className="space-y-4">
+        <form className="space-y-4" onSubmit={handleSubmit}>
 
-          
 
           {/* Email */}
           <div>
@@ -50,6 +59,7 @@ const Register = () => {
               required
               className="w-full px-3.5 py-2.5 rounded-xl text-sm border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent bg-stone-50 dark:bg-slate-800 border-stone-200 dark:border-slate-700 text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-slate-600"
             />
+            {errors.email && <p className="text-red-600 text-sm mt-1">{errors.email[0]}</p>}
           </div>
 
           {/* Password */}
@@ -59,14 +69,14 @@ const Register = () => {
             </label>
             <div className="relative">
               <input
-                
+                type="password"
                 placeholder="••••••••"
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 required
                 className="w-full px-3.5 py-2.5 pr-11 rounded-xl text-sm border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent bg-stone-50 dark:bg-slate-800 border-stone-200 dark:border-slate-700 text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-slate-600"
               />
-              
+              {errors.password && <p className="text-red-600 text-sm mt-1">{errors.password[0]}</p>}
             </div>
           </div>
 
@@ -75,9 +85,9 @@ const Register = () => {
           {/* Submit */}
           <button
             type="submit"
-            className={`mt-2 w-full py-3 rounded-xl text-sm font-semibold text-white transition-all duration-200 active:scale-95 hover:-translate-y-0.5 shadow-lg  bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-900`}
+            className={`mt-2 w-full cursor-pointer py-3 rounded-xl text-sm font-semibold text-white transition-all duration-200 active:scale-95 hover:-translate-y-0.5 shadow-lg  bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-900 ${loading ? "opacity-70 cursor-not-allowed" : ""}`}
           >
-            Se connecter
+            {loading ? "Connexion..." : "Se connecter"}
           </button>
         </form>
 
@@ -96,4 +106,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default Login;
