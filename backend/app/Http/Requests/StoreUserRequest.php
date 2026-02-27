@@ -25,10 +25,10 @@ class StoreUserRequest extends FormRequest
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
-            'role' => 'required|in:admin,agency,user',
+            'role' => 'in:admin,agency,user',
         ];
     }
-    
+
     public function messages(): array
     {
         return [
@@ -40,10 +40,14 @@ class StoreUserRequest extends FormRequest
             'email.string' => 'L\'adresse e-mail doit être une chaîne de caractères.',
             'email.email' => 'L\'adresse e-mail doit être une adresse e-mail valide.',
             'email.max' => 'L\'adresse e-mail ne doit pas dépasser 255 caractères.',
-            'email.unique' => 'Une adresse e-mail avec cette valeur existe déjà.'
+            'email.unique' => 'Une adresse e-mail avec cette valeur existe déjà.',
+            'password.required' => 'Le mot de passe est obligatoire.',
+            'password.string' => 'Le mot de passe doit être une chaîne de caractères.',
+            'password.min' => 'Le mot de passe doit comporter au moins 8 caractères.',
+            'password.confirmed' => 'Le mot de passe de confirmation ne correspond pas.',
+            'role.in' => 'Le rôle doit être l\'un des suivants : admin, agency, user.'
         ];
     }
 }
-    
 
-    
+
