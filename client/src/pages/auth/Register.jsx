@@ -22,7 +22,7 @@ const EyeIcon = ({ open }) => (
 
 const Register = () => {
 
-    const { register, loading, errors, success } = useRegister()
+    const { register, loading, errors } = useRegister()
 
     const [form, setForm] = useState({ name: "", email: "", password: "", password_confirmation: "", role: "user" });
 
