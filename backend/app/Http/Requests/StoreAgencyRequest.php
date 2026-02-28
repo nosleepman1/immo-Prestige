@@ -22,7 +22,7 @@ class StoreAgencyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'company_name' => 'required|string|max:255',
+            'company_name' => 'required|string|max:255|unique:agencies,company_name',
             'description' => 'required|string',
             'address' => 'required|string|max:255',
             'city' => 'required|string|max:100',
@@ -37,6 +37,9 @@ class StoreAgencyRequest extends FormRequest
     {
         return [
             'company_name.required' => 'Le nom de l\'entreprise est requis.',
+            'company_name.string' => 'Le nom de l\'entreprise doit être une chaîne de caractères.',
+            'company_name.max' => 'Le nom de l\'entreprise ne doit pas dépasser 255 caractères.',
+            'company_name.unique' => 'Une entreprise avec ce nom existe déjà.',
             'description.required' => 'La description est requise.',
             'address.required' => 'L\'adresse est requise.',
             'city.required' => 'La ville est requise.',
