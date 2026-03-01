@@ -40,10 +40,10 @@ const Register = () => {
   return (
 
 
-    <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-stone-100 dark:bg-slate-950 transition-colors duration-300">
+    <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-background transition-colors duration-300">
 
       
-      <div className="w-full max-w-md bg-white dark:bg-slate-900 border border-stone-200 dark:border-slate-700 rounded-2xl shadow-xl dark:shadow-slate-900/60 p-9">
+      <div className="w-full max-w-md bg-background border border-border text-foreground text-foreground rounded-2xl shadow-xl dark:shadow-slate-900/60 p-9">
 
       
         <div className="text-center mb-7">
@@ -55,7 +55,7 @@ const Register = () => {
         </div>
 
         
-        <form className="space-y-4" onSubmit={handleSubmit}>
+        <form className="space-y-4" onSubmit={handleSubmit} autoComplete="off">
 
           <div>
                 <label className="block text-sm font-medium mb-1.5 text-stone-700 dark:text-slate-300">
@@ -68,7 +68,7 @@ const Register = () => {
                     //value={form.username}
                     onChange={handleChange}
                     
-                    className="w-full px-3.5 py-2.5 rounded-xl text-sm border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent bg-stone-50 dark:bg-slate-800 border-stone-200 dark:border-slate-700 text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-slate-600"
+                    className="input w-full bg-transparent border border-border text-foreground rounded-xl"
                 />
                 {errors.name && <p className="text-red-600 text-sm mt-1">{errors.name[0]}</p>}
           </div>
@@ -85,7 +85,8 @@ const Register = () => {
               //value={form.email}
               onChange={handleChange}
               
-              className="w-full px-3.5 py-2.5 rounded-xl text-sm border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent bg-stone-50 dark:bg-slate-800 border-stone-200 dark:border-slate-700 text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-slate-600"
+              className="input w-full bg-transparent border border-border text-foreground rounded-xl"
+              
             />
             {errors.email && <p className="text-red-600 text-sm mt-1">{errors.email[0]}</p>}
           </div>
@@ -102,9 +103,10 @@ const Register = () => {
                 placeholder="••••••••"
                 //value={form.password}
                 onChange={handleChange}
-                
-                className="w-full px-3.5 py-2.5 pr-11 rounded-xl text-sm border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent bg-stone-50 dark:bg-slate-800 border-stone-200 dark:border-slate-700 text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-slate-600"
+                className="input w-full bg-transparent border border-border text-foreground rounded-xl"
               />
+              
+  
               {errors.password && <p className="text-red-600 text-sm mt-1">{errors.password[0]}</p>}
             </div>
           </div>
@@ -122,7 +124,7 @@ const Register = () => {
                 //value={form.confirm}
                 onChange={handleChange}
                 
-                className="w-full px-3.5 py-2.5 pr-11 rounded-xl text-sm border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent bg-stone-50 dark:bg-slate-800 border-stone-200 dark:border-slate-700 text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-slate-600"
+                className="input w-full bg-transparent border border-border text-foreground rounded-xl"
               />
               {errors.password_confirmation && <p className="text-red-600 text-sm mt-1">{errors.password_confirmation[0]}</p>}
             </div>
@@ -137,30 +139,30 @@ const Register = () => {
           <button
             type="submit"
             disabled={loading}
-            className={`mt-2 w-full py-3 rounded-xl text-sm font-semibold text-white transition-all duration-200 active:scale-95 hover:-translate-y-0.5 shadow-lg  bg-blue-700 cursor-pointer hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-900 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={`w-full btn hover:border-0 hover:shadow-2xl border-0  block px-3 py-2 rounded-lg text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 shadow-md shadow-amber-500/20 transition-all duration-300 text-center ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             {loading ? "Création en cours..." : "Créer un compte"}
           </button>
         </form>
 
         {/* Footer */}
-        <p className="mt-6 text-center text-sm text-stone-500 dark:text-slate-400">
+        <p className="mt-6 text-center text-sm text-foreground">
           Vous avez déjà un compte ?{" "}
           <Link
             to="/login"
-            className="font-semibold text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 underline underline-offset-2 decoration-transparent hover:decoration-current transition-all duration-150"
+            className="font-semibold text-warning  underline underline-offset-2 decoration-transparent hover:decoration-current transition-all duration-150"
           >
             Se connecter
           </Link>
         </p>
 
-        <p className="mt-6 text-center text-sm text-stone-500 dark:text-slate-400">
+        <p className="mt-6 text-center text-sm text-foreground">
           Vous etes un agence ?{" "}
           <Link
             to="/register-agency" 
-            className="font-semibold text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 underline underline-offset-2 decoration-transparent hover:decoration-current transition-all duration-150"
+            className="font-semibold text-warning underline underline-offset-2 decoration-transparent hover:decoration-current transition-all duration-150"
           >
-            S'inscrire en tant qu'agence
+            S'inscrire 
           </Link>
         </p>
 

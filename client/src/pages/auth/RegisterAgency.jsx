@@ -67,17 +67,17 @@ export default function RegisterAgency() {
   }
 
   const inputClass =
-    "w-full px-3.5 py-2.5 rounded-xl text-sm border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent bg-stone-50 dark:bg-slate-800 border-stone-200 dark:border-slate-700 text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-slate-600"
+    "w-full px-3.5 py-2.5 rounded-xl input bg-transparent border border-border text-foreground text-sm"
 
-  const labelClass = "block text-sm font-medium mb-1.5 text-stone-700 dark:text-slate-300"
+  const labelClass = "block text-sm font-medium mb-1.5 text-foreground"
 
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-8 bg-stone-100 dark:bg-slate-950 transition-colors duration-300">
-      <div className="w-full max-w-2xl bg-white dark:bg-slate-900 border border-stone-200 dark:border-slate-700 rounded-2xl shadow-xl dark:shadow-slate-900/60 overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center px-4 py-8 bg-background transition-colors duration-300">
+      <div className="w-full max-w-2xl bg-background border border-border rounded-2xl shadow-xl dark:shadow-slate-900/60 overflow-hidden">
 
         {/* Header */}
-        <div className="px-8 pt-8 pb-5 border-b border-stone-100 dark:border-slate-800 text-center">
+        <div className="px-8 pt-8 pb-5 border-b border-border text-center">
           <h1 className="text-2xl font-bold tracking-tight text-stone-900 dark:text-white">
             Créer un compte agence
           </h1>
@@ -89,7 +89,7 @@ export default function RegisterAgency() {
         <form onSubmit={handleSubmit} className="px-8 py-6 max-h-[75vh] overflow-y-auto">
 
           {/* ── Section 1 : Compte ── */}
-          <p className="text-xs font-semibold uppercase tracking-widest text-violet-600 dark:text-violet-400 mb-4">
+          <p className="text-xs font-bold uppercase tracking-widest text-success  mb-4">
             Informations du compte
           </p>
 
@@ -125,7 +125,7 @@ export default function RegisterAgency() {
           </div>
 
           {/* ── Section 2 : Agence ── */}
-          <p className="text-xs font-semibold uppercase tracking-widest text-violet-600 dark:text-violet-400 mb-4">
+          <p className="text-xs font-bold uppercase tracking-widest text-success  mb-4">
             Informations de l'agence
           </p>
 
@@ -161,7 +161,7 @@ export default function RegisterAgency() {
           </div>
 
           {/* ── Section 3 : Localisation ── */}
-          <p className="text-xs font-semibold uppercase tracking-widest text-violet-600 dark:text-violet-400 mb-4">
+          <p className=" text-xs font-bold uppercase tracking-widest text-success  mb-4">
             Localisation &amp; contact
           </p>
 
@@ -172,7 +172,7 @@ export default function RegisterAgency() {
               <select
                 name="country"
                 onChange={handleChange}
-                className={`${inputClass} cursor-pointer`}
+                className={`select select-bordered w-full bg-base-100 bg-background text-foreground cursor-pointer text-base-content disabled:opacity-50 disabled:cursor-not-allowed`}
                 defaultValue=""
               >
                 <option value="" disabled>Sélectionner un pays</option>
@@ -194,7 +194,6 @@ export default function RegisterAgency() {
                 onChange={handleChange}
                 disabled={!selectedCountry}
                 value={form.city}
-                className={`${inputClass} cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed`}
               >
                 <option value="" disabled>
                   {selectedCountry ? 'Sélectionner une ville' : 'Choisissez un pays d\'abord'}
@@ -225,7 +224,7 @@ export default function RegisterAgency() {
               <label className={labelClass}>Numéro de téléphone</label>
               <div className="flex gap-2">
                 {/* Indicatif */}
-                <div className={`flex items-center px-3.5 rounded-xl text-sm border bg-stone-50 dark:bg-slate-800 border-stone-200 dark:border-slate-700 text-stone-500 dark:text-slate-400 whitespace-nowrap min-w-[80px] justify-center font-mono ${!selectedCountry ? 'opacity-50' : ''}`}>
+                <div className={`flex items-center px-3.5 rounded-xl text-sm border bg-background border-stone-200 dark:border-slate-700 text-stone-500 dark:text-slate-400 whitespace-nowrap min-w-[80px] justify-center font-mono ${!selectedCountry ? 'opacity-50' : ''}`}>
                   {selectedCountry ? selectedCountry.dialCode : '+???'}
                 </div>
                 <input
@@ -240,7 +239,7 @@ export default function RegisterAgency() {
                 {errors &&  <p className='text-red-600'>{errors.phone}</p>}
               </div>
               {selectedCountry && (
-                <p className="mt-1 text-xs text-stone-400 dark:text-slate-500">
+                <p className="mt-1 text-xs text-foreground ">
                   Le numéro sera enregistré comme : <span className="font-mono text-stone-600 dark:text-slate-300">{selectedCountry.dialCode}{form.phone || 'XXXXXXXXX'}</span>
                 </p>
               )}
@@ -252,7 +251,7 @@ export default function RegisterAgency() {
           <button
             type="submit"
             disabled={load}
-            className={`w-full py-3 rounded-xl text-sm font-semibold text-white transition-all duration-200 active:scale-95 hover:-translate-y-0.5 shadow-lg bg-blue-700 cursor-pointer hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-900 ${load ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={`w-full btn hover:border-0 border-0 hover:shadow-2xl  block px-3 py-2 rounded-lg text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 shadow-md shadow-amber-500/20 transition-all duration-300 text-center ${load ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             {load ? 'Création en cours...' : 'Créer un compte agence'}
           </button>
@@ -265,16 +264,11 @@ export default function RegisterAgency() {
         <div className="px-8 pb-7 pt-2 text-center space-y-2 border-t border-stone-100 dark:border-slate-800">
           <p className="text-sm text-stone-500 dark:text-slate-400">
             Vous avez déjà un compte ? {' '}
-            <Link to="/login" className="font-semibold text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 underline underline-offset-2 decoration-transparent hover:decoration-current transition-all duration-150">
+            <Link to="/login" className="font-semibold text-success underline underline-offset-2 decoration-transparent hover:decoration-current transition-all duration-150">
               Se connecter
             </Link>
           </p>
-          <p className="text-sm text-stone-500 dark:text-slate-400">
-            Vous êtes un client ?{' '}
-            <Link to="/register" className="font-semibold text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 underline underline-offset-2 decoration-transparent hover:decoration-current transition-all duration-150">
-              S'inscrire en tant que client
-            </Link>
-          </p>
+          
         </div>
       </div>
     </div>
