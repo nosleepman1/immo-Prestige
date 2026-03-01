@@ -11,9 +11,7 @@ const Navbar = () => {
   const navLinks = [
     { name: "Accueil", href: "/" },
     { name: "Propriétés", href: "/properties" },
-    { name: "Agents", href: "/agents" },
     { name: "Contact", href: "/contact" },
-    {name: "Ajouter un bien", href: "/properties/add"}
   ]
 
   const navLinkClass = ({ isActive }) =>

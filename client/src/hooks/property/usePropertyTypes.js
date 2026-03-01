@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { DEVISES } from '../../services/propertyServices'
+import { PROPERTIES_TYPES } from '../../services/propertyServices'
 
 
 
@@ -18,7 +18,7 @@ const usePropertyTypes = () => {
             setLoading(true)
             setError({})
 
-            const response = await DEVISES()
+            const response = await PROPERTIES_TYPES()
             setPropertyTypes(response.data)
             setLoading(false)      
             

@@ -9,6 +9,7 @@ import PrivateRoute from "./routes/PrivateRoutes"
 import RegisterAgency from "./pages/auth/RegisterAgency"
 import { DEVISES, PROPERTIES_TYPES } from "./services/propertyServices"
 import PropertyForm from "./pages/properties/AddProperty"
+//import Properties from "./pages/properties/Properties"
 
 function App() {
 
@@ -33,7 +34,7 @@ function App() {
           
           <Route element={<PrivateRoute />}>
 
-            <Route path="/properties" element={<div className="p-4">Properties Page</div>} />
+            {/* <Route path="/properties" element={<Properties />} /> */}
             <Route path="/properties/add" element={<PropertyForm />} />
             <Route path="/properties/:id" element={<div className="p-4">Property Details Page</div>} />
             <Route path="/properties/:id/edit" element={<div className="p-4">Edit Property Page</div>} />

@@ -7,7 +7,7 @@ import { DEVISES } from "../../services/propertyServices"
 const useDevises = () => {
 
     const [devises, setDevises] = useState([])
-    const [loading, setLoading] = useState(true)
+    const [loadingDevises, setLoading] = useState(true)
     const [errorDevise, setError] = useState({})
 
 
@@ -32,7 +32,7 @@ const useDevises = () => {
 
     }, [])
 
-    return {devises, loading, errorDevise}
+    return {devises, loadingDevises, errorDevise}
 
 }
 
