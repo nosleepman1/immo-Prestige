@@ -1,2 +1,157 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@plugin "daisyui";
 @custom-variant dark (&:where(.dark, .dark *));
+
+
+:root {
+  /* 🌞 LIGHT MODE */
+
+  --background: 36 33% 98%;        /* stone-50 */
+  --foreground: 20 14% 15%;        /* stone-900 */
+
+  --card: 0 0% 100%;
+  --card-foreground: 20 14% 15%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 20 14% 15%;
+
+  --primary: 38 92% 50%;           /* amber-500 */
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 36 20% 90%;         /* stone-200 */
+  --secondary-foreground: 20 14% 20%;
+
+  --muted: 36 20% 90%;
+  --muted-foreground: 25 5% 45%;   /* stone-600 */
+
+  --accent: 38 92% 50%;            /* amber-500 */
+  --accent-foreground: 0 0% 100%;
+
+  --border: 36 20% 85%;            /* stone-200 */
+  --input: 36 20% 85%;
+  --ring: 38 92% 50%;
+
+  --radius: 0.75rem;
+}
+
+.dark {
+  /* 🌙 DARK MODE */
+
+  --background: 20 14% 10%;        /* stone-950 */
+  --foreground: 36 33% 96%;        /* stone-100 */
+
+  --card: 20 14% 15%;              /* stone-900 */
+  --card-foreground: 36 33% 96%;
+
+  --popover: 20 14% 15%;
+  --popover-foreground: 36 33% 96%;
+
+  --primary: 38 92% 60%;           /* amber-400 */
+  --primary-foreground: 20 14% 10%;
+
+  --secondary: 20 10% 25%;         /* stone-800 */
+  --secondary-foreground: 36 33% 90%;
+
+  --muted: 20 10% 25%;
+  --muted-foreground: 25 5% 65%;   /* stone-400 */
+
+  --accent: 38 92% 60%;
+  --accent-foreground: 20 14% 10%;
+
+  --border: 20 10% 25%;
+  --input: 20 10% 25%;
+  --ring: 38 92% 60%;
+}
+
+
+
+ /* 🌞 UTILITAIRES LIGHT / DARK MODE */
+
+.bg-background { background-color: hsl(var(--background)); }
+.text-foreground { color: hsl(var(--foreground)); }
+.text-foreground1 { color: hsl(var(--background) );}
+.bg-card { background-color: hsl(var(--card)); }
+.text-card-foreground { color: hsl(var(--card-foreground)); }
+
+.bg-popover { background-color: hsl(var(--popover)); }
+.text-popover-foreground { color: hsl(var(--popover-foreground)); }
+
+.bg-primary { background-color: hsl(var(--primary)); }
+.text-primary-foreground { color: hsl(var(--primary-foreground)); }
+
+.bg-secondary { background-color: hsl(var(--secondary)); }
+.text-secondary-foreground { color: hsl(var(--secondary-foreground)); }
+
+.bg-muted { background-color: hsl(var(--muted)); }
+.text-muted-foreground { color: hsl(var(--muted-foreground)); }
+
+.bg-accent { background-color: hsl(var(--accent)); }
+.text-accent-foreground { color: hsl(var(--accent-foreground)); }
+
+.border-border { border-color: hsl(var(--border)); }
+
+
+
+
+/* 🌞 BUTTONS / INTERACTIFS */
+
+.btn-primary {
+  background-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+  background-color: hsl(var(--primary) / 0.85); /* léger assombrissement */
+}
+
+.btn-primary:active {
+  background-color: hsl(var(--primary) / 0.7); /* encore plus foncé */
+}
+
+.btn-primary:focus {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+/* SECONDARY BUTTONS */
+.btn-secondary {
+  background-color: hsl(var(--secondary));
+  color: hsl(var(--secondary-foreground));
+  transition: background-color 0.2s;
+}
+
+.btn-secondary:hover {
+  background-color: hsl(var(--secondary) / 0.85);
+}
+
+.btn-secondary:active {
+  background-color: hsl(var(--secondary) / 0.7);
+}
+
+.btn-secondary:focus {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+/* ACCENT BUTTONS */
+.btn-accent {
+  background-color: hsl(var(--accent));
+  color: hsl(var(--accent-foreground));
+  transition: background-color 0.2s;
+}
+
+.btn-accent:hover {
+  background-color: hsl(var(--accent) / 0.85);
+}
+
+.btn-accent:active {
+  background-color: hsl(var(--accent) / 0.7);
+}
+
+.btn-accent:focus {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}

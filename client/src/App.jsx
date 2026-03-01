@@ -7,41 +7,45 @@ import Loader from "./components/Loader"
 import Profile from "./pages/auth/Profile"
 import PrivateRoute from "./routes/PrivateRoutes"
 import RegisterAgency from "./pages/auth/RegisterAgency"
+import { DEVISES, PROPERTIES_TYPES } from "./services/propertyServices"
+import PropertyForm from "./pages/properties/AddProperty"
 
 function App() {
-  
+
+
+    
+    
+    
+    
+    
 
   return (
+
+      
   
       <Router>
         <Navbar />
-
+       
         <Routes>
           
           <Route path="/" element={<Loader />} />
 
           
-            <Route path="/properties" element={
-              <PrivateRoute>
-                <div className="p-4">Properties Page</div>
-              </PrivateRoute>
-            } />
-            
-            
-            <Route path="/agents" element={
-              <PrivateRoute>
-                <div className="p-4">Agents Page</div>
-              </PrivateRoute>
-            } />
-            
-            
+          <Route element={<PrivateRoute />}>
+
+            <Route path="/properties" element={<div className="p-4">Properties Page</div>} />
+            <Route path="/properties/add" element={<PropertyForm />} />
+            <Route path="/properties/:id" element={<div className="p-4">Property Details Page</div>} />
+            <Route path="/properties/:id/edit" element={<div className="p-4">Edit Property Page</div>} />
+
             <Route path="/contact" element={<div className="p-4">Contact Page</div>} />
-           
-            <Route path="/profile" element={
-              <PrivateRoute>
-                <Profile />
-              </PrivateRoute>
-            } />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/about" element={<p>About Page</p>} />
+
+
+          </Route>
+
+            
           
           
           <Route path="/login" element={<Login />} />
