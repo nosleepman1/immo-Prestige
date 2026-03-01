@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('property_type_id')->constrained()->onDelete('cascade');
             $table->foreignId('agency_id')->constrained()->onDelete('cascade');
             $table->foreignId('devise_id')->constrained();
-            $table->string('company_name');
+            $table->string('name');
             $table->text('description')->nullable();
             $table->double('surface');
             $table->double('rooms');
