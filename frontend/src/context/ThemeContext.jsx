@@ -19,8 +19,11 @@ export const ThemeProvider = ({ children }) => {
     const html = document.documentElement;
     if (theme === 'dark') {
       html.classList.add('dark');
+      html.setAttribute('data-theme', 'dark'); // DaisyUI
     } else {
+      console.log('setting to light mode')
       html.classList.remove('dark');
+      html.setAttribute('data-theme', 'light'); // DaisyUI
     }
     localStorage.setItem('theme', theme);
   }, [theme]);

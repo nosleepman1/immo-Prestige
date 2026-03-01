@@ -14,12 +14,6 @@ import PropertyForm from "./pages/properties/AddProperty"
 function App() {
 
 
-    
-    
-    
-    
-    
-
   return (
 
       

@@ -21,7 +21,7 @@ const Login = () => {
     }
 
     return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-background transition-colors duration-300">
+    <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-background  transition-colors duration-300">
 
       {/* Card */}
       <div className="w-full max-w-md bg-background border border-border rounded-2xl shadow-xl dark:shadow-slate-900/60 p-9">

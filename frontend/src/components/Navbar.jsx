@@ -20,7 +20,7 @@ const Navbar = () => {
       : "px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors duration-200"
 
   return (
-    <nav className="bg-background border-b border-border shadow-sm sticky top-0 z-50">
+    <nav className="bg-red border-b border-border shadow-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
 
