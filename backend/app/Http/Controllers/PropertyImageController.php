@@ -16,12 +16,12 @@ class PropertyImageController extends Controller
      */
     public function index()
     {
-        
+
     }
 
 
-    public function showPropertyImage(Property $property){
-        
+    public function showPropertyImages(Property $property){
+
         return PropertyImagesResource::collection($property->images);
     }
 
@@ -30,28 +30,26 @@ class PropertyImageController extends Controller
      */
     public function store(StorePropertyImageRequest $request, Property $property)
     {
-        // $property = Property::find($request->property_id);
 
         if (!$property) {
             return response()->json(['message' => 'Property not found'], 404);
         }
 
         if($request->hasFile('image')) {
-            foreach($request->file('image') as $imageFile) {
-              
-                $imagePath = $imageFile->store('property_images', 'public');
 
-                PropertyImage::create([
-                    'property_id' =>$property->id,
-                    'image_path' => $imagePath
-                ]);
-            }
+            $imageFile = $request->file('image');
+            $imagePath = $imageFile->store('property_images', 'public');
+            
+            PropertyImage::create([
+                'property_id' =>$property->id,
+                'image_path' => $imagePath
+            ]);
+
         }
-        return response()->json(
-            [
-                ['message' => 'Property image(s) created successfully'],
-                'data' => PropertyImage::where('property_id', $request->property_id)->get()
-            ], 201);
+        return response()->json([
+            'message'=> 'creation reusie',
+            'data' => $property->images
+        ]);
     }
     /**
      * Display the specified resource.
@@ -70,11 +68,10 @@ class PropertyImageController extends Controller
         $data = $request->validated();
         $propertyImage->update($data);
 
-        return response()->json(
-            [
-                ['message' => 'Property image updated successfully'],
-                'data' => $propertyImage
-            ], 200);
+        return response()->json([
+            'message'=> 'creation reusie',
+            'data' => $propertyImage->toArray()
+        ]);
     }
 
     /**

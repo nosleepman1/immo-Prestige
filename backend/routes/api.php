@@ -50,6 +50,20 @@ Route::group(['prefix' => 'agency'], function () {
 
 Route::apiResource('properties', PropertyController::class)->middleware(['auth:sanctum']);
 
+//images
+Route::prefix('properties')->group(function () {
+
+    Route::get('/{property}/images', [PropertyImageController::class, 'showPropertyImages']);
+    Route::post('/{property}/images', [PropertyImageController::class, 'store']);
+
+
+});
+
+
+
+
+
+
 // Route::group(['prefix' => 'properties'], function () {
 //     Route::get('/', [PropertyController::class, 'index'])->middleware(['auth:sanctum']);
 //     Route::post('/store', [PropertyController::class, 'store'])->middleware(['auth:sanctum']);

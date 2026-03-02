@@ -17,7 +17,7 @@ class PropertyController extends Controller
      */
     public function index()
     {
-        return PropertyResource::collection(Property::all());
+        return PropertyResource::collection(Property::orderBy('created_at', 'desc')->get());
     }
 
     /**
