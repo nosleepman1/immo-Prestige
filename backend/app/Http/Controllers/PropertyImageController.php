@@ -35,11 +35,12 @@ class PropertyImageController extends Controller
             return response()->json(['message' => 'Property not found'], 404);
         }
 
-        if($request->hasFile('image')) {
 
-            $imageFile = $request->file('image');
+        if($request->hasFile('image_path')) {
+
+            $imageFile = $request->file('image_path');
             $imagePath = $imageFile->store('property_images', 'public');
-            
+
             PropertyImage::create([
                 'property_id' =>$property->id,
                 'image_path' => $imagePath
@@ -48,7 +49,7 @@ class PropertyImageController extends Controller
         }
         return response()->json([
             'message'=> 'creation reusie',
-            'data' => $property->images
+            'data' => $property->images()->get()
         ]);
     }
     /**
