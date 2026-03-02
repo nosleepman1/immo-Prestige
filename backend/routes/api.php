@@ -10,21 +10,28 @@ use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\PropertyImageController;
 use App\Http\Controllers\PropertyTypeController;
 use App\Http\Controllers\UserController;
+use App\Http\Resources\AgencyResource;
 use App\Http\Resources\UserResource;
+use App\Models\Agency;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/user', function (Request $request) {
-    return new UserResource($request->user());
+    $agency = Agency::where('user_id', $request->user()->id)->first();
+
+    return response()->json([
+        'user' => new UserResource($request->user()),
+        'agency' => $agency ? new AgencyResource($agency) : null,
+    ], 200);
 })->middleware('auth:sanctum');
 
 
-Route::group(['prefix' => 'users'], function () {
+Route::group(['prefix' => 'auth'], function () {
         Route::get('/', [UserController::class, 'index']);
-        Route::get('/{user}', [UserController::class, 'show']);
+        Route::get('/user', [UserController::class, 'show'])->middleware(['auth:sanctum']);
         Route::post('/register', [UserController::class, 'store']);
         Route::post('/login', [UserController::class, 'login']);
-        Route::put('/{user}', [UserController::class, 'update'])->middleware(['auth:sanctum', 'verified ']);
+        Route::put('/{user}', [UserController::class, 'update'])->middleware(['auth:sanctum']);
         Route::delete('/{user}', [UserController::class, 'destroy'])->middleware(['auth:sanctum']);
         Route::post('/logout', [UserController::class, 'logout'])->middleware(['auth:sanctum']);
     });
@@ -41,17 +48,17 @@ Route::group(['prefix' => 'agency'], function () {
     Route::delete('/{agency}', [AgencyController::class, 'destroy'])->middleware(['auth:sanctum']);
 });
 
-Route::apiResource('properties', PropertyController::class);
+Route::apiResource('properties', PropertyController::class)->middleware(['auth:sanctum']);
 
-Route::group(['prefix' => 'properties'], function () {
-    Route::get('/', [PropertyController::class, 'index'])->middleware(['auth:sanctum']);
-    Route::post('/store', [PropertyController::class, 'store'])->middleware(['auth:sanctum']);
-    Route::get('/{property}', [PropertyController::class, 'show'])->middleware(['auth:sanctum']);
-    Route::put('/{property}', [PropertyController::class, 'update'])->middleware(['auth:sanctum']);
-    Route::delete('/{property}', [PropertyController::class, 'destroy'])->middleware(['auth:sanctum']);
-    Route::post('/image/{property}', [PropertyImageController::class,'store'])->middleware(['auth-sanctum']);
-    Route::get('/images/{property}', [PropertyImageController::class, 'showPropertyImage'])->middleware(['auth-sanctum']);
-    });
+// Route::group(['prefix' => 'properties'], function () {
+//     Route::get('/', [PropertyController::class, 'index'])->middleware(['auth:sanctum']);
+//     Route::post('/store', [PropertyController::class, 'store'])->middleware(['auth:sanctum']);
+//     Route::get('/{property}', [PropertyController::class, 'show'])->middleware(['auth:sanctum']);
+//     Route::put('/{property}', [PropertyController::class, 'update'])->middleware(['auth:sanctum']);
+//     Route::delete('/{property}', [PropertyController::class, 'destroy'])->middleware(['auth:sanctum']);
+//     Route::post('/image/{property}', [PropertyImageController::class,'store'])->middleware(['auth-sanctum']);
+//     Route::get('/images/{property}', [PropertyImageController::class, 'showPropertyImage'])->middleware(['auth-sanctum']);
+//     });
 
    Route::group(['prefix','messages'], function() {
          Route::get('/conversation/{user}', [PropertyController::class,'MyConversation'])

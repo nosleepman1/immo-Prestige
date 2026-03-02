@@ -37,7 +37,10 @@ class PropertyController extends Controller
 
         $property = Property::create($data);
 
-        return new PropertyResource($property);
+        return response()->json([
+            'message' => 'Property created successfully',
+            'data' => new PropertyResource($property)
+        ], 201);
     }
 
     /**

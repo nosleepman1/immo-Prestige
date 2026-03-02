@@ -7,8 +7,10 @@ use App\Events\UserRegistered;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreLoginRequest;
 use App\Http\Requests\StoreUserRequest;
+use App\Http\Resources\AgencyResource;
 use App\Http\Resources\UserResource;
 use App\Mail\WelcomeMail;
+use App\Models\Agency;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -94,7 +96,13 @@ class UserController extends Controller
 
         $token = $user->createToken(env('TOKEN_SECRET'))->plainTextToken;
 
+        $agency = Agency::where('user_id', $user->id)->first();
+
+
         return response()->json([
+            'message' => 'connexion reussie',
+            'user' => new UserResource($user),
+            'agency' => $agency ? new AgencyResource($agency) : null,
             'access_token' => $token,
             'token_type' => 'Bearer ',
         ], 200)->cookie('token', $token, 60 * 24 * 30);
@@ -105,7 +113,12 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        return new UserResource($user);
+        $agency = Agency::where('user_id', $user->id)->first();
+
+        return response()->json([
+            'user' => new UserResource($user),
+            'agency' => $agency ? new AgencyResource($agency) : null,
+        ], 200);
     }
 
     /**
