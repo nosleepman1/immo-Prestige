@@ -6,13 +6,15 @@ import { NavLink } from "react-router-dom"
 const Navbar = () => {
   const { theme, toggleTheme } = useTheme()
   const [menuOpen, setMenuOpen] = useState(false)
-  const { isAuthenticated, logout } = useContext(AuthContext)
+  const { isAuthenticated, logout, user } = useContext(AuthContext)
 
   const navLinks = [
     { name: "Accueil", href: "/" },
-    { name: "Propriétés", href: "/properties" },
     { name: "Contact", href: "/contact" },
   ]
+
+
+  
 
   const navLinkClass = ({ isActive }) =>
     isActive
@@ -20,7 +22,7 @@ const Navbar = () => {
       : "px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors duration-200"
 
   return (
-    <nav className="bg-red border-b border-border shadow-sm sticky top-0 z-50">
+    <nav className="bg-white dark:bg-black border-b border-border shadow-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
 
@@ -33,11 +35,18 @@ const Navbar = () => {
 
           {/* Desktop Nav Links */}
           <div className="hidden md:flex items-center space-x-1">
+           
             {navLinks.map((page) => (
               <NavLink key={page.name} to={page.href} className={navLinkClass}>
                 {page.name}
               </NavLink>
             ))}
+
+            {user?.user.role == "agency" && (
+              <NavLink to="/properties" className={navLinkClass}>
+                Proprietes
+              </NavLink>
+            )}
           </div>
 
           {/* Right side: theme + auth */}

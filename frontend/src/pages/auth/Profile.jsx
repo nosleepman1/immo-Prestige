@@ -7,7 +7,6 @@ const Profile = () => {
     const {user, loading, error} = useContext(AuthContext)
 
 
-
     if (loading) {
         return <Loader />;
     }
@@ -16,14 +15,19 @@ const Profile = () => {
         return <div className="error">{error}</div>;
     }
 
+
+    console.log(user);
+
     return (
         <div className="profile"> 
             <h2 className="text-2xl font-bold mb-4">Profile</h2>
 
             {user && (
                 <div>
-                    <p>Name: {user.name}</p>
-                    <p>Email: {user.email}</p>
+                    <p>Name: {user.user.name}</p>
+                    <p>Email: {user.user.email}</p>
+                    <p>Role: {user.user.role}</p>
+                    <p>Agency: {user.agency ? user.agency.company_name : 'N/A'}</p>
                 </div>
             )}
 
