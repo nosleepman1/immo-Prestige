@@ -1,11 +1,22 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Building2, Plus } from "lucide-react";
-import { PROPERTIES } from "@/data/properties";
+import { Building2, Loader, Plus } from "lucide-react";
+// import { PROPERTIES } from "@/data/properties";
 import { PropertyCard } from "@/components/properties/PropertyCard";
+import useGetProperties from "@/hooks/property/useGetProperties";
+import CostumLoader from "@/components/Loader";
 
 const Properties = () => {
   const navigate = useNavigate();
+
+  const {properties, loading, error} = useGetProperties()
+
+  const PROPERTIES = properties.data || []
+  console.log(PROPERTIES);
+  
+  
+ 
+
 
   return (
     <div className="min-h-screen flex flex-col p-6 bg-background text-foreground transition-colors duration-300">
@@ -29,8 +40,13 @@ const Properties = () => {
         </Button>
       </div>
 
+      {error && 
+            <div className="" role="alert"> 
+              <p className="text-red-600"></p>
+            </div>}
+
       {/* Grid */}
-      {PROPERTIES.length === 0 ? (
+      {loading ? <CostumLoader /> : PROPERTIES.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground gap-3 py-24">
           <Building2 className="h-12 w-12 opacity-30" />
           <p className="text-lg font-medium">Aucun bien trouvé</p>

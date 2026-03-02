@@ -13,7 +13,7 @@ const PROPERTIES_TYPES = async() => {
 
 const STORE_PROPERTY = async (data, token) => {
     const response = await API.post('/properties', data, {
-        
+
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -22,5 +22,14 @@ const STORE_PROPERTY = async (data, token) => {
     return response.data
 }
 
+const GET_PROPERTIES = async (token) => {
+    const response = await API.get('/properties', {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    })
+    return response.data
+}
 
-export {DEVISES, PROPERTIES_TYPES, STORE_PROPERTY}
+
+export {DEVISES, PROPERTIES_TYPES, STORE_PROPERTY, GET_PROPERTIES}

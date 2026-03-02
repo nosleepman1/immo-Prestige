@@ -56,10 +56,14 @@ export default function AddProperty() {
   };
 
   const handleSubmit = async (e) => {
+    
     e.preventDefault();
-    console.log("Submitting:", formData);
-    const response = await newProperty(formData, token)
-    console.log("Response:", response);
+
+     newProperty(formData, token)
+      .then(() => {
+        navigate('/properties')
+      })
+  
 
   };
 
