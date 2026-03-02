@@ -12,12 +12,14 @@ export const AuthProvider = ({ children }) => {
 
 
     const login = async (newToken) => {
+        
         try {
+
             localStorage.setItem('token', newToken)
             setToken(newToken)
 
             const currentUser = await CURRENT_USER(newToken)
-            setUser(currentUser.data)
+            setUser(currentUser)
 
         } catch (err) {
             localStorage.removeItem('token')
@@ -39,7 +41,7 @@ export const AuthProvider = ({ children }) => {
             if(token) {
                 try {
                     const currentUser = await CURRENT_USER(token)
-                    setUser(currentUser.data)
+                    setUser(currentUser)
                 } catch {
                     logout()
                 }

@@ -2,12 +2,12 @@ import API from './api'
 
 
 const REGISTER = async (userData) => {
-    const response = await API.post('/users/register', userData)
+    const response = await API.post('/auth/register', userData)
     return response.data
 }
 
 const LOGIN = async (credentials) => {
-    const response = await API.post('/users/login', credentials)
+    const response = await API.post('/auth/login', credentials)
     return response.data
 }
 
