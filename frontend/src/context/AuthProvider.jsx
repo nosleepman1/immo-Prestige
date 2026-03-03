@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { AuthContext } from "./AuthContext";
 import { CURRENT_USER } from "../services/authServices";
 
+
 export const AuthProvider = ({ children }) => {
 
     
@@ -50,7 +51,7 @@ export const AuthProvider = ({ children }) => {
         }
 
         loadUser()
-    }, [token])
+    }, [token]) 
 
 
 

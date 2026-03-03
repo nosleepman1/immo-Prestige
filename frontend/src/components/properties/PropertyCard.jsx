@@ -14,16 +14,12 @@ import {
     Heart,
 } from "lucide-react";
 
-export const TYPE_LABELS = {
-    1: "Villa",
-    2: "Studio",
-    3: "Duplex",
-    4: "Appartement",
-};
+
 
 export const PropertyCard = ({ property }) => {
-    const typeLabel = TYPE_LABELS[property.property_type_id] ?? "Bien";
-    const coverImage = property.images?.[0] || "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&q=80";
+    
+    const coverImage = property.images?.[0] ? "http://localhost:8000/storage/" + property.images[0].image_path : "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&q=80";
+ 
 
     return (
         <Card className="group flex flex-col overflow-hidden rounded-[1.25rem] border-0 shadow-lg shadow-black/5 transition-all duration-300 hover:shadow-xl hover:shadow-black/10 hover:-translate-y-1 bg-background dark:shadow-none dark:border dark:border-border">
@@ -43,7 +39,7 @@ export const PropertyCard = ({ property }) => {
                     <div className="flex flex-col gap-1.5 items-start">
                         <Badge className="bg-white/90 text-slate-900 hover:bg-white backdrop-blur-sm border-0 font-medium tracking-wide shadow-sm rounded-lg px-2.5 py-1">
                             <Building2 className="mr-1.5 h-3.5 w-3.5 text-primary" />
-                            {typeLabel}
+                            {property.property_type?.name}
                         </Badge>
                         {property.furnished && (
                             <Badge className="bg-primary/90 text-primary-foreground hover:bg-primary backdrop-blur-sm border-0 font-medium tracking-wide shadow-sm rounded-lg px-2.5 py-1">

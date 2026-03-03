@@ -12,9 +12,6 @@ const Properties = () => {
   const {properties, loading, error} = useGetProperties()
 
   const PROPERTIES = properties.data || []
-  console.log(PROPERTIES);
-  
-  
  
 
 

@@ -1,10 +1,10 @@
 import React from 'react'
-import Loader from '../components/Loader'
+import {   ButtonDialog } from '@/components/utils/Dialog'
 
 export default function Home() {
   return (
     <div>
-        <Loader />
+        
     </div>
   )
 }

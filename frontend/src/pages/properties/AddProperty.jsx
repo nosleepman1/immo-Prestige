@@ -6,6 +6,7 @@ import useDevises from "../../hooks/property/useDevises";
 import COUNTRIES from "../../data/countries";
 import { AuthContext } from "@/context/AuthContext";
 import usePostProperty from "@/hooks/property/usePostProperty";
+import usePostPropertyImage from "@/hooks/property/usePostPropertyImage";
 
 // Mock Agencies since it's a foreign key
 
@@ -21,13 +22,13 @@ export default function AddProperty() {
   const { devises, loadingDevises } = useDevises() || {};
   const {newProperty, loading, errors} = usePostProperty() || {};
   const {user, token} = useContext(AuthContext) || {};
+  
 
- 
 
   const [formData, setFormData] = useState({
     name: "",
     property_type_id: "",
-    agency_id: user.agency.id,
+    agency_id: user?.agency.id || "",
     devise_id: "",
     price: "",
     surface: "",
@@ -53,17 +54,33 @@ export default function AddProperty() {
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
+
   };
+
+  const {storeImage, loadingImage, errorsImage} = usePostPropertyImage()
+
+ 
 
   const handleSubmit = async (e) => {
     
     e.preventDefault();
+    const fileInput = document.getElementById("image");
+    const selectedFile = fileInput?.files[0];
 
-     newProperty(formData, token)
-      .then(() => {
-        navigate('/properties')
-      })
-  
+    
+    const propertyId =  await newProperty(formData, token)
+    
+    if(selectedFile) {
+      await storeImage(propertyId, selectedFile)
+        .then(() => {
+          navigate("/properties");
+        })
+        .catch((error) => {
+          console.log(error);
+          navigate("/properties");
+        })
+      
+    } 
 
   };
 
@@ -93,6 +110,8 @@ export default function AddProperty() {
               Remplissez les informations ci-dessous.
             </p>
             {errors && (<p>{errors.message}</p>)}
+            {errorsImage && (<p>{errorsImage.message}</p>)}
+          
           </div>
         </div>
 
@@ -356,6 +375,27 @@ export default function AddProperty() {
               </div>
             </div>
 
+            <div className="px-8 py-4">
+              <label htmlFor="image" className="block text-foreground my-2">
+                Sélectionner une image
+              </label>
+              
+              <input
+                type="file"
+                id="image"
+                name="image_path"
+                onChange={(e) => {
+                  const file = e.target.files[0];
+                  setImageFile(file) // test immédiat
+                  console.log(file);
+                  console.log(imageFile);
+                  
+                }}
+                className="block w-full text-sm text-foreground border border-border rounded px-2 py-1 cursor-pointer"
+              />
+            </div>
+
+
             {/* Actions */}
             <div className="p-6 md:p-8 flex items-center justify-end gap-3 bg-muted/20 border-t border-border mt-auto">
               <button
@@ -367,10 +407,10 @@ export default function AddProperty() {
               </button>
               <button
                 type="submit"
-                className={`cursor-pointer inline-flex items-center gap-2 px-6 py-2.5 rounded-xl font-semibold bg-primary text-primary-foreground shadow-sm hover:opacity-90 active:scale-[0.98] transition-all ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                className={`cursor-pointer inline-flex items-center gap-2 px-6 py-2.5 rounded-xl font-semibold bg-primary text-primary-foreground shadow-sm hover:opacity-90 active:scale-[0.98] transition-all ${loading || loadingImage ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
                 <Save className="" />
-                {loading ? "Enregistrement en cours..." : "Enregistrer"}
+                {loading || loadingImage ? "Enregistrement en cours..." : "Enregistrer"}
               </button>
             </div>
           </form>
