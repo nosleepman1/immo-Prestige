@@ -16,9 +16,9 @@ class PropertyResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'property_type_id' => $this->property_type_id,
-            'agency_id' => $this->agency_id,
-            'devise_id' => $this->devise_id,
+            'property_type' => new PropertyTypeResource($this->whenLoaded('propertyType')),
+            'agency' => new AgencyResource($this->whenLoaded('agency')),
+            'devise' => new DeviseRessource($this->whenLoaded('devise')),
             'name' => $this->name,
             'description' => $this->description,
             'surface' => $this->surface,
@@ -36,7 +36,8 @@ class PropertyResource extends JsonResource
             'sold' => $this->sold,
             'is_active' => $this->is_active,
             'created_at' => $this->createdAt,
-            'updated_at' => $this->updatedAt     
+            'updated_at' => $this->updatedAt,
+            'images' => PropertyImagesResource::collection($this->whenLoaded('images'))
 
         ];
     }

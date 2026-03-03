@@ -17,7 +17,15 @@ class PropertyController extends Controller
      */
     public function index()
     {
-        return PropertyResource::collection(Property::orderBy('created_at', 'desc')->get());
+        //pagination with current page and next page    
+        $property = Property::with('images')
+            ->with('propertyType')
+            ->with('devise')
+            ->with('agency')
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+
+        return PropertyResource::collection($property);
     }
 
     /**
