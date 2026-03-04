@@ -4,18 +4,10 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { IconSearch, IconPin, IconEye, IconEdit, IconTrash, IconPlus, IconHome } from "@/components/utils/Icons";
 import { ButtonDialog } from "@/components/utils/Dialog";
+import useDeleteProperty from "@/hooks/property/useDeleteProperty";
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Helpers
-// ─────────────────────────────────────────────────────────────────────────────
-const formatPrice = (price, currency = "XOF") => {
-  const locales = { XOF: "fr-FR", EUR: "fr-FR", USD: "en-US" };
-  return new Intl.NumberFormat(locales[currency] || "fr-FR", {
-    style: "currency",
-    currency,
-    maximumFractionDigits: 0,
-  }).format(price);
-};
+
+
 
 // Construit l'URL de l'image à partir du path relatif Laravel
 const imgUrl = (path) =>
@@ -45,34 +37,17 @@ const PropertyImage = ({ src, alt }) => {
   return <img src={src} alt={alt} onError={() => setError(true)} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />;
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
-// PropertiesTable
-//
-// Props:
-//   response  — objet complet retourné par Laravel (data + links + meta)
-//   onPageChange(page) — appelé quand l'utilisateur change de page
-//   onView(property)   — callback bouton Voir
-//   onEdit(property)   — callback bouton Modifier
-//   onDelete(property) — callback bouton Supprimer
-//   onAdd()            — callback bouton Ajouter
-// ─────────────────────────────────────────────────────────────────────────────
-const PropertiesTable = ({
-  response,          // { data, links, meta }
-  onPageChange,
-  onView,
-  onEdit,
-  onDelete,
-  onAdd,
-}) => {
+const PropertiesTable = () => {
+
   const [search, setSearch] = useState("");
-  const     [page, setPage] = useState(1);
+  const [page, setPage] = useState(1);
 
   const navigate = useNavigate();
 
-  const {properties, loading, error} = useGetProperties(page)
+  const {properties, loading, error, refetch} = useGetProperties(page)
+  const { deleteProperty, loading: deleteLoading, error: deleteError } = useDeleteProperty()
 
 
-  // Extraire data / meta / links depuis la réponse Laravel
   const meta        = properties?.meta   ?? {};
   const links       = properties?.links  ?? {};
   const data        = properties?.data ?? []
@@ -85,12 +60,12 @@ const PropertiesTable = ({
 
  
 
-  // Filtrage local (sur la page courante uniquement — le vrai filtre reste côté serveur)
+  
   const filtered = data?.filter((p) => {
     const q = search.toLowerCase();
     return (
       p.name?.toLowerCase().includes(q) ||
-      p.city?.toLowerCase().includes(q) ||
+      p.region?.toLowerCase().includes(q) ||
       p.property_type?.name?.toLowerCase().includes(q) ||
       p.agency?.company_name?.toLowerCase().includes(q)
     );
@@ -120,8 +95,17 @@ const PropertiesTable = ({
     navigate(`/properties/${id}/edit`)
   }
 
-  const handleDelete = (id) => {
-    alert(id)
+  const [deleted, setDeleted] = useState(false)
+  const handleDelete = async (id) => {
+    await deleteProperty(id)
+      .then(() => {
+        setDeleted(true)
+        refetch()
+        setTimeout(() => setDeleted(false), 2000)
+      })
+      .catch((error) => {
+        console.error(error)
+      })
   }
 
   return (
@@ -129,7 +113,11 @@ const PropertiesTable = ({
       {loading ? <CostumLoader /> : ( 
       <div className="max-w-7xl mx-auto space-y-6">
 
-        {/* ── Header ── */}
+        {deleted && (
+          <div className="alert alert-success" role="alert">
+            <span>Propriété supprimée avec succès</span>
+          </div>
+        )}
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold tracking-tight">{filtered[0]?.agency?.company_name}</h1>
@@ -207,7 +195,7 @@ const PropertiesTable = ({
                           <p className="font-semibold text-sm">{property.name}</p>
                           <p className="text-xs opacity-40 mt-0.5 flex items-center gap-1">
                             <IconPin />
-                            {[property.city, property.region]
+                            {[property.region, property.country]
                               .filter(Boolean).join(", ")}
                           </p>
                         

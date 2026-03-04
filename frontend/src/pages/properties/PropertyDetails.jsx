@@ -37,8 +37,7 @@ const IMAGES = [
 ];
 
 /* ─── HELPERS ───────────────────────────────────────── */
-const fmt = (n) =>
-  new Intl.NumberFormat("fr-FR").format(n);
+const fmt = (n) => new Intl.NumberFormat("fr-FR").format(n);
 
 const Val = ({ v }) =>
   v === null || v === undefined ? (
@@ -53,7 +52,7 @@ export default function PropertyDetail() {
     const {id} = useParams()
     const {property, loading, error} = useGetProperty(id)
     const [imgIdx, setImgIdx] = useState(0);
-  const [direction, setDirection] = useState(1);
+    const [direction, setDirection] = useState(1);
 
   const prev = () => {
     setDirection(-1);
@@ -88,8 +87,7 @@ export default function PropertyDetail() {
   /* detail rows parsed from json */
   const details = [
     { label: "Pays", value: property?.country, icon: <BsGeoAlt /> },
-    { label: "Région", value: property?.region, icon: <HiLocationMarker /> },
-    { label: "Ville", value: property?.city, icon: <HiHome /> },
+    { label: "Région/Ville", value: property?.region, icon: <HiLocationMarker /> },
     { label: "Adresse", value: property?.address, icon: <HiLocationMarker /> },
     { label: "Étage", value: property?.floor, icon: <MdStairs /> },
     { label: "Meublé", value: property?.furnished ? "Oui" : "Non", icon: <MdChair /> },
@@ -109,21 +107,21 @@ export default function PropertyDetail() {
 
         {loading ? <CostumLoader /> : (
             <div className="min-h-screen bg-background text-foreground font-['Outfit',sans-serif]">
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,600;0,700;1,500&family=Outfit:wght@300;400;500;600&display=swap');
-        .font-display { font-family: 'Cormorant', serif; }
-        .font-body    { font-family: 'Outfit', sans-serif; }
-        .gold         { color: #C9935A; }
-        .gold-bg      { background: #C9935A; }
-        .gold-border  { border-color: #C9935A; }
-        .glass {
-          background: rgba(var(--b1-rgb, 255 255 255) / 0.06);
-          backdrop-filter: blur(18px);
-          -webkit-backdrop-filter: blur(18px);
-        }
-        .scrollbar-thin::-webkit-scrollbar { width: 4px; height: 4px; }
-        .scrollbar-thin::-webkit-scrollbar-thumb { background: #C9935A44; border-radius: 99px; }
-      `}</style>
+              <style>{`
+                @import url('https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,600;0,700;1,500&family=Outfit:wght@300;400;500;600&display=swap');
+                .font-display { font-family: 'Cormorant', serif; }
+                .font-body    { font-family: 'Outfit', sans-serif; }
+                .gold         { color: #C9935A; }
+                .gold-bg      { background: #C9935A; }
+                .gold-border  { border-color: #C9935A; }
+                .glass {
+                  background: rgba(var(--b1-rgb, 255 255 255) / 0.06);
+                  backdrop-filter: blur(18px);
+                  -webkit-backdrop-filter: blur(18px);
+                }
+                .scrollbar-thin::-webkit-scrollbar { width: 4px; height: 4px; }
+                .scrollbar-thin::-webkit-scrollbar-thumb { background: #C9935A44; border-radius: 99px; }
+              `}</style>
 
       {/* ══════════════════════════════════════
           HERO — full‑height image carousel
@@ -188,7 +186,7 @@ export default function PropertyDetail() {
             className="flex items-center gap-2 text-white/60 text-sm mb-7 font-body"
           >
             <HiLocationMarker className="gold text-base shrink-0" />
-            {property.address}, {property.city}, {property.region}
+            {property.address}, {property.region}, {property.country}
           </motion.div>
 
           {/* STAT PILLS */}
@@ -334,7 +332,7 @@ export default function PropertyDetail() {
                 <HiLocationMarker className="gold text-4xl" />
                 <div className="text-center font-body">
                   <p className="text-sm font-medium">{property.address}</p>
-                  <p className="text-xs text-base-content/45 mt-0.5">{property.city}, {property.region}, {property.country}</p>
+                  <p className="text-xs text-base-content/45 mt-0.5">{property.region}, {property.country}</p>
                 </div>
                 <div className="flex gap-6 mt-2 text-xs text-base-content/35 font-body">
                   <span>Lng: <Val v={property.longitude} /></span>

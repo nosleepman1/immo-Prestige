@@ -15,7 +15,7 @@ const usePostProperty = () => {
 
         try {
             const response = await STORE_PROPERTY(formData, token)
-            console.log(response.data.id);
+            console.log(response);
             return response.data.id
             
             

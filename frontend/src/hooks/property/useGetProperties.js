@@ -3,16 +3,21 @@ import API from "@/services/api"
 import { useContext, useEffect, useState } from "react"
 
 const useGetProperties = (page = 1) => {
-    // On initialise avec la bonne forme { data, links, meta }
+   
     const [properties, setProperties] = useState({ data: [], links: {}, meta: {} })
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState({})
     const { token } = useContext(AuthContext)
+    const [refreshTrigger, setRefreshTrigger] = useState(0)
+
+    const refetch = () => setRefreshTrigger(prev => prev + 1)
 
     useEffect(() => {
+        
         const getProperties = async () => {
             setLoading(true)
             setError({})
+
 
             try {
                 const response = await API.get(`/properties?page=${page}`, {
@@ -20,7 +25,7 @@ const useGetProperties = (page = 1) => {
                         'Authorization': `Bearer ${token}`
                     }
                 })
-                setProperties(response.data) // stocke { data, links, meta }
+                setProperties(response.data) 
             } catch (error) {
                 if (error.response?.data?.message) {
                     setError(error.response.data.message)
@@ -34,9 +39,9 @@ const useGetProperties = (page = 1) => {
             }
         }
         getProperties()
-    }, [page]) // ← re-fetch automatique quand page change
+    }, [page, refreshTrigger]) // ← re-fetch automatique quand page change ou appel de refetch()
 
-    return { properties, loading, error }
+    return { properties, loading, error, refetch }
 }
 
 export default useGetProperties

@@ -14,7 +14,6 @@ const PROPERTIES_TYPES = async() => {
 
 const STORE_PROPERTY = async (data, token) => {
     const response = await API.post('/properties', data, {
-
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -53,5 +52,24 @@ const GET_PROPERTY = async (id, token) => {
     return response.data
 }
 
+const UPDATE_PROPERTY = async (id, data, token) => {
+    const response = await API.put(`/properties/${id}`, data, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    })
+    return response.data
+}
 
-export {DEVISES, PROPERTIES_TYPES, STORE_PROPERTY, GET_PROPERTIES, STORE_IMAGE, GET_PROPERTY}
+const DELETE_PROPERTY = async (id, token) => {
+    const response = await API.delete(`/properties/${id}`, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    })
+    console.log(response);
+    return response.data
+}
+
+
+export {DEVISES, PROPERTIES_TYPES, STORE_PROPERTY, GET_PROPERTIES, STORE_IMAGE, GET_PROPERTY, UPDATE_PROPERTY, DELETE_PROPERTY}

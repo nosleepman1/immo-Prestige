@@ -20,8 +20,11 @@ export default function AddProperty() {
 
   const { propertyTypes } = usePropertyTypes() || {};
   const { devises, loadingDevises } = useDevises() || {};
+  
   const {newProperty, loading, errors} = usePostProperty() || {};
   const {user, token} = useContext(AuthContext) || {};
+
+  const [imageFile, setImageFile] = useState(null);
   
 
 
@@ -36,8 +39,8 @@ export default function AddProperty() {
     bedrooms: "",
     floor: "",
     country: "",
-    region: "dakar",
-    address: "",
+    region: "",
+    city: "",
     description: "",
     furnished: false,
     is_active: true,
@@ -67,20 +70,25 @@ export default function AddProperty() {
     const fileInput = document.getElementById("image");
     const selectedFile = fileInput?.files[0];
 
+    console.log(formData);
     
     const propertyId =  await newProperty(formData, token)
+    console.log(propertyId);
     
-    if(selectedFile) {
-      await storeImage(propertyId, selectedFile)
-        .then(() => {
-          navigate("/properties");
-        })
-        .catch((error) => {
-          console.log(error);
-          navigate("/properties");
-        })
-      
-    } 
+    if(propertyId){
+      if(selectedFile) {
+        
+        await storeImage(propertyId, selectedFile)
+          .then(() => {
+            navigate("/properties");
+          })
+
+          .catch((error) => {
+            console.log(error);
+          })
+      }
+    }
+     
 
   };
 
@@ -290,8 +298,8 @@ export default function AddProperty() {
                     value={formData.country}
                     onChange={(e) => {
                       handleChange(e);
-                      // Reset city when country changes
-                      setFormData((prev) => ({ ...prev, city: "" }));
+                      // Reset region when country changes
+                      setFormData((prev) => ({ ...prev, region: "" }));
                     }}
                   >
                     <option value="" disabled>Sélectionner un pays</option>
@@ -302,10 +310,10 @@ export default function AddProperty() {
                 </div>
 
                 <div>
-                  <label htmlFor="city" className={labelClass}>Ville *</label>
+                  <label htmlFor="region" className={labelClass}>Ville *</label>
                   <select
-                    id="city"
-                    name="city"
+                    id="region"
+                    name="region"
                     required
                     className={selectClass}
                     value={formData.region}
@@ -320,15 +328,15 @@ export default function AddProperty() {
                 </div>
 
                 <div className="md:col-span-2">
-                  <label htmlFor="address" className={labelClass}>Adresse complète *</label>
+                  <label htmlFor="city" className={labelClass}>Adresse complète *</label>
                   <input
-                    id="address"
-                    name="address"
+                    id="city"
+                    name="city"
                     type="text"
                     required
                     placeholder="ex: 12 Rue des Almadies"
                     className={inputClass}
-                    value={formData.address}
+                    value={formData.city}
                     onChange={handleChange}
                   />
                 </div>
@@ -387,8 +395,6 @@ export default function AddProperty() {
                 onChange={(e) => {
                   const file = e.target.files[0];
                   setImageFile(file) // test immédiat
-                  console.log(file);
-                  console.log(imageFile);
                   
                 }}
                 className="block w-full text-sm text-foreground border border-border rounded px-2 py-1 cursor-pointer"
