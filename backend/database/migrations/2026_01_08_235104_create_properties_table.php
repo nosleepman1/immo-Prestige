@@ -27,7 +27,6 @@ return new class extends Migration
             $table->string('country');
             $table->string('region');
             $table->string('city');
-            $table->string('address');
             $table->string('longitude')->nullable();
             $table->string('latitude')->nullable();
             $table->boolean('sold')->default(false);

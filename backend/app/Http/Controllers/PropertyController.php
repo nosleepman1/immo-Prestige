@@ -85,6 +85,7 @@ class PropertyController extends Controller
     {
         // property deletion logic here
         $property->delete();
+        
         return response()->json([
             'message' => 'Property deleted successfully'
         ], 200);
