@@ -194,6 +194,7 @@ export default function RegisterAgency() {
                 onChange={handleChange}
                 disabled={!selectedCountry}
                 value={form.city}
+                className={`select select-bordered w-full bg-base-100 bg-background text-foreground cursor-pointer text-base-content disabled:opacity-50 disabled:cursor-not-allowed`}
               >
                 <option value="" disabled>
                   {selectedCountry ? 'Sélectionner une ville' : 'Choisissez un pays d\'abord'}
