@@ -19,6 +19,7 @@ class PropertyResource extends JsonResource
             'property_type' => new PropertyTypeResource($this->whenLoaded('propertyType')),
             'agency' => new AgencyResource($this->whenLoaded('agency')),
             'devise' => new DeviseRessource($this->whenLoaded('devise')),
+            'is_posted' => $this->is_posted,
             'name' => $this->name,
             'description' => $this->description,
             'surface' => $this->surface,

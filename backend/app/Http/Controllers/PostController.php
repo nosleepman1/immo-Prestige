@@ -8,6 +8,7 @@ use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
 use App\Http\Resources\PostResource;
 use App\Models\Agency;
+use App\Models\Property;
 use Illuminate\Support\Facades\Auth;
 
 class PostController extends Controller
@@ -17,7 +18,6 @@ class PostController extends Controller
      */
     public function index()
     {
-       
         return PostResource::collection(Post::all());
     }
 
@@ -38,17 +38,36 @@ class PostController extends Controller
         if(Auth::user()->role !== 'agency'){
              return response()->json(
                 [
-                    'error' => 'unAuthorize'
+                    'error' => 'Vous n\'avez pas le droit de poster'
                 ],
                 403
              );
         }
 
         $data = $request->validated();
+
         $data['user_id'] = Auth::user()->id;
+
+        $property = Property::find($data['property_id']);
+
+        if($property->is_posted){
+            return response()->json([
+                'message' => 'This property is already posted'
+            ], 400);
+        }
         
-        $post = Post::create($data);
-        return new PostResource($post);
+        $res = $property->update([
+            'is_posted' => true
+        ]);
+
+        if($res){
+            $post = Post::create($data);
+            return new PostResource($post);
+        }
+
+        return response()->json([
+            'message' => 'Failed to update agency.'
+        ], 500);
        
     }
 
@@ -57,6 +76,20 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
+        return new PostResource($post);
+    }
+
+
+    public function update(UpdatePostRequest $request, Post $post)
+    {
+        if(Auth::user()->id !== $post->user_id){
+            return response()->json([
+                'error' => 'Vous n\'avez pas le droit de modifier ce post'
+            ], 403);
+        }
+
+        $data = $request->validated();
+        $post->update($data);
         return new PostResource($post);
     }
 

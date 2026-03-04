@@ -29,7 +29,8 @@ class Property extends Model
         'longitude',
         'latitude',
         'sold',
-        'is_active'
+        'is_active',
+        'is_posted'
     ];
 
 
@@ -56,7 +57,7 @@ class Property extends Model
 
 
     public function post() {
-        return $this->hasOne(Post::class);
+        return $this->hasMany(Post::class);
     }
 
 

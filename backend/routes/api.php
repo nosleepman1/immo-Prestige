@@ -48,31 +48,32 @@ Route::group(['prefix' => 'agency'], function () {
     Route::delete('/{agency}', [AgencyController::class, 'destroy'])->middleware(['auth:sanctum']);
 });
 
+
+
+
 Route::apiResource('properties', PropertyController::class)->middleware(['auth:sanctum']);
 
-//images
 Route::prefix('properties')->group(function () {
-
     Route::get('/{property}/images', [PropertyImageController::class, 'showPropertyImages']);
     Route::post('/{property}/images', [PropertyImageController::class, 'store']);
-
-
 });
 
 
 
 
+Route::group(['prefix'=> 'posts'], function () {
+
+    Route::post('/new', [PostController::class,'store'])->middleware(['auth:sanctum']);
+    Route::get('/', [PostController::class,'index']);
+    Route::get('/{post}', [PostController::class,'show']);
+    Route::put('/{post}', [PostController::class,'update'])->middleware(['auth:sanctum']);
+    Route::delete('/{post}', [PostController::class,'destroy'])->middleware(['auth:sanctum']);
+    
+});
 
 
-// Route::group(['prefix' => 'properties'], function () {
-//     Route::get('/', [PropertyController::class, 'index'])->middleware(['auth:sanctum']);
-//     Route::post('/store', [PropertyController::class, 'store'])->middleware(['auth:sanctum']);
-//     Route::get('/{property}', [PropertyController::class, 'show'])->middleware(['auth:sanctum']);
-//     Route::put('/{property}', [PropertyController::class, 'update'])->middleware(['auth:sanctum']);
-//     Route::delete('/{property}', [PropertyController::class, 'destroy'])->middleware(['auth:sanctum']);
-//     Route::post('/image/{property}', [PropertyImageController::class,'store'])->middleware(['auth-sanctum']);
-//     Route::get('/images/{property}', [PropertyImageController::class, 'showPropertyImage'])->middleware(['auth-sanctum']);
-//     });
+
+
 
    Route::group(['prefix','messages'], function() {
          Route::get('/conversation/{user}', [PropertyController::class,'MyConversation'])
@@ -95,8 +96,7 @@ Route::prefix('properties')->group(function () {
 
 
 
-Route::apiResource('posts', PostController::class)
-        ->middleware(['auth:sanctum']);
+
 
 
 

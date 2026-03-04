@@ -31,6 +31,7 @@ return new class extends Migration
             $table->string('latitude')->nullable();
             $table->boolean('sold')->default(false);
             $table->boolean('is_active')->default(false);
+            $table->boolean('is_posted')->default(false);
             $table->timestamps();
         });
     }
