@@ -9,6 +9,8 @@ import PropertyForm from "./pages/properties/AddProperty"
 import PropertiesTable from "./pages/properties/PropertiesTable"
 import Home from "./pages/Home"
 import PropertyDetails from "./pages/properties/PropertyDetails"
+import EditProperty from "./pages/properties/EditProperty"
+import PropertyDetailsClient from "./pages/properties/PropertyDetailsClient"
 
 function App() {
 
@@ -26,11 +28,16 @@ function App() {
             <Route path="/properties" element={<PropertiesTable />} />
             <Route path="/properties/new" element={<PropertyForm />} />
             <Route path="/properties/:id" element={<PropertyDetails />} />
-            <Route path="/properties/:id/edit" element={<div className="p-4">Edit Property Page</div>} />
+            <Route path="/properties/:id/edit" element={<EditProperty />} />
+
+            
+            <Route path="/property/:id/client" element={<PropertyDetailsClient />} />
+
+
 
             <Route path="/contact" element={<div className="p-4">Contact Page</div>} />
             <Route path="/profile" element={<Profile />} />
-            <Route path="/about" element={<p>About Page</p>} />
+       
 
 
           </Route>

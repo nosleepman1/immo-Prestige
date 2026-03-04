@@ -12,7 +12,7 @@ import usePostPropertyImage from "@/hooks/property/usePostPropertyImage";
 
 
 
-export default function AddProperty() {
+export default function EditProperty() {
 
 
   const navigate = useNavigate();

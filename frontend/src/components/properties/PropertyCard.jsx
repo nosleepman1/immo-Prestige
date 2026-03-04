@@ -13,13 +13,14 @@ import {
     Home,
     Heart,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 
 
 export const PropertyCard = ({ property }) => {
     
     const coverImage = property.images?.[0] ? "http://localhost:8000/storage/" + property.images[0].image_path : "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&q=80";
- 
+    const navigate = useNavigate();
 
     return (
         <Card className="group flex flex-col overflow-hidden rounded-[1.25rem] border-0 shadow-lg shadow-black/5 transition-all duration-300 hover:shadow-xl hover:shadow-black/10 hover:-translate-y-1 bg-background dark:shadow-none dark:border dark:border-border">
@@ -124,15 +125,17 @@ export const PropertyCard = ({ property }) => {
 
                     {/* Quick Actions */}
                     <div className="flex items-center gap-1.5 translate-y-1 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
-                        <Button size="icon" variant="ghost" className="h-9 w-9 rounded-xl bg-muted/50 text-foreground hover:bg-primary hover:text-primary-foreground transition-colors">
-                            <Eye className="h-4 w-4" />
+                        <Button  
+                            className="btn btn-primary border-0 rounded-xl bg-muted/50 
+                            text-foreground hover:bg-primary hover:text-primary-foreground 
+                            transition-colors"
+                            onClick={() => navigate(`/property/${property.id}/client`)} 
+                            >
+
+                               
+                            <Eye  /> details
                         </Button>
-                        <Button size="icon" variant="ghost" className="h-9 w-9 rounded-xl bg-muted/50 text-foreground hover:bg-primary hover:text-primary-foreground transition-colors">
-                            <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button size="icon" variant="ghost" className="h-9 w-9 rounded-xl bg-muted/50 text-destructive hover:bg-destructive hover:text-destructive-foreground transition-colors">
-                            <Trash2 className="h-4 w-4" />
-                        </Button>
+                        
                     </div>
                 </div>
             </CardContent>
