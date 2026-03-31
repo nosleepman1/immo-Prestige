@@ -17,7 +17,8 @@ class PropertyImageFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'image_path' => 'https://picsum.photos/400/300?random=' . fake()->unique()->numberBetween(1, 10000),
+            'is_cover' => true,
         ];
     }
 }
