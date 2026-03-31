@@ -31,14 +31,13 @@ class PropertyResource extends JsonResource
             'country' => $this->country,
             'region' => $this->region,
             'city' => $this->city,
-            'address' => $this->address,
             'longitude' => $this->longitude,
             'latitude' => $this->latitude,
             'sold' => $this->sold,
             'is_active' => $this->is_active,
-            'created_at' => $this->createdAt,
-            'updated_at' => $this->updatedAt,
-            'images' => PropertyImagesResource::collection($this->whenLoaded('images'))
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+            'images' => PropertyImageResource::collection($this->whenLoaded('images'))
 
         ];
     }

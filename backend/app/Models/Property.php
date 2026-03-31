@@ -20,7 +20,7 @@ class Property extends Model
         'rooms',
         'bedrooms',
         'floor',
-        'funished',
+        'furnished',
         'price',
         'country',
         'region',

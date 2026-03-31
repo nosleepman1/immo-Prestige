@@ -10,6 +10,7 @@ use App\Http\Resources\PostResource;
 use App\Models\Agency;
 use App\Models\Property;
 use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\Request;
 
 class PostController extends Controller
 {
@@ -18,7 +19,20 @@ class PostController extends Controller
      */
     public function index()
     {
-        return PostResource::collection(Post::all());
+        $posts = Post::with([
+                'user',
+                'user.agencies',
+                'property',
+                'property.images',
+                'property.propertyType',
+                'property.agency',
+                'property.devise'
+            ])
+            ->withCount(['likes', 'comments'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+
+        return PostResource::collection($posts);
     }
 
 
@@ -79,19 +93,6 @@ class PostController extends Controller
         return new PostResource($post);
     }
 
-
-    public function update(UpdatePostRequest $request, Post $post)
-    {
-        if(Auth::user()->id !== $post->user_id){
-            return response()->json([
-                'error' => 'Vous n\'avez pas le droit de modifier ce post'
-            ], 403);
-        }
-
-        $data = $request->validated();
-        $post->update($data);
-        return new PostResource($post);
-    }
 
 
 
