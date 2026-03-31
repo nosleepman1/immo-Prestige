@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\Agency;
+use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -12,7 +14,7 @@ class AgencySeeder extends Seeder
      */
     public function run(): void
     {
-        $user = \App\Models\User::firstOrCreate(
+        $user = User::firstOrCreate(
             ['email' => 'tine@gmail.com'],
             [
                 'name' => 'Mohamed TINE',
@@ -21,14 +23,13 @@ class AgencySeeder extends Seeder
             ]
         );
 
-        \App\Models\Agency::create([
+        Agency::create([
             'user_id' => $user->id,
             'company_name' => 'AMBO TECH',
             'description' => "Nous sommes une startup tech qui evolue auussi dans le secteur de l'immobilier",
             'address' => 'Keur Massar',
             'city' => 'Dakar',
             'phone' => '773757077',
-            'email' => 'tine@gmail.com',
             'id_card' => '16482000021'
         ]);
     }
