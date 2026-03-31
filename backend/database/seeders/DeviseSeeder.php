@@ -14,12 +14,12 @@ class DeviseSeeder extends Seeder
     public function run(): void
     {
         $devises = [
-            ['name' => 'Euro', 'symbol' => '€'],
-            ['name' => 'Dollar', 'symbol' => '$'],
-            ['name' => 'Pound', 'symbol' => '£'],
-            ['name' => 'CFA', 'symbol' => 'CFA'],
-            ['name'=> 'Yen', 'symbol'=> '¥'],
-            ['name'=> 'Yuan', 'symbol'=> '¥'],       
+            ['name' => 'Euro', 'code' => '€'],
+            ['name' => 'Dollar', 'code' => '$'],
+            ['name' => 'Pound', 'code' => '£'],
+            ['name' => 'CFA', 'code' => 'CFA'],
+            ['name'=> 'Yen', 'code'=> '¥'],
+            ['name'=> 'Yuan', 'code'=> 'Y'],       
         ];
 
         foreach ($devises as $devise) {

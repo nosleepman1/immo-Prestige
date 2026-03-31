@@ -12,26 +12,28 @@ class PropertySeeder extends Seeder
      * Run the database seeds.
      */
     public function run(): void
-    {
-        $property = [
-            [
-                "name" => "Mohamed TINE",
-                "email" => "tine@gmail.com",
-                "password" => "tine@gmail.com",
-                "password_confirmation" => "tine@gmail.com",
-                "role" => "agency",
+     {
+    //     $property = [
+    //         [
+    //             "id" => number_format(0,2,".",""),
+    //             "name"=> fake("property")->name,
+    //             "description"=> fake("property")->text(200),
+    //             "price"=> fake("property")->numberBetween(100000,1000000),
+    //             "city"=> fake("property")->text(50) ,   
+    //             "country"=> fake("property")->text(50),
+    //             "property_type_id"=> 1,
+    //             "bedrooms"=> fake("property")->numberBetween(1,10),
+    //             "bathrooms"=> fake("property")->numberBetween(1,10),
+    //             "area"=> fake("property")->numberBetween(100,1000),
+    //             "year_built"=> fake("property")->numberBetween(1900,2022),
+    //             "status"=> fake("property")->text(50),
+    //             "agency_id"=> 1,
+    //             "user_id"=> 1,  
+    //         ]   
+    //     ];
 
-                "company_name" => "AMBO TECH",
-                "description" => "Nous sommes une startup tech qui evolue auussi dans le secteur de l'immobilier",
-                "address" => "Keur Massar",
-                "city" => "Dakar",
-                "phone" => "773757077",
-                "id_card" => "16482000021"
-            ]   
-        ];
-
-        foreach ($property as $prop) {
-            Property::create($prop);
-        }
+    //     foreach ($property as $prop) {
+    //         Property::create($prop);
+    //     }
     }
 }

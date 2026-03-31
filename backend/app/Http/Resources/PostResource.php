@@ -16,12 +16,12 @@ class PostResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'user_id' => $this->user_id,
-            'property_id' => $this->property_id,
+            'user' => new UserResource($this->whenLoaded('user')),
+            'property' => new PropertyResource($this->whenLoaded('property')),
+            'likes_count' => $this->likes_count,
+            'comments_count' => $this->comments_count,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'property' => $this->property()->get()
-            
         ];
     }
 }

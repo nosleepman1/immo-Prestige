@@ -90,11 +90,11 @@ class UserController extends Controller
 
         $user = User::where('email', $credentials['email'])->first();
 
-        if (!$user || !Hash::check($credentials['password'], $user['password'])) {
+        if (!$user || !Hash::check($credentials['password'], $user->password)) {
             return response()->json(['message' => 'addresse email ou mot de passe incorrect'], 401);
         }
 
-        $token = $user->createToken(env('TOKEN_SECRET'))->plainTextToken;
+        $token = $user->createToken(env('TOKEN_SECRET', 'auth_token'))->plainTextToken;
 
         $agency = Agency::where('user_id', $user->id)->first();
 

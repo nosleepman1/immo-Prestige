@@ -20,7 +20,7 @@ const useLogin = () => {
             setErrors({})
 
             const response = await LOGIN(credentials)
-            login(response.access_token)
+            await login(response.access_token)
             navigate('/profile')
 
         } catch (err) {
