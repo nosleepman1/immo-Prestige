@@ -4,33 +4,40 @@ import { Link, useNavigate } from 'react-router-dom'
 import { formatDistanceToNow } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import { motion, AnimatePresence } from 'framer-motion'
+import { LuSend } from "react-icons/lu";
 import useToggleLike from '@/hooks/post/useToggleLike'
 import useComments from '@/hooks/post/useComments'
+import { en } from 'zod/v4/locales'
 
 export default function PostCard({ post }) {
+
   const { id: postId, property, user, likes_count, comments_count, created_at, is_liked_by_user } = post
   
   const [localLiked, setLocalLiked] = useState(is_liked_by_user || false)
+
+
   const [localLikesCount, setLocalLikesCount] = useState(likes_count || 0)
   const [localCommentsCount, setLocalCommentsCount] = useState(comments_count || 0)
   
+
+
   const [isCommentsOpen, setIsCommentsOpen] = useState(false)
   const [commentText, setCommentText] = useState('')
   
+
   const { toggleLike, loading: liking } = useToggleLike()
   const { comments, getComments, addComment, loading: commentsLoading, addingComment } = useComments(postId)
   
   const navigate = useNavigate()
 
   useEffect(() => {
-    // Ne fetch que si le modal s'ouvre pour la première fois
+    
     if (isCommentsOpen && comments.length === 0 && localCommentsCount > 0) {
       getComments()
     }
   }, [isCommentsOpen])
 
   const handleLike = async () => {
-    // Optimistic Update pour une interface fluide
     const prevLiked = localLiked
     const prevCount = localLikesCount
     setLocalLiked(!prevLiked)
@@ -39,14 +46,13 @@ export default function PostCard({ post }) {
     const res = await toggleLike(postId)
     
     if (res.error === 'unauthenticated') {
-      // Annuler optimistic update et rediriger
       setLocalLiked(prevLiked)
       setLocalLikesCount(prevCount)
       navigate('/login')
       return
     }
+    
     if (!res.success) {
-      // Revert in case of backend failure
       setLocalLiked(prevLiked)
       setLocalLikesCount(prevCount)
     }
@@ -54,6 +60,7 @@ export default function PostCard({ post }) {
 
   const handleCommentSubmit = async (e) => {
     e.preventDefault()
+    
     if (!commentText.trim()) return
     
     const res = await addComment(commentText)
@@ -69,7 +76,7 @@ export default function PostCard({ post }) {
 
   const coverImage = property?.images?.find(img => img.is_cover)?.image_path || property?.images?.[0]?.image_path || 'https://placehold.co/600x400?text=No+Image'
   
-  const formattedDate = created_at ? formatDistanceToNow(new Date(created_at), { addSuffix: true, locale: fr }) : ''
+  const formattedDate = created_at ? formatDistanceToNow(new Date(created_at), { locale: fr }) : ''
 
   return (
     <>
@@ -95,7 +102,7 @@ export default function PostCard({ post }) {
         </div>
 
         {/* Main Image */}
-        <Link to={`/properties/${property?.id}`}>
+        <Link to={`/`}>
           <div className="relative aspect-square sm:aspect-[4/3] w-full bg-muted cursor-pointer overflow-hidden group">
             <img 
               src={coverImage} 
@@ -257,6 +264,7 @@ export default function PostCard({ post }) {
 
               {/* Comment Input Footer */}
               <div className="p-3 border-t border-border bg-background">
+                
                 <form onSubmit={handleCommentSubmit} className="flex items-center space-x-3">
                   <div className="flex-1 flex items-center bg-muted/50 border border-input rounded-full px-4 py-2 focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/20 transition-all">
                     <input 
@@ -271,7 +279,7 @@ export default function PostCard({ post }) {
                       disabled={!commentText.trim() || addingComment}
                       className={`text-primary font-semibold text-[14px] transition-opacity ml-2 ${(!commentText.trim() || addingComment) ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
                     >
-                      Post
+                      <LuSend size={20} />
                     </button>
                   </div>
                 </form>
