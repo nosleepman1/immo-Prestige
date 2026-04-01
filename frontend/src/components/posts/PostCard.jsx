@@ -183,87 +183,99 @@ export default function PostCard({ post }) {
         ========================================
         BOTTOM SHEET DRAWER (Instagram Style) 
         ========================================
-      */}
-      <AnimatePresence>
+         {/* Backdrop sombre mais SANS blur comme demandé */}
+
+
+        <AnimatePresence>
         {isCommentsOpen && (
           <div className="fixed inset-0 z-50 flex flex-col justify-end mx-auto max-w-lg">
-            {/* Backdrop transparent pour fermer en cliquant à côté */}
+           
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsCommentsOpen(false)}
-              className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+              className="absolute inset-0 bg-black/50"
             />
 
-            {/* Le volet glissant */}
+            {/* Le volet glissant aux coins fortement arrondis */}
             <motion.div 
               initial={{ y: "100%" }}
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
-              transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="relative w-full h-[65vh] sm:h-[75vh] bg-card text-card-foreground rounded-t-2xl shadow-2xl flex flex-col overflow-hidden"
+              transition={{ type: "spring", damping: 30, stiffness: 300 }}
+              className="relative w-full h-[70vh] bg-background text-foreground rounded-t-3xl shadow-2xl flex flex-col overflow-hidden"
             >
-              {/* Drag handle (purement visuel ici pour l'esthétique) */}
-              <div className="w-full flex justify-center pt-3 pb-2 cursor-pointer" onClick={() => setIsCommentsOpen(false)}>
-                <div className="w-12 h-1.5 bg-muted-foreground/30 rounded-full" />
-              </div>
-              
-              <div className="flex justify-between items-center px-4 pb-3 border-b border-border">
-                <h3 className="font-bold text-lg text-center flex-1">Commentaires</h3>
-                <button onClick={() => setIsCommentsOpen(false)} className="p-1 hover:bg-muted rounded-full transition-colors absolute right-4">
-                  <X size={20} />
-                </button>
+              {/* Entête avec la petite barre et le titre Comments */}
+              <div className="flex flex-col items-center pt-3 pb-4 border-b border-border relative">
+                <div className="w-10 h-1 bg-muted-foreground/30 rounded-full mb-3" />
+                <h3 className="font-bold text-[15px]">Comments</h3>
               </div>
 
               {/* Comments List */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-5 scrollbar-thin scrollbar-thumb-border">
+              <div className="flex-1 overflow-y-auto p-4 space-y-6 scrollbar-none">
                 {commentsLoading ? (
-                  <div className="flex justify-center p-4"><div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div></div>
+                  <div className="flex justify-center p-4"><div className="w-5 h-5 border-2 border-primary/20 border-t-primary rounded-full animate-spin"></div></div>
                 ) : comments.length === 0 ? (
-                  <div className="text-center text-muted-foreground pt-10">
-                    <MessageCircle size={32} className="mx-auto mb-3 opacity-20" />
-                    Aucun commentaire pour l'instant.<br/>Soyez le premier !
+                  <div className="text-center text-muted-foreground pt-10 text-sm">
+                    No comments yet.<br/>Be the first to comment!
                   </div>
                 ) : (
                   comments.map(c => (
-                    <div key={c.id} className="flex space-x-3">
-                      <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-xs font-bold shrink-0">
+                    <div key={c.id} className="flex space-x-3 group relative">
+                      {/* Avatar */}
+                      <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center text-xs font-bold shrink-0 overflow-hidden border border-border">
                         {c.user?.name ? c.user.name.charAt(0).toUpperCase() : 'U'}
                       </div>
-                      <div className="text-sm">
+                      
+                      {/* Comment Body */}
+                      <div className="flex-1 text-[14px]">
                         <div className="flex items-center space-x-2">
-                          <span className="font-semibold">{c.user?.name || 'Utilisateur'}</span>
-                          <span className="text-[10px] text-muted-foreground">
-                            {formatDistanceToNow(new Date(c.created_at), { addSuffix: true, locale: fr })}
+                          <span className="font-bold text-foreground">{c.user?.name || 'user'}</span>
+                          <span className="text-muted-foreground text-[13px]">
+                            {/* Simplifié pour simuler le '2w', date-fns génèrerait '2 sem.' */}
+                            {formatDistanceToNow(new Date(c.created_at), { addSuffix: false, locale: fr }).replace('environ', '').trim()}
                           </span>
                         </div>
                         <p className="mt-0.5 text-foreground/90">{c.content}</p>
+                        <div className="flex items-center space-x-4 mt-2 text-[12px] font-semibold text-muted-foreground">
+                          <button className="hover:text-foreground transition-colors">Reply</button>
+                        </div>
+                      </div>
+
+                      {/* Right side Like icon */}
+                      <div className="flex flex-col items-center ml-2 space-y-1">
+                        <button className="text-muted-foreground hover:text-red-500 transition-colors">
+                          <Heart size={14} className="stroke-[2.5]" />
+                        </button>
+                        {/* Fake likes count for UI purposes to match Instagram UI */}
                       </div>
                     </div>
                   ))
                 )}
               </div>
 
-              {/* Comment Input */}
-              <form onSubmit={handleCommentSubmit} className="p-3 border-t border-border bg-card">
-                <div className="flex items-center gap-2 bg-muted/50 rounded-full px-4 py-2 border border-border focus-within:ring-2 focus-within:ring-primary/50 transition-all">
-                  <input 
-                    type="text"
-                    value={commentText}
-                    onChange={(e) => setCommentText(e.target.value)}
-                    placeholder="Ajouter un commentaire..."
-                    className="flex-1 bg-transparent border-none outline-none text-sm py-1"
-                  />
-                  <button 
-                    type="submit"
-                    disabled={!commentText.trim() || addingComment}
-                    className="text-primary disabled:opacity-30 disabled:cursor-not-allowed hover:scale-110 transition-transform p-1"
-                  >
-                    <Send size={18} />
-                  </button>
-                </div>
-              </form>
+              {/* Comment Input Footer */}
+              <div className="p-3 border-t border-border bg-background">
+                <form onSubmit={handleCommentSubmit} className="flex items-center space-x-3">
+                  <div className="flex-1 flex items-center bg-muted/50 border border-input rounded-full px-4 py-2 focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/20 transition-all">
+                    <input 
+                      type="text"
+                      value={commentText}
+                      onChange={(e) => setCommentText(e.target.value)}
+                      placeholder="What do you think of this?"
+                      className="flex-1 bg-transparent border-none outline-none text-[14px] text-foreground placeholder:-muted-foreground"
+                    />
+                    <button 
+                      type="submit"
+                      disabled={!commentText.trim() || addingComment}
+                      className={`text-primary font-semibold text-[14px] transition-opacity ml-2 ${(!commentText.trim() || addingComment) ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+                    >
+                      Post
+                    </button>
+                  </div>
+                </form>
+              </div>
             </motion.div>
           </div>
         )}
