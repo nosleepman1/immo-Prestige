@@ -47,42 +47,33 @@ class LikeController extends Controller
      * Store a newly created resource in storage.
      */
 
-    public function store(StoreLikeRequest $request, Post $post)
+    public function store(Post $post)
     {
-        $data = $request->validated();
-        $data['user_id'] = Auth::user()->id;
-        $data['post_id'] = $post->id;
-        $like = Like::create($data);
+        $userId = Auth::user()->id;
+        
+        $existingLike = Like::where('user_id', $userId)
+            ->where('post_id', $post->id)
+            ->first();
 
-        return new LikeResource($like);
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Like $like)
-    {
-
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Like $like)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Like $like)
-    {
-        // like deletion logic here
-        $like->delete();
-        return response()->json(
-            [
-                ['message' => 'Like deleted successfully']
+        if ($existingLike) {
+            $existingLike->delete();
+            return response()->json([
+                'liked' => false,
+                'message' => 'Post unliked'
             ], 200);
+        }
+
+        $like = Like::create([
+            'user_id' => $userId,
+            'post_id' => $post->id
+        ]);
+
+        return response()->json([
+            'liked' => true,
+            'message' => 'Post liked',
+            'data' => new LikeResource($like)
+        ], 201);
     }
+
+    
 }

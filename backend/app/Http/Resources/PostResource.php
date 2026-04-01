@@ -19,6 +19,7 @@ class PostResource extends JsonResource
             'user' => new UserResource($this->whenLoaded('user')),
             'property' => new PropertyResource($this->whenLoaded('property')),
             'likes_count' => $this->likes_count,
+            'is_liked_by_user' => $request->user('sanctum') ? $this->likes()->where('user_id', $request->user('sanctum')->id)->exists() : false,
             'comments_count' => $this->comments_count,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
