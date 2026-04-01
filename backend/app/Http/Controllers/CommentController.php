@@ -38,14 +38,15 @@ class CommentController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreCommentRequest $request)
+    public function store(StoreCommentRequest $request, Post $post)
     {
-  
         $data = $request->validated();
         $data['user_id'] = Auth::user()->id;
+        $data['post_id'] = $post->id;
+        
         $comment = Comment::create($data);
 
-        return new CommentResource($comment);
+        return new CommentResource($comment->load('user:id,name'));
     }
         
 
