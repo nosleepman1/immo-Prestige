@@ -26,7 +26,8 @@ const MOCK_POSTS = [
     user: { name: "Prestige Immobilier", avatar: null },
     property: {
       name: "Villa Moderne Almadies",
-      description: "Magnifique villa avec piscine, 4 chambres, garage double. Vue mer imprenable.",
+      description:
+        "Magnifique villa avec piscine, 4 chambres, garage double. Vue mer imprenable.",
       city: "Dakar",
       country: "Sénégal",
       price: 150000000,
@@ -34,7 +35,13 @@ const MOCK_POSTS = [
       surface: 320,
       rooms: 6,
       sold: false,
-      images: [{ image_path: "https://images.unsplash.com/photo-1613977257363-707ba9348227?w=800", is_cover: true }],
+      images: [
+        {
+          image_path:
+            "https://images.unsplash.com/photo-1613977257363-707ba9348227?w=800",
+          is_cover: true,
+        },
+      ],
     },
     likes_count: 142,
     comments_count: 18,
@@ -46,7 +53,8 @@ const MOCK_POSTS = [
     user: { name: "Dakar Realty", avatar: null },
     property: {
       name: "Appartement Plateau",
-      description: "Superbe appartement rénové au cœur du Plateau, lumineux et moderne.",
+      description:
+        "Superbe appartement rénové au cœur du Plateau, lumineux et moderne.",
       city: "Dakar",
       country: "Sénégal",
       price: 45000000,
@@ -54,7 +62,13 @@ const MOCK_POSTS = [
       surface: 110,
       rooms: 3,
       sold: false,
-      images: [{ image_path: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800", is_cover: true }],
+      images: [
+        {
+          image_path:
+            "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800",
+          is_cover: true,
+        },
+      ],
     },
     likes_count: 87,
     comments_count: 5,
@@ -66,7 +80,8 @@ const MOCK_POSTS = [
     user: { name: "Elite Properties", avatar: null },
     property: {
       name: "Duplex Mermoz",
-      description: "Beau duplex dans une résidence sécurisée avec jardin privatif.",
+      description:
+        "Beau duplex dans une résidence sécurisée avec jardin privatif.",
       city: "Dakar",
       country: "Sénégal",
       price: 95000000,
@@ -74,7 +89,13 @@ const MOCK_POSTS = [
       surface: 200,
       rooms: 5,
       sold: true,
-      images: [{ image_path: "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800", is_cover: true }],
+      images: [
+        {
+          image_path:
+            "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800",
+          is_cover: true,
+        },
+      ],
     },
     likes_count: 203,
     comments_count: 31,
@@ -84,19 +105,49 @@ const MOCK_POSTS = [
 ];
 
 const MOCK_COMMENTS = [
-  { id: "c1", user: { name: "Aminata Diallo" }, content: "Très belle propriété, j'adore l'emplacement !", created_at: new Date(Date.now() - 1000 * 60 * 30).toISOString() },
-  { id: "c2", user: { name: "Moussa Ndiaye" }, content: "Le prix est-il négociable ?", created_at: new Date(Date.now() - 1000 * 60 * 60).toISOString() },
-  { id: "c3", user: { name: "Fatou Seck" }, content: "Magnifique ! Je voudrais une visite 🙏", created_at: new Date(Date.now() - 1000 * 60 * 120).toISOString() },
-  { id: "c4", user: { name: "Ibrahim Ba" }, content: "Est-ce que la piscine est incluse dans le prix ?", created_at: new Date(Date.now() - 1000 * 60 * 180).toISOString() },
+  {
+    id: "c1",
+    user: { name: "Aminata Diallo" },
+    content: "Très belle propriété, j'adore l'emplacement !",
+    created_at: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
+  },
+  {
+    id: "c2",
+    user: { name: "Moussa Ndiaye" },
+    content: "Le prix est-il négociable ?",
+    created_at: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
+  },
+  {
+    id: "c3",
+    user: { name: "Fatou Seck" },
+    content: "Magnifique ! Je voudrais une visite 🙏",
+    created_at: new Date(Date.now() - 1000 * 60 * 120).toISOString(),
+  },
+  {
+    id: "c4",
+    user: { name: "Ibrahim Ba" },
+    content: "Est-ce que la piscine est incluse dans le prix ?",
+    created_at: new Date(Date.now() - 1000 * 60 * 180).toISOString(),
+  },
 ];
 // ─────────────────────────────────────────────────────────────
 
 function PostCard({ post }: { post: any }) {
-  const { id: postId, property, user, likes_count, comments_count, created_at, is_liked_by_user } = post;
+  const {
+    id: postId,
+    property,
+    user,
+    likes_count,
+    comments_count,
+    created_at,
+    is_liked_by_user,
+  } = post;
 
   const [localLiked, setLocalLiked] = useState(is_liked_by_user || false);
   const [localLikesCount, setLocalLikesCount] = useState(likes_count || 0);
-  const [localCommentsCount, setLocalCommentsCount] = useState(comments_count || 0);
+  const [localCommentsCount, setLocalCommentsCount] = useState(
+    comments_count || 0,
+  );
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
   const [commentText, setCommentText] = useState("");
   const [comments, setComments] = useState([]);
@@ -105,29 +156,40 @@ function PostCard({ post }: { post: any }) {
   const likeScale = useRef(new Animated.Value(1)).current;
 
   const coverImage =
-    property?.images?.find((img) => img.is_cover)?.image_path ||
+    property?.images?.find((img: any) => img.is_cover)?.image_path ||
     property?.images?.[0]?.image_path ||
     "https://placehold.co/600x400?text=No+Image";
 
   const formattedDate = created_at
-    ? formatDistanceToNow(new Date(created_at), { locale: fr, addSuffix: false })
+    ? formatDistanceToNow(new Date(created_at), {
+        locale: fr,
+        addSuffix: false,
+      })
     : "";
 
   const handleLike = () => {
     // Animate heart
     Animated.sequence([
-      Animated.spring(likeScale, { toValue: 1.4, useNativeDriver: true, speed: 50 }),
-      Animated.spring(likeScale, { toValue: 1, useNativeDriver: true, speed: 50 }),
+      Animated.spring(likeScale, {
+        toValue: 1.4,
+        useNativeDriver: true,
+        speed: 50,
+      }),
+      Animated.spring(likeScale, {
+        toValue: 1,
+        useNativeDriver: true,
+        speed: 50,
+      }),
     ]).start();
 
-    setLocalLiked((prev) => !prev);
-    setLocalLikesCount((prev) => (localLiked ? prev - 1 : prev + 1));
+    setLocalLiked((prev: boolean) => !prev);
+    setLocalLikesCount((prev: number) => (localLiked ? prev - 1 : prev + 1));
   };
 
   const openComments = () => {
     if (!commentsLoaded) {
       // Simulate fetch
-      setTimeout(() => setComments(MOCK_COMMENTS), 300);
+      setTimeout(() => setComments(MOCK_COMMENTS as any), 300);
       setCommentsLoaded(true);
     }
     setIsCommentsOpen(true);
@@ -141,12 +203,12 @@ function PostCard({ post }: { post: any }) {
       content: commentText,
       created_at: new Date().toISOString(),
     };
-    setComments((prev) => [newComment, ...prev]);
-    setLocalCommentsCount((prev) => prev + 1);
+    setComments((prev: any) => [newComment, ...prev]);
+    setLocalCommentsCount((prev: number) => prev + 1);
     setCommentText("");
   };
 
-  const formatPrice = (price) =>
+  const formatPrice = (price: number) =>
     new Intl.NumberFormat("fr-FR").format(price);
 
   return (
@@ -161,7 +223,9 @@ function PostCard({ post }: { post: any }) {
               </Text>
             </View>
             <View>
-              <Text style={styles.userName}>{user?.name || "Agence Immobilière"}</Text>
+              <Text style={styles.userName}>
+                {user?.name || "Agence Immobilière"}
+              </Text>
               <View style={styles.locationRow}>
                 <Ionicons name="location-outline" size={12} color="#9ca3af" />
                 <Text style={styles.locationText}>
@@ -175,7 +239,11 @@ function PostCard({ post }: { post: any }) {
 
         {/* ── Image ── */}
         <View style={styles.imageWrap}>
-          <Image source={{ uri: coverImage }} style={styles.image} resizeMode="cover" />
+          <Image
+            source={{ uri: coverImage }}
+            style={styles.image}
+            resizeMode="cover"
+          />
           {property?.sold && (
             <View style={styles.soldBadge}>
               <Text style={styles.soldText}>VENDU</Text>
@@ -220,7 +288,11 @@ function PostCard({ post }: { post: any }) {
         <View style={styles.details}>
           <View style={styles.detailsRow}>
             <View style={styles.detailChip}>
-              <MaterialCommunityIcons name="ruler-square" size={14} color="#6b7280" />
+              <MaterialCommunityIcons
+                name="ruler-square"
+                size={14}
+                color="#6b7280"
+              />
               <Text style={styles.detailText}>{property?.surface} m²</Text>
             </View>
             <View style={styles.detailChip}>
@@ -267,13 +339,16 @@ function PostCard({ post }: { post: any }) {
             </View>
 
             {/* Comments List */}
-            <ScrollView style={styles.commentsList} showsVerticalScrollIndicator={false}>
+            <ScrollView
+              style={styles.commentsList}
+              showsVerticalScrollIndicator={false}
+            >
               {comments.length === 0 ? (
                 <Text style={styles.noComments}>
                   Aucun commentaire.{"\n"}Soyez le premier à commenter !
                 </Text>
               ) : (
-                comments.map((c) => (
+                comments.map((c: any) => (
                   <View key={c.id} style={styles.commentItem}>
                     <View style={styles.commentAvatar}>
                       <Text style={styles.commentAvatarText}>
@@ -284,7 +359,9 @@ function PostCard({ post }: { post: any }) {
                       <View style={styles.commentMeta}>
                         <Text style={styles.commentUser}>{c.user?.name}</Text>
                         <Text style={styles.commentTime}>
-                          {formatDistanceToNow(new Date(c.created_at), { locale: fr })}
+                          {formatDistanceToNow(new Date(c.created_at), {
+                            locale: fr,
+                          })}
                         </Text>
                       </View>
                       <Text style={styles.commentContent}>{c.content}</Text>
@@ -293,7 +370,11 @@ function PostCard({ post }: { post: any }) {
                       </TouchableOpacity>
                     </View>
                     <TouchableOpacity>
-                      <Ionicons name="heart-outline" size={14} color="#9ca3af" />
+                      <Ionicons
+                        name="heart-outline"
+                        size={14}
+                        color="#9ca3af"
+                      />
                     </TouchableOpacity>
                   </View>
                 ))
@@ -311,7 +392,10 @@ function PostCard({ post }: { post: any }) {
                 multiline={false}
               />
               {commentText.trim().length > 0 && (
-                <TouchableOpacity onPress={handleCommentSubmit} style={styles.sendBtn}>
+                <TouchableOpacity
+                  onPress={handleCommentSubmit}
+                  style={styles.sendBtn}
+                >
                   <Feather name="send" size={20} color="#1a1a2e" />
                 </TouchableOpacity>
               )}
@@ -352,16 +436,31 @@ const styles = StyleSheet.create({
   },
 
   // Header
-  header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", padding: 12 },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 12,
+  },
   headerLeft: { flexDirection: "row", alignItems: "center", gap: 10 },
   avatar: {
-    width: 40, height: 40, borderRadius: 20,
-    backgroundColor: "#e0e7ff", justifyContent: "center", alignItems: "center",
-    borderWidth: 1, borderColor: "#c7d2fe",
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#e0e7ff",
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#c7d2fe",
   },
   avatarText: { fontWeight: "700", color: "#4f46e5", fontSize: 16 },
   userName: { fontWeight: "600", fontSize: 13, color: "#111827" },
-  locationRow: { flexDirection: "row", alignItems: "center", marginTop: 2, gap: 2 },
+  locationRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 2,
+    gap: 2,
+  },
   locationText: { fontSize: 11, color: "#9ca3af" },
   timeText: { fontSize: 11, color: "#9ca3af" },
 
@@ -369,16 +468,28 @@ const styles = StyleSheet.create({
   imageWrap: { width: "100%", aspectRatio: 1, position: "relative" },
   image: { width: "100%", height: "100%" },
   soldBadge: {
-    position: "absolute", top: 12, right: 12,
-    backgroundColor: "#ef4444", paddingHorizontal: 10, paddingVertical: 4,
+    position: "absolute",
+    top: 12,
+    right: 12,
+    backgroundColor: "#ef4444",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
     borderRadius: 20,
   },
-  soldText: { color: "#fff", fontSize: 11, fontWeight: "700", letterSpacing: 1 },
+  soldText: {
+    color: "#fff",
+    fontSize: 11,
+    fontWeight: "700",
+    letterSpacing: 1,
+  },
 
   // Actions
   actions: {
-    flexDirection: "row", justifyContent: "space-between",
-    alignItems: "center", paddingHorizontal: 12, paddingVertical: 10,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 12,
+    paddingVertical: 10,
   },
   actionsLeft: { flexDirection: "row", gap: 16 },
   actionBtn: { flexDirection: "row", alignItems: "center", gap: 5 },
@@ -389,9 +500,13 @@ const styles = StyleSheet.create({
   details: { paddingHorizontal: 12, paddingBottom: 14 },
   detailsRow: { flexDirection: "row", gap: 8, marginBottom: 8 },
   detailChip: {
-    flexDirection: "row", alignItems: "center", gap: 4,
-    backgroundColor: "#f3f4f6", paddingHorizontal: 10,
-    paddingVertical: 4, borderRadius: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    backgroundColor: "#f3f4f6",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 20,
   },
   detailText: { fontSize: 12, color: "#6b7280", fontWeight: "500" },
   description: { fontSize: 13, color: "#374151", lineHeight: 19 },
@@ -399,7 +514,11 @@ const styles = StyleSheet.create({
   viewComments: { fontSize: 13, color: "#9ca3af", marginTop: 6 },
 
   // Modal / Bottom Sheet
-  modalOverlay: { flex: 1, justifyContent: "flex-end", backgroundColor: "rgba(0,0,0,0.5)" },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "flex-end",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
   sheet: {
     height: height * 0.72,
     backgroundColor: "#fff",
@@ -408,41 +527,75 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   sheetHeader: {
-    alignItems: "center", paddingTop: 12, paddingBottom: 14,
-    borderBottomWidth: 0.5, borderBottomColor: "#e5e7eb",
+    alignItems: "center",
+    paddingTop: 12,
+    paddingBottom: 14,
+    borderBottomWidth: 0.5,
+    borderBottomColor: "#e5e7eb",
   },
-  sheetHandle: { width: 36, height: 4, backgroundColor: "#d1d5db", borderRadius: 2, marginBottom: 10 },
+  sheetHandle: {
+    width: 36,
+    height: 4,
+    backgroundColor: "#d1d5db",
+    borderRadius: 2,
+    marginBottom: 10,
+  },
   sheetTitle: { fontWeight: "700", fontSize: 15, color: "#111827" },
 
   // Comments
   commentsList: { flex: 1, paddingHorizontal: 16, paddingTop: 12 },
-  noComments: { textAlign: "center", color: "#9ca3af", marginTop: 40, lineHeight: 22, fontSize: 14 },
+  noComments: {
+    textAlign: "center",
+    color: "#9ca3af",
+    marginTop: 40,
+    lineHeight: 22,
+    fontSize: 14,
+  },
   commentItem: { flexDirection: "row", gap: 10, marginBottom: 22 },
   commentAvatar: {
-    width: 34, height: 34, borderRadius: 17,
-    backgroundColor: "#f3f4f6", justifyContent: "center", alignItems: "center",
-    borderWidth: 1, borderColor: "#e5e7eb",
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: "#f3f4f6",
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
   },
   commentAvatarText: { fontWeight: "700", fontSize: 13, color: "#374151" },
   commentBody: { flex: 1 },
   commentMeta: { flexDirection: "row", gap: 8, alignItems: "center" },
   commentUser: { fontWeight: "700", fontSize: 13, color: "#111827" },
   commentTime: { fontSize: 11, color: "#9ca3af" },
-  commentContent: { fontSize: 13, color: "#374151", marginTop: 2, lineHeight: 18 },
+  commentContent: {
+    fontSize: 13,
+    color: "#374151",
+    marginTop: 2,
+    lineHeight: 18,
+  },
   replyBtn: { fontSize: 12, fontWeight: "600", color: "#9ca3af", marginTop: 6 },
 
   // Comment Input
   commentInputWrap: {
-    flexDirection: "row", alignItems: "center", gap: 10,
-    paddingHorizontal: 14, paddingVertical: 10,
-    borderTopWidth: 0.5, borderTopColor: "#e5e7eb",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderTopWidth: 0.5,
+    borderTopColor: "#e5e7eb",
     backgroundColor: "#fff",
   },
   commentInput: {
-    flex: 1, height: 40, backgroundColor: "#f3f4f6",
-    borderRadius: 20, paddingHorizontal: 16,
-    fontSize: 14, color: "#111827",
-    borderWidth: 1, borderColor: "#e5e7eb",
+    flex: 1,
+    height: 40,
+    backgroundColor: "#f3f4f6",
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    fontSize: 14,
+    color: "#111827",
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
   },
   sendBtn: { padding: 6 },
 });
