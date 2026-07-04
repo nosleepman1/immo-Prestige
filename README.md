@@ -9,18 +9,18 @@
 ```mermaid
 graph TD
     %% Frontend / Clients
-    Web[Web Frontend - React / Vite] -->|Axios REST API| API[API Backend - Laravel 12]
-    Mobile[Mobile App - Expo / React Native] -->|Mock/Futur API| API
+    Web["Web Frontend (React / Vite)"] -->|Axios REST API| API["API Backend (Laravel 12)"]
+    Mobile["Mobile App (Expo / React Native)"] -->|Mock / Future API| API
 
     %% Backend
-    API -->|Eloquent ORM| DB[(Base de données - Postgre)]
+    API -->|Eloquent ORM| DB[("Base de données (PostgreSQL / SQLite)")]
 
     %% Features within API
-    subgraph Services Backend
-        API --> Auths[Authentification Sanctum]
-        API --> Props[Gestion des Propriétés & Images]
-        API --> Social[Likes, Commentaires & Réponses]
-        API --> Messaging[Messagerie entre Clients & Agents]
+    subgraph "Services Backend"
+        API --> Auths["Authentification Sanctum"]
+        API --> Props["Gestion des Propriétés & Images"]
+        API --> Social["Likes, Commentaires & Réponses"]
+        API --> Messaging["Messagerie Clients & Agents"]
     end
 ```
 
