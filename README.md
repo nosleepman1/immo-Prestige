@@ -13,7 +13,7 @@ graph TD
     Mobile[Mobile App - Expo / React Native] -->|Mock/Futur API| API
 
     %% Backend
-    API -->|Eloquent ORM| DB[(Base de données - SQLite)]
+    API -->|Eloquent ORM| DB[(Base de données - PostgreSQL)]
 
     %% Features within API
     subgraph Services Backend
