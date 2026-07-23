@@ -6,7 +6,7 @@ use App\Models\PropertyImage;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePropertyImageRequest;
 use App\Http\Requests\UpdatePropertyImageRequest;
-use App\Http\Resources\PropertyImagesResource;
+use App\Http\Resources\PropertyImageResource;
 use App\Models\Property;
 
 class PropertyImageController extends Controller
@@ -22,7 +22,7 @@ class PropertyImageController extends Controller
 
     public function showPropertyImages(Property $property){
 
-        return PropertyImagesResource::collection($property->images);
+        return PropertyImageResource::collection($property->images);
     }
 
     /**

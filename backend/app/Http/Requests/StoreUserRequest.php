@@ -21,11 +21,13 @@ class StoreUserRequest extends FormRequest
      */
     public function rules(): array
     {
+        // Public self-registration only ever creates a 'user'. Role is not
+        // client-supplied — agency accounts go through Lot 3 onboarding,
+        // admins are provisioned via seeder.
         return [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
-            'role' => 'in:admin,agency,user',
         ];
     }
 
@@ -45,7 +47,6 @@ class StoreUserRequest extends FormRequest
             'password.string' => 'Le mot de passe doit être une chaîne de caractères.',
             'password.min' => 'Le mot de passe doit comporter au moins 8 caractères.',
             'password.confirmed' => 'Le mot de passe de confirmation ne correspond pas.',
-            'role.in' => 'Le rôle doit être l\'un des suivants : admin, agency, user.'
         ];
     }
 }

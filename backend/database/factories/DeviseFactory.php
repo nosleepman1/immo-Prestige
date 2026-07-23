@@ -17,7 +17,8 @@ class DeviseFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'name' => fake()->currencyCode(),
+            'code' => fake()->unique()->currencyCode(),
         ];
     }
 }

@@ -3,19 +3,18 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateUserRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return true;
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * Role is intentionally absent: it is not mutable through this endpoint
+     * (privilege-escalation guard).
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
@@ -23,9 +22,11 @@ class UpdateUserRequest extends FormRequest
     {
         return [
             'name' => 'sometimes|required|string|max:255',
-            'email' => 'sometimes|required|string|email|max:255|unique:users,email,' . $this->route('user')->id,
+            'email' => [
+                'sometimes', 'required', 'email', 'max:255',
+                Rule::unique('users', 'email')->ignore($this->route('user')),
+            ],
             'password' => 'sometimes|required|string|min:8|confirmed',
-            'role' => 'sometimes|required|in:admin,agent,user',
         ];
     }
 }

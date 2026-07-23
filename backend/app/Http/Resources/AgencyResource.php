@@ -24,8 +24,8 @@ class AgencyResource extends JsonResource
             'id_card' => $this->id_card,
             'is_active' => $this->is_active,
             'user_id' => $this->user_id,
-            'created_at' => $this->createdAt,
-            'updated_at' => $this->updatedAt
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at
         ];
     }
 }

@@ -22,7 +22,7 @@ class StoreLoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => 'required|email|exists:users,email',
+            'email' => 'required|email',
             'password' => 'required|string',
         ];
     }
@@ -34,7 +34,6 @@ class StoreLoginRequest extends FormRequest
         return [
             'email.required' => 'L\'email est requis.',
             'email.email' => 'Le format de l\'email est invalide.',
-            'email.exists' => 'addresse email ou mot de passe incorrect.',
             'password.required' => 'Le mot de passe est requis.',
 
         ];

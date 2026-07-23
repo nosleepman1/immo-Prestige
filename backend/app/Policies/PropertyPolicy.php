@@ -2,65 +2,47 @@
 
 namespace App\Policies;
 
-use Illuminate\Auth\Access\Response;
 use App\Models\Property;
 use App\Models\User;
 
 class PropertyPolicy
 {
-    /**
-     * Determine whether the user can view any models.
-     */
     public function viewAny(User $user): bool
     {
-        return $user->role === 'agency';
+        return true;
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
     public function view(User $user, Property $property): bool
     {
-        return $user->role === 'agency';
+        return true;
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
     public function create(User $user): bool
     {
         return $user->role === 'agency';
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
     public function update(User $user, Property $property): bool
     {
-        return $user->role === 'agency';
+        return $this->owns($user, $property);
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
     public function delete(User $user, Property $property): bool
     {
-        return $user->role === 'agency';
+        return $this->owns($user, $property);
     }
 
     /**
-     * Determine whether the user can restore the model.
+     * The property belongs to the agency owned by this user.
+     * Uses the relation as a query (not attribute access) to stay
+     * compatible with preventLazyLoading.
      */
-    public function restore(User $user, Property $property): bool
+    private function owns(User $user, Property $property): bool
     {
-        return false;
-    }
+        if ($user->role === 'admin') {
+            return true;
+        }
 
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
-    public function forceDelete(User $user, Property $property): bool
-    {
-        return false;
+        return (int) $property->agency()->value('user_id') === $user->id;
     }
 }
