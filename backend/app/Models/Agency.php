@@ -77,4 +77,24 @@ class Agency extends Model
     {
         return $this->hasMany(AgencyDocument::class);
     }
+
+    public function subscriptions()
+    {
+        return $this->hasMany(Subscription::class);
+    }
+
+    public function subscription()
+    {
+        return $this->hasOne(Subscription::class)->latestOfMany();
+    }
+
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    public function hasActiveSubscription(): bool
+    {
+        return (bool) $this->subscription()->first()?->isActive();
+    }
 }
