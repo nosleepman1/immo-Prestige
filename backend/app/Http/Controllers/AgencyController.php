@@ -2,79 +2,28 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Agency;
-use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreAgencyRequest;
-use App\Http\Requests\StoreUserRequest;
+use App\Actions\Agency\DeleteAgency;
+use App\Actions\Agency\UpdateAgency;
 use App\Http\Requests\UpdateAgencyRequest;
 use App\Http\Resources\AgencyResource;
-use App\Http\Resources\UserResource;
-use App\Models\User;
+use App\Models\Agency;
+use Illuminate\Http\JsonResponse;
 
 class AgencyController extends Controller
 {
-    public function __construct()
+    public function update(UpdateAgencyRequest $request, Agency $agency, UpdateAgency $updateAgency): AgencyResource
     {
-        
+        $this->authorize('update', $agency);
+
+        return AgencyResource::make($updateAgency->handle($agency, $request->validated()));
     }
 
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function destroy(Agency $agency, DeleteAgency $deleteAgency): JsonResponse
     {
-        return AgencyResource::collection(Agency::all());
-    }
+        $this->authorize('delete', $agency);
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreUserRequest $request, StoreAgencyRequest $agencyRequest)
-    {
-        $data = $request->validated();
-        $data['password'] = bcrypt($data['password']);
-        $user = User::create($data);
+        $deleteAgency->handle($agency);
 
-        if ($user->role != 'agency') {
-            $user->delete();
-            return response()->json(['message' => 'User role must be agency to create an agency'], 400);
-        }
-
-        $agencyData = $agencyRequest->validated();
-        $agencyData['user_id'] = $user->id;
-        $agency = Agency::create($agencyData);
-        return [
-            new UserResource($user),
-            new AgencyResource($agency)
-        ];
-    }
-    /**
-     * Display the specified resource.
-     */
-    public function show(Agency $agency)
-    {
-        
-        return new AgencyResource($agency);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateAgencyRequest $request, Agency $agency)
-    {
-        $agency->update($request->validated());
-        return new AgencyResource($agency);
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Agency $agency)
-    {
-        $agency->delete();
-        return response()->json([
-            'message' => 'Agency deleted successfully.'
-        ], 200);
-    
+        return response()->json(null, 204);
     }
 }
