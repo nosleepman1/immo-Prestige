@@ -3,8 +3,20 @@
 use App\Http\Controllers\AgencyController;
 use Illuminate\Support\Facades\Route;
 
-// Agency onboarding (index / show / create) is rebuilt in Lot 3.
-Route::prefix('agency')->middleware('auth:sanctum')->group(function () {
-    Route::put('/{agency}', [AgencyController::class, 'update']);
-    Route::delete('/{agency}', [AgencyController::class, 'destroy']);
+Route::prefix('agency')->group(function () {
+    // Public onboarding.
+    Route::post('/register', [AgencyController::class, 'register']);
+    Route::post('/password', [AgencyController::class, 'setPassword']);
+
+    // Own account (accessible even before the password is set).
+    Route::middleware(['auth:sanctum', 'role:agency'])->group(function () {
+        Route::get('/me', [AgencyController::class, 'me']);
+        Route::post('/resubmit', [AgencyController::class, 'resubmit']);
+    });
+
+    // Management (owner/admin).
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::put('/{agency}', [AgencyController::class, 'update']);
+        Route::delete('/{agency}', [AgencyController::class, 'destroy']);
+    });
 });
