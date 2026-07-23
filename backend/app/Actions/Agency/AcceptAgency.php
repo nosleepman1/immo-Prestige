@@ -15,18 +15,22 @@ use Illuminate\Support\Str;
 class AcceptAgency
 {
     /**
-     * Idempotent: a second review is refused so no duplicate token/e-mail is issued.
+     * Idempotent under concurrency: the reviewed-state guard runs inside the
+     * transaction against a row-locked reload, so a double-click cannot issue
+     * two tokens or two e-mails.
      */
     public function handle(Agency $agency, User $admin): Agency
     {
-        if ($agency->isReviewed()) {
-            throw new AgencyAlreadyReviewedException();
-        }
-
         $email = $agency->user()->value('email');
 
         [$agency, $setupUrl] = DB::transaction(function () use ($agency, $admin, $email) {
-            $agency->update([
+            $locked = Agency::whereKey($agency->getKey())->lockForUpdate()->first();
+
+            if ($locked->isReviewed()) {
+                throw new AgencyAlreadyReviewedException();
+            }
+
+            $locked->update([
                 'status' => AgencyStatus::Accepted,
                 'reviewed_by' => $admin->id,
                 'reviewed_at' => now(),
@@ -34,7 +38,7 @@ class AcceptAgency
 
             $plaintext = Str::random(64);
             PasswordSetupToken::create([
-                'user_id' => $agency->user_id,
+                'user_id' => $locked->user_id,
                 'token' => hash('sha256', $plaintext),
                 'expires_at' => now()->addDay(),
             ]);
@@ -43,7 +47,7 @@ class AcceptAgency
                 .'/agency/password?token='.$plaintext
                 .'&email='.urlencode($email);
 
-            return [$agency, $setupUrl];
+            return [$locked, $setupUrl];
         });
 
         Mail::to($email)->send(new AgencyAcceptedMail($agency, $setupUrl));

@@ -95,4 +95,17 @@ class ReviewAgencyTest extends TestCase
 
         $this->postJson("/api/v1/admin/agencies/{$agency->id}/accept")->assertStatus(401);
     }
+
+    public function test_reviewing_a_missing_agency_returns_404(): void
+    {
+        $admin = User::factory()->admin()->create();
+
+        $this->actingAs($admin, 'sanctum')
+            ->postJson('/api/v1/admin/agencies/999999/accept')
+            ->assertStatus(404);
+
+        $this->actingAs($admin, 'sanctum')
+            ->postJson('/api/v1/admin/agencies/999999/refuse', ['reason' => 'x'])
+            ->assertStatus(404);
+    }
 }

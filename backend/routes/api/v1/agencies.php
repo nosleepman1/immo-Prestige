@@ -14,8 +14,8 @@ Route::prefix('agency')->group(function () {
         Route::post('/resubmit', [AgencyController::class, 'resubmit']);
     });
 
-    // Management (owner/admin).
-    Route::middleware('auth:sanctum')->group(function () {
+    // Management (owner/admin) — requires a set password.
+    Route::middleware(['auth:sanctum', 'password.set'])->group(function () {
         Route::put('/{agency}', [AgencyController::class, 'update']);
         Route::delete('/{agency}', [AgencyController::class, 'destroy']);
     });

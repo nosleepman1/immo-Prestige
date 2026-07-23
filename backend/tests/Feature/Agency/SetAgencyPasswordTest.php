@@ -74,6 +74,17 @@ class SetAgencyPasswordTest extends TestCase
         ])->assertStatus(410)->assertJsonPath('code', 'TOKEN_ALREADY_USED');
     }
 
+    public function test_it_validates_the_password(): void
+    {
+        [$user, $token] = $this->acceptedAgencyWithToken();
+
+        $this->postJson('/api/v1/agency/password', [
+            'email' => 'agence@example.com',
+            'token' => $token,
+            'password' => 'short',
+        ])->assertStatus(422)->assertJsonValidationErrors(['password']);
+    }
+
     public function test_a_wrong_token_is_rejected(): void
     {
         $this->acceptedAgencyWithToken();

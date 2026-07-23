@@ -35,12 +35,12 @@ class SetAgencyPassword
             throw new InvalidPasswordSetupTokenException();
         }
 
-        if ($setupToken->isUsed()) {
-            throw new PasswordSetupTokenUsedException();
-        }
-
         if ($setupToken->isExpired()) {
             throw new PasswordSetupTokenExpiredException();
+        }
+
+        if ($setupToken->isUsed()) {
+            throw new PasswordSetupTokenUsedException();
         }
 
         $agency = DB::transaction(function () use ($user, $setupToken, $password) {
@@ -48,6 +48,9 @@ class SetAgencyPassword
                 'password' => $password,
                 'email_verified_at' => now(),
             ])->save();
+
+            // Revoke the limited registration token; a fresh one is issued below.
+            $user->tokens()->delete();
 
             $setupToken->update(['used_at' => now()]);
 
