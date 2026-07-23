@@ -59,9 +59,11 @@ Le backend fournit toutes les API sécurisées nécessaires au fonctionnement de
 
 ### Prérequis
 
-- **PHP** >= 8.2
+- **PHP** >= 8.2 (extensions `pdo_pgsql`, `redis` ou client `predis` fourni)
 - **Composer**
-- **SQLite** (activé dans votre configuration PHP)
+- **Docker** (pour PostgreSQL + Redis via `docker-compose.yml`)
+
+_Note : les tests automatisés tournent sur SQLite en mémoire (aucun service externe requis) ; PostgreSQL et Redis ne sont nécessaires que pour faire tourner l'application._
 
 ### Installation & Lancement
 
@@ -69,25 +71,31 @@ Le backend fournit toutes les API sécurisées nécessaires au fonctionnement de
     ```bash
     cd backend
     ```
-2.  Installez les dépendances et configurez l'environnement via le script automatisé :
+2.  Démarrez la base de données et Redis :
+
+    ```bash
+    docker compose up -d
+    ```
+
+3.  Installez les dépendances et configurez l'environnement via le script automatisé :
 
     ```bash
     composer run setup
     ```
 
-    _Ce script se chargera d'installer les dépendances, de générer la clé d'application, de créer la base de données SQLite et de lancer les migrations._
+    _Ce script installe les dépendances, copie `.env.example` vers `.env`, génère la clé d'application et lance les migrations sur PostgreSQL._
 
-3.  Exécutez le seeder pour remplir la base de données de test :
+4.  Exécutez le seeder pour remplir la base de données de test :
 
     ```bash
     php artisan db:seed
     ```
 
-4.  Lancez le serveur de développement :
+5.  Lancez le serveur de développement :
     ```bash
     composer run dev
     ```
-    _Ce script lance simultanément le serveur de développement PHP, le traitement des files d'attente (queue:listen) et le serveur Vite pour les assets._
+    _Ce script lance simultanément le serveur PHP, le worker de file d'attente (queue:listen) et le suivi des logs (pail)._
 
 ### Comptes de Test (Générés par le Seeder)
 
