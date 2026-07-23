@@ -30,7 +30,7 @@ class PayDunyaGateway implements PaymentGateway
                 'custom_data' => ['payment_id' => $payment->id],
                 'actions' => [
                     'callback_url' => route('webhooks.paydunya'),
-                    'return_url' => rtrim(config('app.frontend_url'), '/').'/agency/subscription',
+                    'return_url' => rtrim((string) config('app.frontend_url'), '/').'/agency/subscription',
                 ],
             ]);
 
@@ -46,7 +46,9 @@ class PayDunyaGateway implements PaymentGateway
 
     public function verifyIpn(array $payload): bool
     {
-        $expected = hash('sha512', (string) ($this->config['private_key'] ?? ''));
+        // PayDunya IPN carries hash = sha512(MASTER key). Cheap first gate only;
+        // the authoritative check is confirm() below.
+        $expected = hash('sha512', (string) ($this->config['master_key'] ?? ''));
 
         return isset($payload['hash']) && hash_equals($expected, (string) $payload['hash']);
     }
@@ -56,9 +58,20 @@ class PayDunyaGateway implements PaymentGateway
         return $payload['invoice']['token'] ?? $payload['token'] ?? null;
     }
 
-    public function isCompleted(array $payload): bool
+    public function confirm(string $token): InvoiceConfirmation
     {
-        return ($payload['status'] ?? null) === 'completed';
+        $response = Http::withHeaders($this->headers())
+            ->get($this->baseUrl.'/checkout-invoice/confirm/'.$token);
+
+        if (! $response->successful()) {
+            return InvoiceConfirmation::notFound();
+        }
+
+        return new InvoiceConfirmation(
+            found: true,
+            completed: $response->json('status') === 'completed',
+            amount: (int) $response->json('invoice.total_amount'),
+        );
     }
 
     /**

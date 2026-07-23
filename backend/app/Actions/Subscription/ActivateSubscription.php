@@ -11,18 +11,25 @@ class ActivateSubscription
 {
     /**
      * Activate or extend the agency's subscription from a paid subscription
-     * payment. Freezes price/quota so later plan edits never rewrite history.
-     * If the subscription is still active, the new period is appended to the end.
+     * payment. Freezes price/quota so a later plan edit never rewrites history.
+     * The new period is appended after the latest still-running term (remaining
+     * trial or paid days are preserved, not forfeited).
      */
     public function handle(Payment $payment): Subscription
     {
         $plan = Plan::findOrFail($payment->plan_id);
 
-        $subscription = Subscription::firstOrNew(['agency_id' => $payment->agency_id]);
+        $subscription = Subscription::where('agency_id', $payment->agency_id)
+            ->lockForUpdate()
+            ->first()
+            ?? new Subscription(['agency_id' => $payment->agency_id]);
 
-        $base = $subscription->ends_at && $subscription->ends_at->isFuture()
-            ? $subscription->ends_at
-            : now();
+        $base = now();
+        foreach ([$subscription->ends_at, $subscription->trial_ends_at] as $date) {
+            if ($date && $date->isFuture() && $date->greaterThan($base)) {
+                $base = $date;
+            }
+        }
 
         $subscription->fill([
             'plan_id' => $plan->id,

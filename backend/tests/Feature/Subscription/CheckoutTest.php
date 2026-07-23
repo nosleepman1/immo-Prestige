@@ -3,14 +3,56 @@
 namespace Tests\Feature\Subscription;
 
 use App\Models\Agency;
+use App\Models\Payment;
 use App\Models\Plan;
 use App\Models\User;
+use App\Payments\Contracts\PaymentGateway;
+use App\Payments\GatewayInvoice;
+use App\Payments\InvoiceConfirmation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use RuntimeException;
 use Tests\TestCase;
 
 class CheckoutTest extends TestCase
 {
     use RefreshDatabase;
+
+    public function test_a_gateway_failure_returns_502_without_a_dangling_pending_payment(): void
+    {
+        $user = User::factory()->agency()->create();
+        Agency::factory()->create(['user_id' => $user->id]);
+        $plan = Plan::factory()->create();
+
+        $this->app->bind(PaymentGateway::class, fn () => new class implements PaymentGateway {
+            public function createInvoice(Payment $payment, string $description): GatewayInvoice
+            {
+                throw new RuntimeException('gateway down');
+            }
+
+            public function verifyIpn(array $payload): bool
+            {
+                return false;
+            }
+
+            public function invoiceToken(array $payload): ?string
+            {
+                return null;
+            }
+
+            public function confirm(string $token): InvoiceConfirmation
+            {
+                return InvoiceConfirmation::notFound();
+            }
+        });
+
+        $this->actingAs($user, 'sanctum')
+            ->postJson('/api/v1/subscriptions/checkout', ['plan_id' => $plan->id])
+            ->assertStatus(502)
+            ->assertJsonPath('code', 'PAYMENT_INITIATION_FAILED');
+
+        $this->assertDatabaseHas('payments', ['plan_id' => $plan->id, 'status' => 'failed']);
+        $this->assertSame(0, Payment::where('status', 'pending')->count());
+    }
 
     public function test_an_agency_can_checkout_a_plan(): void
     {

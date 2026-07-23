@@ -4,6 +4,7 @@ namespace App\Payments\Contracts;
 
 use App\Models\Payment;
 use App\Payments\GatewayInvoice;
+use App\Payments\InvoiceConfirmation;
 
 /**
  * I/O boundary to the payment provider. Justified as an interface: it is
@@ -15,7 +16,7 @@ interface PaymentGateway
     public function createInvoice(Payment $payment, string $description): GatewayInvoice;
 
     /**
-     * Verify the authenticity of an incoming IPN payload (provider signature).
+     * Cheap first-gate authenticity check on an incoming IPN payload.
      *
      * @param  array<string, mixed>  $payload
      */
@@ -29,9 +30,8 @@ interface PaymentGateway
     public function invoiceToken(array $payload): ?string;
 
     /**
-     * Whether the IPN payload reports a completed/successful payment.
-     *
-     * @param  array<string, mixed>  $payload
+     * Re-fetch the authoritative invoice state from the provider. This — not the
+     * IPN body — is the source of truth used before provisioning.
      */
-    public function isCompleted(array $payload): bool;
+    public function confirm(string $token): InvoiceConfirmation;
 }
