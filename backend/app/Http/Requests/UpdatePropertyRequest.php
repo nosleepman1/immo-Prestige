@@ -33,8 +33,8 @@ class UpdatePropertyRequest extends FormRequest
             'country' => 'sometimes|required|string|min:3',
             'region' => 'sometimes|required|string|max:100',
             'city' => 'sometimes|required|string|max:100',
-            'longitude' => 'nullable|string|max:50',
-            'latitude' => 'nullable|string|max:50',
+            'longitude' => 'nullable|numeric|between:-180,180',
+            'latitude' => 'nullable|numeric|between:-90,90',
             'sold' => 'boolean',
             'is_active' => 'boolean',
         ];

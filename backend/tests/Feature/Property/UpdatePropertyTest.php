@@ -58,6 +58,18 @@ class UpdatePropertyTest extends TestCase
             ->assertJsonValidationErrors(['price']);
     }
 
+    public function test_update_rejects_out_of_range_coordinates(): void
+    {
+        $owner = User::factory()->agency()->create();
+        $agency = Agency::factory()->create(['user_id' => $owner->id]);
+        $property = Property::factory()->create(['agency_id' => $agency->id]);
+
+        $this->actingAs($owner, 'sanctum')
+            ->putJson("/api/v1/properties/{$property->id}", ['latitude' => 200])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['latitude']);
+    }
+
     public function test_updating_a_missing_property_returns_404(): void
     {
         $owner = User::factory()->agency()->create();
