@@ -21,7 +21,8 @@ return new class extends Migration
             $table->string('phone');
             $table->string( 'id_card')->unique();
             $table->boolean('is_active')->default(false);
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->unique()->constrained()->onDelete('cascade');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

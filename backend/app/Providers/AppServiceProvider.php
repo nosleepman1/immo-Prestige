@@ -2,17 +2,8 @@
 
 namespace App\Providers;
 
-use App\Events\RegisterUser;
-use App\Events\UserRegistered;
-use App\Listeners\RegisterUserListener;
-use App\Listeners\UserRegisteredListener;
-use App\Models\Agency;
-use App\Policies\AgencyPolicy;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Gate as FacadesGate;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Gate;
-
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -21,6 +12,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        //
     }
 
     /**
@@ -28,9 +20,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Event::listen(
-            UserRegistered::class,
-            UserRegisteredListener::class
-        );
+        // Fail loudly on N+1 outside production. Policies are auto-discovered
+        // (App\Policies\{Model}Policy).
+        Model::preventLazyLoading(! $this->app->isProduction());
     }
 }

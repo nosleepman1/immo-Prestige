@@ -2,6 +2,9 @@
 
 namespace Database\Factories;
 
+use App\Models\Agency;
+use App\Models\Devise;
+use App\Models\PropertyType;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,6 +20,9 @@ class PropertyFactory extends Factory
     public function definition(): array
     {
         return [
+            'property_type_id' => PropertyType::factory(),
+            'agency_id' => Agency::factory(),
+            'devise_id' => Devise::factory(),
             'name' => fake()->words(3, true),
             'description' => fake()->text(),
             'surface' => fake()->randomFloat(2, 20, 500),

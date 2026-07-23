@@ -6,7 +6,7 @@ use App\Models\Devise;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreDeviseRequest;
 use App\Http\Requests\UpdateDeviseRequest;
-use App\Http\Resources\DeviseRessource;
+use App\Http\Resources\DeviseResource;
 
 class DeviseController extends Controller
 {
@@ -15,7 +15,7 @@ class DeviseController extends Controller
      */
     public function index()
     {
-         return DeviseRessource::collection(Devise::all());
+         return DeviseResource::collection(Devise::all());
     }
 
     /**
@@ -24,7 +24,7 @@ class DeviseController extends Controller
     public function store(StoreDeviseRequest $request)
     {
         $devise = Devise::create($request->validated());
-        return new DeviseRessource($devise);
+        return new DeviseResource($devise);
     }
 
     /**

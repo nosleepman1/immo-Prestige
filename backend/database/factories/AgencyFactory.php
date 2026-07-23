@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -24,6 +25,7 @@ class AgencyFactory extends Factory
             'phone' => fake()->phoneNumber(),
             'id_card' => fake()->unique()->uuid(),
             'is_active' => true,
+            'user_id' => User::factory()->agency(),
         ];
     }
 }

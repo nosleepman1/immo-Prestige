@@ -4,11 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Property extends Model
 {
     /** @use HasFactory<\Database\Factories\PropertyFactory> */
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'property_type_id',
@@ -25,12 +26,19 @@ class Property extends Model
         'country',
         'region',
         'city',
-        'address',
         'longitude',
         'latitude',
         'sold',
         'is_active',
         'is_posted'
+    ];
+
+    protected $casts = [
+        'furnished' => 'boolean',
+        'sold' => 'boolean',
+        'is_active' => 'boolean',
+        'is_posted' => 'boolean',
+        'price' => 'decimal:2',
     ];
 
 
