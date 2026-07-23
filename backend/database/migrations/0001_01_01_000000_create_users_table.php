@@ -17,7 +17,9 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
+            // Nullable: an agency account exists in `pending` state before its
+            // owner defines a password via the acceptance link.
+            $table->string('password')->nullable();
             $table->enum('role', ['admin', 'agency', 'user']);
             $table->rememberToken();
             $table->softDeletes();

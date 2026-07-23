@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\UserRole;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -47,7 +48,36 @@ class User extends Authenticatable implements MustVerifyEmail
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'role' => UserRole::class,
         ];
+    }
+
+    /**
+     * Soft-delete the owned agency (which cascades to its properties) when the
+     * user is soft-deleted. Hard deletes rely on the DB FK cascade.
+     */
+    protected static function booted(): void
+    {
+        static::deleting(function (User $user) {
+            if (! $user->isForceDeleting()) {
+                $user->agencies()->first()?->delete();
+            }
+        });
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === UserRole::Admin;
+    }
+
+    public function isAgency(): bool
+    {
+        return $this->role === UserRole::Agency;
+    }
+
+    public function passwordSetupTokens()
+    {
+        return $this->hasMany(PasswordSetupToken::class);
     }
 
     /**
