@@ -44,6 +44,17 @@ class UpdateUserTest extends TestCase
         $this->assertDatabaseHas('users', ['id' => $user->id, 'role' => 'user']);
     }
 
+    public function test_email_is_normalized_to_lowercase_on_update(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user, 'sanctum')
+            ->putJson("/api/v1/auth/{$user->id}", ['email' => 'Mixed.Case@Example.COM'])
+            ->assertOk();
+
+        $this->assertDatabaseHas('users', ['id' => $user->id, 'email' => 'mixed.case@example.com']);
+    }
+
     public function test_a_guest_cannot_update_a_user(): void
     {
         $user = User::factory()->create();
