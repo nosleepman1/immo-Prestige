@@ -39,6 +39,10 @@ class Property extends Model
         'is_active' => 'boolean',
         'is_posted' => 'boolean',
         'price' => 'decimal:2',
+        'rooms' => 'integer',
+        'bedrooms' => 'integer',
+        'longitude' => 'decimal:6',
+        'latitude' => 'decimal:6',
     ];
 
 

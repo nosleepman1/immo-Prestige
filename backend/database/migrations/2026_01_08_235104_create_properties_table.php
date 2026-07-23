@@ -13,27 +13,32 @@ return new class extends Migration
     {
         Schema::create('properties', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('property_type_id')->constrained()->onDelete('cascade');
+            // Reference table: never cascade-delete properties when a type is removed.
+            $table->foreignId('property_type_id')->constrained()->restrictOnDelete();
             $table->foreignId('agency_id')->constrained()->onDelete('cascade');
-            $table->foreignId('devise_id')->constrained();
+            $table->foreignId('devise_id')->constrained()->restrictOnDelete();
             $table->string('name');
             $table->text('description')->nullable();
             $table->double('surface');
-            $table->double('rooms');
-            $table->double('bedrooms')->nullable();
+            $table->unsignedTinyInteger('rooms');
+            $table->unsignedTinyInteger('bedrooms')->nullable();
             $table->integer('floor')->nullable();
             $table->boolean('furnished')->default(false);
-            $table->decimal('price', 10, 2);
+            $table->decimal('price', 12, 2);
             $table->string('country');
             $table->string('region');
             $table->string('city');
-            $table->string('longitude')->nullable();
-            $table->string('latitude')->nullable();
+            $table->decimal('longitude', 9, 6)->nullable();
+            $table->decimal('latitude', 9, 6)->nullable();
             $table->boolean('sold')->default(false);
             $table->boolean('is_active')->default(false);
             $table->boolean('is_posted')->default(false);
             $table->softDeletes();
             $table->timestamps();
+
+            // Public search/filter columns.
+            $table->index(['country', 'region', 'city']);
+            $table->index('price');
         });
     }
 
