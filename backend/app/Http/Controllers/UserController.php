@@ -2,176 +2,98 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\RegisterUser;
-use App\Events\UserRegistered;
-use App\Http\Controllers\Controller;
+use App\Actions\Auth\LoginUser;
+use App\Actions\Auth\RegisterUser;
+use App\Actions\User\DeleteUser;
+use App\Actions\User\UpdateUser;
+use App\Data\RegisterUserData;
 use App\Http\Requests\StoreLoginRequest;
 use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdateUserRequest;
 use App\Http\Resources\AgencyResource;
 use App\Http\Resources\UserResource;
 use App\Mail\WelcomeMail;
 use App\Models\Agency;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 
 class UserController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function store(StoreUserRequest $request, RegisterUser $registerUser): JsonResponse
     {
+        $user = $registerUser->handle(RegisterUserData::fromArray($request->validated()));
 
-        return UserResource::collection(User::all());
+        return UserResource::make($user)->response()->setStatusCode(201);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreUserRequest $request )
-    {
-        $data = $request->validated();
-        $data['password'] = bcrypt($data['password']);
-        $data['email'] = strtolower($data['email']);
-
-        $user = User::create($data);
-
-        event(new UserRegistered( $user ));
-
-
-        return response()->json([
-            'message'=> 'inscription reussie, un mail d activation vous a ete envoyé',
-            'status' => 201,
-            'user' => new UserResource($user)
-        ],201);
-    }
-
-    public function verify(Request $request, $id, $hash)
-    {
-        $user = User::findOrFail($id);
-
-        if (!hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
-            return response()->json(['message' => 'Hash invalide'], 400);
-        }
-
-        if ($user->hasVerifiedEmail()) {
-            return response()->json(['message' => 'Email déjà vérifié'], 200);
-        }
-
-        $user->markEmailAsVerified();
-
-        Mail::to($user->getEmailForVerification())->send(new WelcomeMail($user->name, $user->email));
-
-        return response()->json([
-            'message'=> 'email verifié avec succes',
-            'user'=> new UserResource($user)
-
-        ],200);
-    }
-
-    public function resend(Request $request)
-    {
-        $request->user()->sendEmailVerificationNotification();
-
-        return response()->json([
-            'message'=> 'un nouveau mail d activation vous a ete envoyé'
-        ],200);
-    }
-
-
-
-
-
-    public function login(StoreLoginRequest $request)
+    public function login(StoreLoginRequest $request, LoginUser $loginUser): JsonResponse
     {
         $credentials = $request->validated();
 
-        $user = User::where('email', $credentials['email'])->first();
+        $result = $loginUser->handle($credentials['email'], $credentials['password']);
 
-        if (!$user || !Hash::check($credentials['password'], $user->password)) {
-            return response()->json(['message' => 'addresse email ou mot de passe incorrect'], 401);
-        }
-
-        $token = $user->createToken(env('TOKEN_SECRET', 'auth_token'))->plainTextToken;
-
-        $agency = Agency::where('user_id', $user->id)->first();
-
+        $agency = Agency::whereBelongsTo($result['user'])->first();
 
         return response()->json([
-            'message' => 'connexion reussie',
-            'user' => new UserResource($user),
-            'agency' => $agency ? new AgencyResource($agency) : null,
-            'access_token' => $token,
-            'token_type' => 'Bearer ',
-        ], 200)->cookie('token', $token, 60 * 24 * 30);
+            'data' => [
+                'user' => new UserResource($result['user']),
+                'agency' => $agency ? new AgencyResource($agency) : null,
+                'token' => $result['token'],
+            ],
+        ]);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(User $user)
+    public function logout(Request $request): JsonResponse
     {
-        $agency = Agency::where('user_id', $user->id)->first();
+        $request->user()->currentAccessToken()?->delete();
 
-        return response()->json([
-            'user' => new UserResource($user),
-            'agency' => $agency ? new AgencyResource($agency) : null,
-        ], 200);
+        return response()->json(null, 204);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, User $user)
-    {
-       // update simple user info not agency so check if !agency
-         $data = $request->only(['name', 'email', 'password', 'role']);
-            if (isset($data['password'])) {
-                $data['password'] = bcrypt($data['password']);
-            }
-            $user->update($data);
-            return new UserResource($user);
-
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(User $user)
-    {
-        $user->delete();
-        return response()->json([
-            'message' => 'User deleted successfully.'
-        ], 200);
-    }
-
-    public function me(Request $request)
-    {
-        return new UserResource($request->user());
-    }
-
-    public function logout(Request $request)
+    public function me(Request $request): JsonResponse
     {
         $user = $request->user();
+        $agency = Agency::whereBelongsTo($user)->first();
 
-        if (!$user) {
-            return response()->json(['message' => 'Unauthenticated.'], 401);
+        return response()->json([
+            'data' => [
+                'user' => new UserResource($user),
+                'agency' => $agency ? new AgencyResource($agency) : null,
+            ],
+        ]);
+    }
+
+    public function update(UpdateUserRequest $request, User $user, UpdateUser $updateUser): UserResource
+    {
+        $this->authorize('update', $user);
+
+        return UserResource::make($updateUser->handle($user, $request->validated()));
+    }
+
+    public function destroy(User $user, DeleteUser $deleteUser): JsonResponse
+    {
+        $this->authorize('delete', $user);
+
+        $deleteUser->handle($user);
+
+        return response()->json(null, 204);
+    }
+
+    public function verify(Request $request, int $id, string $hash): JsonResponse
+    {
+        $user = User::findOrFail($id);
+
+        if (! hash_equals($hash, sha1($user->getEmailForVerification()))) {
+            return response()->json(['message' => 'Lien de vérification invalide.', 'code' => 'INVALID_HASH'], 400);
         }
 
-        $token = $user->currentAccessToken();
-
-        if ($token) {
-            $token->delete();
-
-             return response()->json([
-            'message' => 'Logged out successfully.'
-        ], 200);
+        if (! $user->hasVerifiedEmail()) {
+            $user->markEmailAsVerified();
+            Mail::to($user->getEmailForVerification())->send(new WelcomeMail($user->name, $user->email));
         }
 
-        return response()->json(['message' => 'No active token found.'], 400);
-
-
+        return response()->json(['data' => new UserResource($user)]);
     }
 }
