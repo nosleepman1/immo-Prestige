@@ -17,15 +17,20 @@ class AgencyResource extends JsonResource
         return [
             'id' => $this->id,
             'company_name' => $this->company_name,
+            'manager_name' => $this->manager_name,
             'description' => $this->description,
             'address' => $this->address,
             'city' => $this->city,
+            'activity_zone' => $this->activity_zone,
             'phone' => $this->phone,
             'id_card' => $this->id_card,
-            'is_active' => $this->is_active,
+            'status' => $this->status,
+            'refusal_reason' => $this->refusal_reason,
+            'activated_at' => $this->activated_at,
             'user_id' => $this->user_id,
+            'documents' => AgencyDocumentResource::collection($this->whenLoaded('documents')),
             'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at
+            'updated_at' => $this->updated_at,
         ];
     }
 }

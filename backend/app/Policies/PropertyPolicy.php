@@ -19,7 +19,7 @@ class PropertyPolicy
 
     public function create(User $user): bool
     {
-        return $user->role === 'agency';
+        return $user->isAgency();
     }
 
     public function update(User $user, Property $property): bool
@@ -39,7 +39,7 @@ class PropertyPolicy
      */
     private function owns(User $user, Property $property): bool
     {
-        if ($user->role === 'admin') {
+        if ($user->isAdmin()) {
             return true;
         }
 

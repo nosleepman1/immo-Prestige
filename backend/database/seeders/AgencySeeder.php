@@ -26,11 +26,14 @@ class AgencySeeder extends Seeder
         Agency::create([
             'user_id' => $user->id,
             'company_name' => 'AMBO TECH',
+            'manager_name' => 'Mohamed TINE',
             'description' => "Nous sommes une startup tech qui evolue auussi dans le secteur de l'immobilier",
             'address' => 'Keur Massar',
             'city' => 'Dakar',
             'phone' => '773757077',
-            'id_card' => '16482000021'
+            'id_card' => '16482000021',
+            'status' => 'accepted',
+            'activated_at' => now(),
         ]);
     }
 }

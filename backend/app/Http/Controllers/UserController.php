@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\Auth\LoginUser;
 use App\Actions\Auth\RegisterUser;
+use App\Actions\Auth\VerifyUserEmail;
 use App\Actions\User\DeleteUser;
 use App\Actions\User\UpdateUser;
 use App\Data\RegisterUserData;
@@ -12,12 +13,10 @@ use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Http\Resources\AgencyResource;
 use App\Http\Resources\UserResource;
-use App\Mail\WelcomeMail;
 use App\Models\Agency;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
 
 class UserController extends Controller
 {
@@ -81,19 +80,8 @@ class UserController extends Controller
         return response()->json(null, 204);
     }
 
-    public function verify(Request $request, int $id, string $hash): JsonResponse
+    public function verify(int $id, string $hash, VerifyUserEmail $verifyUserEmail): UserResource
     {
-        $user = User::findOrFail($id);
-
-        if (! hash_equals($hash, sha1($user->getEmailForVerification()))) {
-            return response()->json(['message' => 'Lien de vérification invalide.', 'code' => 'INVALID_HASH'], 400);
-        }
-
-        if (! $user->hasVerifiedEmail()) {
-            $user->markEmailAsVerified();
-            Mail::to($user->getEmailForVerification())->send(new WelcomeMail($user->name, $user->email));
-        }
-
-        return response()->json(['data' => new UserResource($user)]);
+        return UserResource::make($verifyUserEmail->handle($id, $hash));
     }
 }

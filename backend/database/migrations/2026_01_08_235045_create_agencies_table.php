@@ -14,13 +14,19 @@ return new class extends Migration
     {
         Schema::create('agencies', function (Blueprint $table) {
             $table->id();
-            $table->string( column: 'company_name')->unique();
+            $table->string('company_name')->unique();
+            $table->string('manager_name');
             $table->text('description');
             $table->string('address');
             $table->string('city');
+            $table->string('activity_zone')->nullable();
             $table->string('phone');
-            $table->string( 'id_card')->unique();
-            $table->boolean('is_active')->default(false);
+            $table->string('id_card')->unique();
+            $table->enum('status', ['pending', 'accepted', 'refused'])->default('pending');
+            $table->text('refusal_reason')->nullable();
+            $table->foreignId('reviewed_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->timestamp('reviewed_at')->nullable();
+            $table->timestamp('activated_at')->nullable();
             $table->foreignId('user_id')->unique()->constrained()->onDelete('cascade');
             $table->softDeletes();
             $table->timestamps();
