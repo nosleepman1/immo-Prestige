@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Property;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,8 +18,10 @@ class PropertyImageFactory extends Factory
     public function definition(): array
     {
         return [
-            'image_path' => 'https://picsum.photos/400/300?random=' . fake()->unique()->numberBetween(1, 10000),
+            'property_id' => Property::factory(),
+            'image_path' => 'property_images/'.fake()->unique()->uuid().'.jpg',
             'is_cover' => true,
+            'position' => 0,
         ];
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 class PropertyImageResource extends JsonResource
 {
@@ -16,8 +17,9 @@ class PropertyImageResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'image_path' => $this->image_path,
+            'url' => Storage::disk('public')->url($this->image_path),
             'is_cover' => $this->is_cover,
+            'position' => $this->position,
         ];
     }
 }

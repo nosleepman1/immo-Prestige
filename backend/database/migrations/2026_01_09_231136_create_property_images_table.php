@@ -16,6 +16,8 @@ return new class extends Migration
             $table->foreignId('property_id')->constrained()->onDelete('cascade');
             $table->string('image_path');
             $table->boolean('is_cover')->default(false);
+            $table->unsignedInteger('position')->default(0);
+            $table->softDeletes();
             $table->timestamps();
         });
     }

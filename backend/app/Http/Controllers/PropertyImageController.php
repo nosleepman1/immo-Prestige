@@ -2,89 +2,51 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\PropertyImage;
-use App\Http\Controllers\Controller;
+use App\Actions\Property\DeletePropertyImage;
+use App\Actions\Property\ReorderPropertyImages;
+use App\Actions\Property\SetCoverPropertyImage;
+use App\Actions\Property\UploadPropertyImage;
+use App\Http\Requests\ReorderPropertyImagesRequest;
 use App\Http\Requests\StorePropertyImageRequest;
-use App\Http\Requests\UpdatePropertyImageRequest;
 use App\Http\Resources\PropertyImageResource;
 use App\Models\Property;
+use App\Models\PropertyImage;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class PropertyImageController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function store(StorePropertyImageRequest $request, Property $property, UploadPropertyImage $upload): JsonResponse
     {
+        $this->authorize('uploadImages', $property);
 
+        $image = $upload->handle($property, $request->file('image'));
+
+        return PropertyImageResource::make($image)->response()->setStatusCode(201);
     }
 
+    public function reorder(ReorderPropertyImagesRequest $request, Property $property, ReorderPropertyImages $reorder): AnonymousResourceCollection
+    {
+        $this->authorize('update', $property);
 
-    public function showPropertyImages(Property $property){
+        $reorder->handle($property, $request->validated()['image_ids']);
 
-        return PropertyImageResource::collection($property->images);
+        return PropertyImageResource::collection($property->images()->get());
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StorePropertyImageRequest $request, Property $property)
+    public function setCover(PropertyImage $propertyImage, SetCoverPropertyImage $setCover): PropertyImageResource
     {
+        $this->authorize('update', $propertyImage);
 
-        if (!$property) {
-            return response()->json(['message' => 'Property not found'], 404);
-        }
-
-
-        if($request->hasFile('image_path')) {
-
-            $imageFile = $request->file('image_path');
-            $imagePath = $imageFile->store('property_images', 'public');
-
-            PropertyImage::create([
-                'property_id' =>$property->id,
-                'image_path' => $imagePath
-            ]);
-
-        }
-        return response()->json([
-            'message'=> 'creation reusie',
-            'data' => $property->images()->get()
-        ]);
-    }
-    /**
-     * Display the specified resource.
-     */
-    public function show(PropertyImage $propertyImage)
-    {
-        return response()->json($propertyImage);
+        return PropertyImageResource::make($setCover->handle($propertyImage));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdatePropertyImageRequest $request, PropertyImage $propertyImage)
+    public function destroy(PropertyImage $propertyImage, DeletePropertyImage $delete): JsonResponse
     {
-        // property image update logic here
-        $data = $request->validated();
-        $propertyImage->update($data);
+        $this->authorize('delete', $propertyImage);
 
-        return response()->json([
-            'message'=> 'creation reusie',
-            'data' => $propertyImage->toArray()
-        ]);
-    }
+        $delete->handle($propertyImage);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(PropertyImage $propertyImage)
-    {
-        // property image deletion logic here
-        $propertyImage->delete();
-        return response()->json(
-            [
-                ['message' => 'Property image deleted successfully']
-            ], 200);
+        return response()->json(null, 204);
     }
 }
