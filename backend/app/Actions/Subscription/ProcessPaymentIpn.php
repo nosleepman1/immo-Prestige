@@ -69,6 +69,8 @@ class ProcessPaymentIpn
             match ($locked->purpose) {
                 PaymentPurpose::Subscription => $this->activate->handle($locked),
                 PaymentPurpose::VerificationBadge => $this->activateBadge->handle($locked),
+                // Fail loud (and roll back the Paid mark) on an unhandled purpose.
+                default => throw new \LogicException("Unhandled payment purpose: {$locked->purpose->value}"),
             };
         });
     }

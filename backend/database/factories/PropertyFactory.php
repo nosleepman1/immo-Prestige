@@ -37,8 +37,17 @@ class PropertyFactory extends Factory
             'longitude' => fake()->longitude(-18.0, -11.0),
             'latitude' => fake()->latitude(12.0, 16.0),
             'sold' => fake()->boolean(10),
-            'is_active' => true,
-            'is_posted' => true,
+            'status' => 'published',
         ];
+    }
+
+    public function draft(): static
+    {
+        return $this->state(fn () => ['status' => 'draft']);
+    }
+
+    public function published(): static
+    {
+        return $this->state(fn () => ['status' => 'published']);
     }
 }
