@@ -2,96 +2,60 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Comment;
-use App\Http\Controllers\Controller;
+use App\Actions\Post\CreateComment;
+use App\Actions\Post\DeleteComment;
+use App\Actions\Post\UpdateComment;
 use App\Http\Requests\StoreCommentRequest;
 use App\Http\Requests\UpdateCommentRequest;
 use App\Http\Resources\CommentResource;
+use App\Models\Comment;
 use App\Models\Post;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class CommentController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Public comments for a post (guest-readable), single level of replies.
      */
-    public function myComments(){
-        return CommentResource::collection(Comment::where('user_id', Auth::user()->id));
-    }
+    public function index(Post $post): AnonymousResourceCollection
+    {
+        abort_unless($post->property()->published()->exists(), 404);
 
-    public function postComments(Post $post){
-        $comments = Comment::where('post_id', $post->id)
-            ->with([ 'user:id,name'])
-            ->with(['replies.user:id,name'])
+        $comments = $post->comments()
+            ->with(['user', 'replies.user'])
             ->withCount('replies')
+            ->latest()
             ->get();
 
-        if($comments->isEmpty()){
-            return response()->json(
-                [
-                    'message' => 'No comments found for this post'
-                ], 404);
-        }
         return CommentResource::collection($comments);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreCommentRequest $request, Post $post)
+    public function store(StoreCommentRequest $request, Post $post, CreateComment $createComment): JsonResponse
     {
-        $data = $request->validated();
-        $data['user_id'] = Auth::user()->id;
-        $data['post_id'] = $post->id;
-        
-        $comment = Comment::create($data);
+        $this->authorize('create', Comment::class);
 
-        return new CommentResource($comment->load('user:id,name'));
-    }
-        
+        abort_unless($post->property()->published()->exists(), 404);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Comment $comment)
-    {
-        return new CommentResource($comment);
+        $comment = $createComment->handle($post, $request->user(), $request->validated()['content']);
+
+        return CommentResource::make($comment->load('user'))->response()->setStatusCode(201);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateCommentRequest $request, Comment $comment)
+    public function update(UpdateCommentRequest $request, Comment $comment, UpdateComment $updateComment): CommentResource
     {
-        $data = $request->validated();
-        $data['user_id'] = Auth::user()->id;
+        $this->authorize('update', $comment);
 
-        $comment->update($data);
-
-        return response()->json(
-            [
-                ['message' => 'Comment updated successfully'],
-                'data' => $comment
-            ], 200);
+        return CommentResource::make($updateComment->handle($comment, $request->validated()['content']));
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Comment $comment)
+    public function destroy(Comment $comment, DeleteComment $deleteComment): JsonResponse
     {
+        $this->authorize('delete', $comment);
 
-       if($comment->user_id !== Auth::user()->id){
-            return response()->json(
-                [
-                    'message' => 'Unauthorized'
-                ], 403);
-        }
+        $deleteComment->handle($comment);
 
-        $comment->delete();
-        return response()->json(
-            [
-                ['message' => 'Comment deleted successfully']
-            ], 200);
+        return response()->json(null, 204);
     }
 }

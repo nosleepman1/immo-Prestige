@@ -4,10 +4,14 @@ namespace App\Providers;
 
 use App\Events\AgencyActivated;
 use App\Listeners\StartTrialSubscription;
+use App\Models\Comment;
+use App\Models\CommentReply;
+use App\Models\Post;
 use App\Payments\Contracts\PaymentGateway;
 use App\Payments\FakePaymentGateway;
 use App\Payments\PayDunyaGateway;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 
@@ -37,5 +41,14 @@ class AppServiceProvider extends ServiceProvider
         Model::preventLazyLoading(! $this->app->isProduction());
 
         Event::listen(AgencyActivated::class, StartTrialSubscription::class);
+
+        // Short, stable aliases in reports.reportable_type instead of leaking
+        // fully-qualified class names to API clients. Not enforced: Sanctum's
+        // own tokenable morph is unrelated to this map and must keep resolving.
+        Relation::morphMap([
+            'comment' => Comment::class,
+            'comment_reply' => CommentReply::class,
+            'post' => Post::class,
+        ]);
     }
 }

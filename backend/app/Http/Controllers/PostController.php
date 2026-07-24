@@ -2,108 +2,58 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Post;
-use App\Http\Controllers\Controller;
+use App\Actions\Post\CreatePost;
 use App\Http\Requests\StorePostRequest;
-use App\Http\Requests\UpdatePostRequest;
 use App\Http\Resources\PostResource;
-use App\Models\Agency;
+use App\Models\Post;
 use App\Models\Property;
-use Illuminate\Support\Facades\Auth;
-use Symfony\Component\HttpFoundation\Request;
+use App\Queries\PostFeedQuery;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class PostController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Public feed of published properties, newest first.
      */
-    public function index()
+    public function index(Request $request, PostFeedQuery $query): AnonymousResourceCollection
     {
-        $posts = Post::with([
-                'user',
-                'user.agencies',
-                'property',
-                'property.images',
-                'property.propertyType',
-                'property.agency',
-                'property.devise'
-            ])
-            ->withCount(['likes', 'comments'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
-
-        return PostResource::collection($posts);
+        return PostResource::collection($query->handle($request->user('sanctum')?->id));
     }
 
-
-    public function agencyPosts(Agency $agency)
+    public function show(Request $request, Post $post): PostResource
     {
-        if(Auth::user()->id == $agency->user_id){
-            return PostResource::collection(Post::where('agency_id', $agency->id)->get());
-        }  
-    }
+        abort_unless($post->property()->published()->exists(), 404);
 
-    
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StorePostRequest $request)
-    {
-        if(Auth::user()->role !== 'agency'){
-             return response()->json(
-                [
-                    'error' => 'Vous n\'avez pas le droit de poster'
-                ],
-                403
-             );
+        $post->loadCount(['likes', 'comments']);
+        $post->load(['user', 'property.images', 'property.propertyType', 'property.agency', 'property.devise']);
+
+        if ($user = $request->user('sanctum')) {
+            $post->is_liked_by_user = $post->likes()->where('user_id', $user->id)->exists();
         }
 
-        $data = $request->validated();
-
-        $data['user_id'] = Auth::user()->id;
-
-        $property = Property::find($data['property_id']);
-
-        if($property->is_posted){
-            return response()->json([
-                'message' => 'This property is already posted'
-            ], 400);
-        }
-        
-        $res = $property->update([
-            'is_posted' => true
-        ]);
-
-        if($res){
-            $post = Post::create($data);
-            return new PostResource($post);
-        }
-
-        return response()->json([
-            'message' => 'Failed to update agency.'
-        ], 500);
-       
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Post $post)
-    {
         return new PostResource($post);
     }
 
-
-
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Post $post)
+    public function store(StorePostRequest $request, CreatePost $createPost): JsonResponse
     {
+        $this->authorize('create', Post::class);
+
+        $property = Property::findOrFail($request->validated()['property_id']);
+        $this->authorize('update', $property); // must own the property being posted
+
+        $post = $createPost->handle($request->user(), $property);
+
+        return PostResource::make($post->load('user'))->response()->setStatusCode(201);
+    }
+
+    public function destroy(Post $post): JsonResponse
+    {
+        $this->authorize('delete', $post);
+
         $post->delete();
-        return response()->json([
-            'message' => 'Post deleted successfully.'
-        ], 200);
+
+        return response()->json(null, 204);
     }
 }

@@ -3,8 +3,9 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-class StoreCommentRequest extends FormRequest
+class ReviewReportRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -17,7 +18,7 @@ class StoreCommentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'content' => 'required|string|max:2000',
+            'status' => ['required', Rule::in(['reviewed', 'dismissed'])],
         ];
     }
 }

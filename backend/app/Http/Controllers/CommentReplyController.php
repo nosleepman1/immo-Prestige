@@ -2,72 +2,36 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CommentReply;
-use App\Http\Controllers\Controller;
+use App\Actions\Post\CreateCommentReply;
+use App\Actions\Post\DeleteCommentReply;
 use App\Http\Requests\StoreCommentReplyRequest;
-use App\Http\Requests\UpdateCommentReplyRequest;
 use App\Http\Resources\CommentReplyResource;
-use App\Models\Post;
 use App\Models\Comment;
-use Illuminate\Support\Facades\Auth;
+use App\Models\CommentReply;
+use Illuminate\Http\JsonResponse;
 
 class CommentReplyController extends Controller
 {
-    public function index(Post $post)
+    public function store(StoreCommentReplyRequest $request, Comment $comment, CreateCommentReply $createReply): JsonResponse
     {
-        $commentReplies = CommentReply::where('post_id', $post->id)
-            ->with(['user:id,name'])
-            ->get();
+        $this->authorize('create', CommentReply::class);
+
+        abort_unless(
+            $comment->post()->whereHas('property', fn ($q) => $q->published())->exists(),
+            404
+        );
+
+        $reply = $createReply->handle($comment, $request->user(), $request->validated()['content']);
+
+        return CommentReplyResource::make($reply->load('user'))->response()->setStatusCode(201);
     }
 
-    public function store(StoreCommentReplyRequest $request, Comment $comment)
+    public function destroy(CommentReply $commentReply, DeleteCommentReply $deleteReply): JsonResponse
     {
+        $this->authorize('delete', $commentReply);
 
-        $data = $request->validated();
-        $data['user_id'] = Auth::user()->id;
-        $data['comment_id'] = $comment->id;
-        $commentReply = CommentReply::create($data);
+        $deleteReply->handle($commentReply);
 
-        return response()->json(
-            [
-                'message' => 'Comment reply created successfully',
-                'data' => new CommentReplyResource($commentReply)
-            ], 201);
-    }
-
-    public function show(CommentReply $commentReply)
-    {
-        return new CommentReplyResource($commentReply);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateCommentReplyRequest $request, CommentReply $commentReply)
-    {
-        // comment reply update logic here
-        $data = $request->validated();
-        $data['user_id'] = Auth::user()->id;
-
-        $commentReply->update($data);
-
-        return response()->json(
-            [
-                ['message' => 'Comment reply updated successfully'],
-                'data' => new CommentReplyResource($commentReply)
-            ], 200);
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(CommentReply $commentReply)
-    {
-        $commentReply->delete();
-
-        return response()->json(
-            [
-                ['message' => 'Comment reply deleted successfully']
-            ], 200);
+        return response()->json(null, 204);
     }
 }

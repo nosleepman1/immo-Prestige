@@ -2,15 +2,15 @@
 
 namespace App\Models;
 
-use Dom\Comment as DomComment;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Comment extends Model
 {
     /** @use HasFactory<\Database\Factories\CommentFactory> */
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'post_id',
@@ -28,8 +28,8 @@ class Comment extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function replies() : HasMany {
+    public function replies(): HasMany
+    {
         return $this->hasMany(CommentReply::class);
-    
     }
 }

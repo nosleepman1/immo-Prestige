@@ -9,16 +9,14 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Post extends Model
 {
     /** @use HasFactory<\Database\Factories\PostFactory> */
-    use HasFactory;
-    //use SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'user_id',
-        'property_id'
+        'property_id',
     ];
 
-   
-    public function likes() 
+    public function likes()
     {
         return $this->hasMany(Like::class);
     }
@@ -33,8 +31,8 @@ class Post extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function property() {
+    public function property()
+    {
         return $this->belongsTo(Property::class);
-    
     }
 }

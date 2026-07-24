@@ -18,14 +18,9 @@ class CommentReplyResource extends JsonResource
             'id' => $this->id,
             'comment_id' => $this->comment_id,
             'content' => $this->content,
+            'user' => $this->whenLoaded('user', fn () => ['id' => $this->user->id, 'name' => $this->user->name]),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'user' => $this->whenLoaded('user', function() {
-                return [
-                    'id' => $this->user->id,
-                    'name' => $this->user->name,
-                ];
-            })
         ];
     }
 }

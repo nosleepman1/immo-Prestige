@@ -16,13 +16,12 @@ class PostResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'user' => new UserResource($this->whenLoaded('user')),
+            'user' => $this->whenLoaded('user', fn () => ['id' => $this->user->id, 'name' => $this->user->name]),
             'property' => new PropertyResource($this->whenLoaded('property')),
-            'likes_count' => $this->likes_count,
-            'is_liked_by_user' => $request->user('sanctum') ? $this->likes()->where('user_id', $request->user('sanctum')->id)->exists() : false,
-            'comments_count' => $this->comments_count,
+            'likes_count' => $this->when(isset($this->likes_count), fn () => $this->likes_count),
+            'comments_count' => $this->when(isset($this->comments_count), fn () => $this->comments_count),
+            'is_liked_by_user' => (bool) ($this->is_liked_by_user ?? false),
             'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
         ];
     }
 }

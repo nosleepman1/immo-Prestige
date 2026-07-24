@@ -16,6 +16,11 @@ return new class extends Migration
             $table->foreignId('post_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->timestamps();
+
+            // Idempotency at the DB level, not just in application code. Likes
+            // are a toggle (current state), not a moderated record — unlike is a
+            // hard delete, unlike comments/replies which are soft-deleted.
+            $table->unique(['post_id', 'user_id']);
         });
     }
 
