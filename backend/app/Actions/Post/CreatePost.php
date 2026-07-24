@@ -26,7 +26,10 @@ class CreatePost
                 'user_id' => $user->id,
                 'property_id' => $property->id,
             ]);
-        } catch (QueryException) {
+        } catch (QueryException $e) {
+            if ($e->getCode() !== '23000') {
+                throw $e;
+            }
             // Unique constraint backstop against a concurrent double-post.
             throw new PropertyAlreadyPostedException();
         }

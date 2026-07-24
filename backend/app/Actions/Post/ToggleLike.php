@@ -24,7 +24,10 @@ class ToggleLike
 
         try {
             Like::create(['post_id' => $post->id, 'user_id' => $user->id]);
-        } catch (QueryException) {
+        } catch (QueryException $e) {
+            if ($e->getCode() !== '23000') {
+                throw $e;
+            }
             // Unique constraint backstop: a concurrent request already liked it.
         }
 

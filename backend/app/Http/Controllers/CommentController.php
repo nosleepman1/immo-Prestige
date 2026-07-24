@@ -36,6 +36,8 @@ class CommentController extends Controller
     {
         $this->authorize('create', Comment::class);
 
+        abort_unless($post->property()->published()->exists(), 404);
+
         $comment = $createComment->handle($post, $request->user(), $request->validated()['content']);
 
         return CommentResource::make($comment->load('user'))->response()->setStatusCode(201);

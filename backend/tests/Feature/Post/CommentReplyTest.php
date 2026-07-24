@@ -4,6 +4,8 @@ namespace Tests\Feature\Post;
 
 use App\Models\Comment;
 use App\Models\CommentReply;
+use App\Models\Post;
+use App\Models\Property;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -11,6 +13,18 @@ use Tests\TestCase;
 class CommentReplyTest extends TestCase
 {
     use RefreshDatabase;
+
+    public function test_replying_on_an_unpublished_property_returns_404(): void
+    {
+        $user = User::factory()->create();
+        $property = Property::factory()->draft()->create();
+        $post = Post::factory()->create(['property_id' => $property->id]);
+        $comment = Comment::factory()->create(['post_id' => $post->id]);
+
+        $this->actingAs($user, 'sanctum')
+            ->postJson("/api/v1/comments/{$comment->id}/replies", ['content' => 'x'])
+            ->assertStatus(404);
+    }
 
     public function test_an_authenticated_user_can_reply_to_a_comment(): void
     {

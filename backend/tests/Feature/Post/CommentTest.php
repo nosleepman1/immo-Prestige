@@ -4,6 +4,7 @@ namespace Tests\Feature\Post;
 
 use App\Models\Comment;
 use App\Models\Post;
+use App\Models\Property;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -20,6 +21,34 @@ class CommentTest extends TestCase
         $this->getJson("/api/v1/posts/{$post->id}/comments")
             ->assertOk()
             ->assertJsonCount(1, 'data');
+    }
+
+    public function test_reading_comments_of_an_unpublished_property_returns_404(): void
+    {
+        $property = Property::factory()->draft()->create();
+        $post = Post::factory()->create(['property_id' => $property->id]);
+
+        $this->getJson("/api/v1/posts/{$post->id}/comments")->assertStatus(404);
+    }
+
+    public function test_commenting_on_an_unpublished_property_returns_404(): void
+    {
+        $user = User::factory()->create();
+        $property = Property::factory()->draft()->create();
+        $post = Post::factory()->create(['property_id' => $property->id]);
+
+        $this->actingAs($user, 'sanctum')
+            ->postJson("/api/v1/posts/{$post->id}/comments", ['content' => 'x'])
+            ->assertStatus(404);
+    }
+
+    public function test_commenting_on_a_missing_post_returns_404(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user, 'sanctum')
+            ->postJson('/api/v1/posts/999999/comments', ['content' => 'x'])
+            ->assertStatus(404);
     }
 
     public function test_an_authenticated_user_can_comment(): void

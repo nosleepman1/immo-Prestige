@@ -16,6 +16,11 @@ class CommentReplyController extends Controller
     {
         $this->authorize('create', CommentReply::class);
 
+        abort_unless(
+            $comment->post()->whereHas('property', fn ($q) => $q->published())->exists(),
+            404
+        );
+
         $reply = $createReply->handle($comment, $request->user(), $request->validated()['content']);
 
         return CommentReplyResource::make($reply->load('user'))->response()->setStatusCode(201);

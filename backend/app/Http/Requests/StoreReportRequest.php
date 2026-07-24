@@ -31,7 +31,10 @@ class StoreReportRequest extends FormRequest
 
         return [
             'reportable_type' => ['required', Rule::in(array_keys(self::REPORTABLE_TABLES))],
-            'reportable_id' => ['required', 'integer', Rule::exists($table, 'id')],
+            'reportable_id' => [
+                'required', 'integer',
+                Rule::exists($table, 'id')->where(fn ($q) => $q->whereNull('deleted_at')),
+            ],
             'reason' => ['required', Rule::in(['spam', 'abusive', 'inappropriate', 'other'])],
             'details' => ['nullable', 'string', 'max:1000'],
         ];
