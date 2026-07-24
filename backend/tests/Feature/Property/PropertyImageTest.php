@@ -139,6 +139,27 @@ class PropertyImageTest extends TestCase
             ->assertJsonValidationErrors(['image_ids.0']);
     }
 
+    public function test_another_agency_cannot_reorder_someone_elses_images(): void
+    {
+        [, $property] = $this->ownedProperty();
+        $image = PropertyImage::factory()->create(['property_id' => $property->id]);
+        $intruder = User::factory()->agency()->create();
+        Agency::factory()->create(['user_id' => $intruder->id]);
+
+        $this->actingAs($intruder, 'sanctum')
+            ->putJson("/api/v1/properties/{$property->id}/images/order", ['image_ids' => [$image->id]])
+            ->assertStatus(403);
+    }
+
+    public function test_a_guest_cannot_reorder(): void
+    {
+        [, $property] = $this->ownedProperty();
+        $image = PropertyImage::factory()->create(['property_id' => $property->id]);
+
+        $this->putJson("/api/v1/properties/{$property->id}/images/order", ['image_ids' => [$image->id]])
+            ->assertStatus(401);
+    }
+
     public function test_the_owner_can_change_the_cover_image(): void
     {
         [$owner, $property] = $this->ownedProperty();
@@ -152,6 +173,26 @@ class PropertyImageTest extends TestCase
 
         $this->assertDatabaseHas('property_images', ['id' => $cover->id, 'is_cover' => false]);
         $this->assertDatabaseHas('property_images', ['id' => $other->id, 'is_cover' => true]);
+    }
+
+    public function test_another_agency_cannot_change_the_cover(): void
+    {
+        [, $property] = $this->ownedProperty();
+        $image = PropertyImage::factory()->create(['property_id' => $property->id]);
+        $intruder = User::factory()->agency()->create();
+        Agency::factory()->create(['user_id' => $intruder->id]);
+
+        $this->actingAs($intruder, 'sanctum')
+            ->putJson("/api/v1/property-images/{$image->id}/cover")
+            ->assertStatus(403);
+    }
+
+    public function test_a_guest_cannot_change_the_cover(): void
+    {
+        [, $property] = $this->ownedProperty();
+        $image = PropertyImage::factory()->create(['property_id' => $property->id]);
+
+        $this->putJson("/api/v1/property-images/{$image->id}/cover")->assertStatus(401);
     }
 
     public function test_the_owner_can_delete_an_image(): void

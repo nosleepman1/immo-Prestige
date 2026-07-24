@@ -16,11 +16,6 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class PropertyImageController extends Controller
 {
-    public function index(Property $property): AnonymousResourceCollection
-    {
-        return PropertyImageResource::collection($property->images);
-    }
-
     public function store(StorePropertyImageRequest $request, Property $property, UploadPropertyImage $upload): JsonResponse
     {
         $this->authorize('uploadImages', $property);

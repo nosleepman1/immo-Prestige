@@ -27,7 +27,10 @@ class PublishProperty
 
     private function assertWithinQuota(Agency $agency, Property $property): void
     {
-        $quota = $agency->subscription?->quota_snapshot['property_quota'] ?? null;
+        // ->first() (not the magic `subscription` attribute) keeps this an
+        // explicit query, consistent with preventLazyLoading elsewhere, while
+        // still going through the model's array cast on quota_snapshot.
+        $quota = $agency->subscription()->first()?->quota_snapshot['property_quota'] ?? null;
 
         if ($quota === null) {
             return; // unlimited

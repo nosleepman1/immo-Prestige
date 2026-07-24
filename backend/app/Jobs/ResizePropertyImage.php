@@ -66,7 +66,7 @@ class ResizePropertyImage implements ShouldQueue
         $newHeight = (int) round($height * ($newWidth / $width));
         $resized = imagecreatetruecolor($newWidth, $newHeight);
 
-        if (in_array($type, [IMAGETYPE_PNG, IMAGETYPE_GIF], true)) {
+        if (in_array($type, [IMAGETYPE_PNG, IMAGETYPE_GIF, IMAGETYPE_WEBP], true)) {
             imagealphablending($resized, false);
             imagesavealpha($resized, true);
         }
@@ -77,6 +77,7 @@ class ResizePropertyImage implements ShouldQueue
         match ($type) {
             IMAGETYPE_PNG => imagepng($resized),
             IMAGETYPE_GIF => imagegif($resized),
+            IMAGETYPE_WEBP => imagewebp($resized, null, 82),
             default => imagejpeg($resized, null, 82),
         };
         $encoded = ob_get_clean();

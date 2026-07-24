@@ -38,6 +38,27 @@ class ResizePropertyImageTest extends TestCase
         $this->assertSame(800, $height); // aspect ratio preserved
     }
 
+    public function test_it_re_encodes_an_oversized_webp_as_webp_not_jpeg(): void
+    {
+        Storage::fake('public');
+        $image = PropertyImage::factory()->create(['image_path' => 'property_images/big.webp']);
+
+        $im = imagecreatetruecolor(3200, 1600);
+        ob_start();
+        imagewebp($im);
+        $data = ob_get_clean();
+        imagedestroy($im);
+        Storage::disk('public')->put('property_images/big.webp', $data);
+
+        (new ResizePropertyImage($image->id))->handle();
+
+        $resized = Storage::disk('public')->get('property_images/big.webp');
+        $info = getimagesizefromstring($resized);
+
+        $this->assertSame(1600, $info[0]);
+        $this->assertSame(IMAGETYPE_WEBP, $info[2]); // content stays webp, not silently re-encoded as jpeg
+    }
+
     public function test_it_leaves_a_small_image_untouched(): void
     {
         Storage::fake('public');
