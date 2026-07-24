@@ -5,18 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CommentReply extends Model
 {
     /** @use HasFactory<\Database\Factories\CommentReplyFactory> */
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'comment_id',
         'user_id',
-        'content'
+        'content',
     ];
-
 
     public function comment(): BelongsTo
     {
@@ -27,6 +27,4 @@ class CommentReply extends Model
     {
         return $this->belongsTo(User::class);
     }
-
-    
 }
