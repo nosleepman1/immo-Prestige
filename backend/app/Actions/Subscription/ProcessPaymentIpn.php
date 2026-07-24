@@ -10,10 +10,10 @@ use App\Payments\Contracts\PaymentGateway;
 use Illuminate\Support\Facades\DB;
 
 /**
- * IPN is the source of truth. Every notification is journalled; only a
- * signature-valid, not-yet-paid notification changes state, and the
- * provisioning is idempotent under a row lock (same notification twice =
- * one effect).
+ * IPN handling. Every notification is journalled (even forged/unknown ones).
+ * A notification only provisions when: its signature is valid, and the invoice
+ * — re-confirmed against the provider (the source of truth, not the IPN body) —
+ * is completed for the expected amount. Provisioning is idempotent under a lock.
  */
 class ProcessPaymentIpn
 {
@@ -31,34 +31,35 @@ class ProcessPaymentIpn
         $payment = $token ? Payment::where('invoice_token', $token)->first() : null;
         $signatureValid = $this->gateway->verifyIpn($payload);
 
-        if ($payment) {
-            Transaction::create([
-                'payment_id' => $payment->id,
-                'event' => 'ipn_received',
-                'external_ref' => $token,
-                'signature_valid' => $signatureValid,
-                'payload' => $payload,
-            ]);
-        }
+        Transaction::create([
+            'payment_id' => $payment?->id,
+            'event' => 'ipn_received',
+            'external_ref' => $token,
+            'signature_valid' => $signatureValid,
+            'payload' => $payload,
+        ]);
 
-        // Ignore unauthenticated or unknown notifications — no state change.
-        if (! $signatureValid || ! $payment) {
+        if (! $signatureValid || ! $payment || $payment->isPaid()) {
             return;
         }
 
-        $completed = $this->gateway->isCompleted($payload);
+        // Source of truth: re-confirm with the provider.
+        $confirmation = $this->gateway->confirm($token);
 
-        DB::transaction(function () use ($payment, $completed) {
+        if (! $confirmation->found || ! $confirmation->completed) {
+            return;
+        }
+
+        // Reject amount tampering.
+        if ($confirmation->amount !== null && $confirmation->amount !== $payment->amount) {
+            return;
+        }
+
+        DB::transaction(function () use ($payment) {
             $locked = Payment::whereKey($payment->id)->lockForUpdate()->first();
 
             if ($locked->isPaid()) {
                 return; // already provisioned
-            }
-
-            if (! $completed) {
-                $locked->update(['status' => PaymentStatus::Failed]);
-
-                return;
             }
 
             $locked->update(['status' => PaymentStatus::Paid]);

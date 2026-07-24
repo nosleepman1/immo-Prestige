@@ -4,10 +4,12 @@ namespace App\Actions\Subscription;
 
 use App\Enums\PaymentPurpose;
 use App\Enums\PaymentStatus;
+use App\Exceptions\PaymentInitiationFailedException;
 use App\Models\Agency;
 use App\Models\Payment;
 use App\Models\Plan;
 use App\Payments\Contracts\PaymentGateway;
+use Throwable;
 
 class CheckoutSubscription
 {
@@ -29,7 +31,13 @@ class CheckoutSubscription
             'status' => PaymentStatus::Pending,
         ]);
 
-        $invoice = $this->gateway->createInvoice($payment, "Abonnement {$plan->name}");
+        try {
+            $invoice = $this->gateway->createInvoice($payment, "Abonnement {$plan->name}");
+        } catch (Throwable) {
+            $payment->update(['status' => PaymentStatus::Failed]);
+
+            throw new PaymentInitiationFailedException();
+        }
 
         $payment->update(['invoice_token' => $invoice->token]);
 

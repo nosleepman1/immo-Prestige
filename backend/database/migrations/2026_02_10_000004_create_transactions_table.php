@@ -11,7 +11,8 @@ return new class extends Migration
         // Immutable journal of gateway events (IPN). Source of truth for payments.
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('payment_id')->constrained()->cascadeOnDelete();
+            // Nullable so forged / unknown-token notifications are still journalled.
+            $table->foreignId('payment_id')->nullable()->constrained()->nullOnDelete();
             $table->string('event');
             $table->string('external_ref')->nullable();
             $table->boolean('signature_valid')->default(false);
