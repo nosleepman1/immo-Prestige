@@ -26,6 +26,7 @@ class Agency extends Model
         'reviewed_by',
         'reviewed_at',
         'activated_at',
+        'verified_until',
         'user_id',
     ];
 
@@ -33,7 +34,13 @@ class Agency extends Model
         'status' => AgencyStatus::class,
         'reviewed_at' => 'datetime',
         'activated_at' => 'datetime',
+        'verified_until' => 'datetime',
     ];
+
+    public function isVerified(): bool
+    {
+        return $this->verified_until?->isFuture() ?? false;
+    }
 
     /**
      * Cascade soft-delete to owned properties and documents.

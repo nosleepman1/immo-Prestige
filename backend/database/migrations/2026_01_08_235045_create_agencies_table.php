@@ -27,6 +27,7 @@ return new class extends Migration
             $table->foreignId('reviewed_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamp('reviewed_at')->nullable();
             $table->timestamp('activated_at')->nullable();
+            $table->timestamp('verified_until')->nullable(); // paid badge active while future
             $table->foreignId('user_id')->unique()->constrained()->onDelete('cascade');
             $table->softDeletes();
             $table->timestamps();
