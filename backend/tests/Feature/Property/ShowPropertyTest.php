@@ -34,7 +34,19 @@ class ShowPropertyTest extends TestCase
         $agency = Agency::factory()->create(['user_id' => $owner->id]);
         $property = Property::factory()->draft()->create(['agency_id' => $agency->id]);
 
-        $this->actingAs($owner, 'sanctum')
+        // Real Bearer token (stateless), like the mobile/web client: the public
+        // route must still recognise the owner.
+        $this->withToken($owner->createToken('api')->plainTextToken)
+            ->getJson("/api/v1/properties/{$property->id}")
+            ->assertOk();
+    }
+
+    public function test_an_admin_can_view_any_draft(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $property = Property::factory()->draft()->create();
+
+        $this->withToken($admin->createToken('api')->plainTextToken)
             ->getJson("/api/v1/properties/{$property->id}")
             ->assertOk();
     }
@@ -44,7 +56,7 @@ class ShowPropertyTest extends TestCase
         $property = Property::factory()->draft()->create();
         $intruder = User::factory()->agency()->create();
 
-        $this->actingAs($intruder, 'sanctum')
+        $this->withToken($intruder->createToken('api')->plainTextToken)
             ->getJson("/api/v1/properties/{$property->id}")
             ->assertStatus(404);
     }

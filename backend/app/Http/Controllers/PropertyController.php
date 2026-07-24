@@ -32,14 +32,18 @@ class PropertyController extends Controller
      */
     public function show(Request $request, Property $property): PropertyResource
     {
-        $user = $request->user();
+        $property->load(['propertyType', 'agency', 'devise', 'images']);
+
+        // Route is public (no auth middleware): read the token guard explicitly
+        // so a Bearer-authenticated owner/admin is recognised.
+        $user = $request->user('sanctum');
 
         $visible = $property->isPublished()
-            || ($user && ($user->isAdmin() || (int) $property->agency()->value('user_id') === $user->id));
+            || ($user && ($user->isAdmin() || (int) $property->agency?->user_id === $user->id));
 
         abort_unless($visible, 404);
 
-        return new PropertyResource($property->load(['propertyType', 'agency', 'devise', 'images']));
+        return new PropertyResource($property);
     }
 
     /**
