@@ -73,7 +73,7 @@ class Property extends Model
 
     public function images()
     {
-        return $this->hasMany(PropertyImage::class);
+        return $this->hasMany(PropertyImage::class)->orderBy('position');
     }
 
 

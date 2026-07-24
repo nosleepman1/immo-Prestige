@@ -32,6 +32,16 @@ class PropertyPolicy
         return $this->owns($user, $property);
     }
 
+    public function publish(User $user, Property $property): bool
+    {
+        return $this->owns($user, $property);
+    }
+
+    public function uploadImages(User $user, Property $property): bool
+    {
+        return $this->owns($user, $property);
+    }
+
     /**
      * The property belongs to the agency owned by this user.
      * Uses the relation as a query (not attribute access) to stay
