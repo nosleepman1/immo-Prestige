@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\PropertyStatus;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -29,21 +31,29 @@ class Property extends Model
         'longitude',
         'latitude',
         'sold',
-        'is_active',
-        'is_posted'
+        'status',
     ];
 
     protected $casts = [
         'furnished' => 'boolean',
         'sold' => 'boolean',
-        'is_active' => 'boolean',
-        'is_posted' => 'boolean',
+        'status' => PropertyStatus::class,
         'price' => 'decimal:2',
         'rooms' => 'integer',
         'bedrooms' => 'integer',
         'longitude' => 'decimal:6',
         'latitude' => 'decimal:6',
     ];
+
+    public function scopePublished(Builder $query): Builder
+    {
+        return $query->where('status', PropertyStatus::Published->value);
+    }
+
+    public function isPublished(): bool
+    {
+        return $this->status === PropertyStatus::Published;
+    }
 
 
     public function propertyType()

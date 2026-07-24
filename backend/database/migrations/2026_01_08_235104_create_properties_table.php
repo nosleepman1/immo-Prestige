@@ -31,14 +31,15 @@ return new class extends Migration
             $table->decimal('longitude', 9, 6)->nullable();
             $table->decimal('latitude', 9, 6)->nullable();
             $table->boolean('sold')->default(false);
-            $table->boolean('is_active')->default(false);
-            $table->boolean('is_posted')->default(false);
+            // Distinct lifecycle state (not scattered booleans).
+            $table->enum('status', ['draft', 'published', 'archived'])->default('draft');
             $table->softDeletes();
             $table->timestamps();
 
             // Public search/filter columns.
             $table->index(['country', 'region', 'city']);
             $table->index('price');
+            $table->index('status');
         });
     }
 
