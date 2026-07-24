@@ -25,6 +25,8 @@ class AgencyResource extends JsonResource
             'phone' => $this->phone,
             'id_card' => $this->id_card,
             'status' => $this->status,
+            'is_verified' => $this->isVerified(),
+            'verified_until' => $this->verified_until,
             'refusal_reason' => $this->refusal_reason,
             'activated_at' => $this->activated_at,
             'user_id' => $this->user_id,

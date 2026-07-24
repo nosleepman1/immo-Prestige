@@ -2,6 +2,7 @@
 
 namespace App\Actions\Subscription;
 
+use App\Actions\Verification\ActivateBadge;
 use App\Enums\PaymentPurpose;
 use App\Enums\PaymentStatus;
 use App\Models\Payment;
@@ -20,6 +21,7 @@ class ProcessPaymentIpn
     public function __construct(
         private PaymentGateway $gateway,
         private ActivateSubscription $activate,
+        private ActivateBadge $activateBadge,
     ) {}
 
     /**
@@ -64,10 +66,10 @@ class ProcessPaymentIpn
 
             $locked->update(['status' => PaymentStatus::Paid]);
 
-            if ($locked->purpose === PaymentPurpose::Subscription) {
-                $this->activate->handle($locked);
-            }
-            // verification_badge is provisioned in Lot 5.
+            match ($locked->purpose) {
+                PaymentPurpose::Subscription => $this->activate->handle($locked),
+                PaymentPurpose::VerificationBadge => $this->activateBadge->handle($locked),
+            };
         });
     }
 }

@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
             DeviseSeeder::class,
             PropertyTypeSeeder::class,
             PlanSeeder::class,
+            SettingsSeeder::class,
         ]);
 
         $devises = Devise::all();
