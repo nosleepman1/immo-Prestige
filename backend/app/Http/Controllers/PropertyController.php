@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\Property\CreateProperty;
 use App\Actions\Property\DeleteProperty;
+use App\Actions\Property\PublishProperty;
 use App\Actions\Property\UpdateProperty;
 use App\Http\Requests\PropertySearchRequest;
 use App\Http\Requests\StorePropertyRequest;
@@ -84,5 +85,19 @@ class PropertyController extends Controller
         $deleteProperty->handle($property);
 
         return response()->json(null, 204);
+    }
+
+    /**
+     * Draft -> published. Guarded by three independent rules: active
+     * subscription (subscription.active middleware, 402), plan quota (409) and
+     * listing completeness (422) — each enforced in PublishProperty.
+     */
+    public function publish(Request $request, Property $property, PublishProperty $publishProperty): PropertyResource
+    {
+        $this->authorize('publish', $property);
+
+        $agency = Agency::whereBelongsTo($request->user())->firstOrFail();
+
+        return PropertyResource::make($publishProperty->handle($property, $agency));
     }
 }
