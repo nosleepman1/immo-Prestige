@@ -2,6 +2,7 @@
 
 namespace App\Actions\Post;
 
+use App\Events\PostLikesUpdated;
 use App\Models\Like;
 use App\Models\Post;
 use App\Models\User;
@@ -18,19 +19,22 @@ class ToggleLike
 
         if ($existing) {
             $existing->delete();
-
-            return ['liked' => false];
-        }
-
-        try {
-            Like::create(['post_id' => $post->id, 'user_id' => $user->id]);
-        } catch (QueryException $e) {
-            if ($e->getCode() !== '23000') {
-                throw $e;
+            $liked = false;
+        } else {
+            try {
+                Like::create(['post_id' => $post->id, 'user_id' => $user->id]);
+            } catch (QueryException $e) {
+                if ($e->getCode() !== '23000') {
+                    throw $e;
+                }
+                // Unique constraint backstop: a concurrent request already liked it.
             }
-            // Unique constraint backstop: a concurrent request already liked it.
+            $liked = true;
         }
 
-        return ['liked' => true];
+        // Public channel, aggregate only — no user identity travels here.
+        broadcast(new PostLikesUpdated($post->id, $post->likes()->count()))->toOthers();
+
+        return ['liked' => $liked];
     }
 }
