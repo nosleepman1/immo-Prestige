@@ -30,7 +30,9 @@ class PayDunyaGateway implements PaymentGateway
                 'custom_data' => ['payment_id' => $payment->id],
                 'actions' => [
                     'callback_url' => route('webhooks.paydunya'),
-                    'return_url' => rtrim((string) config('app.frontend_url'), '/').'/agency/subscription',
+                    // Both subscription and badge checkouts land back on the
+                    // agency app's single subscription/billing page.
+                    'return_url' => rtrim((string) config('app.frontend_url'), '/').'/subscription',
                 ],
             ]);
 

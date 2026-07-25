@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\SubscriptionStatus;
 use App\Models\Agency;
 use App\Models\Comment;
 use App\Models\Devise;
@@ -10,6 +11,7 @@ use App\Models\Post;
 use App\Models\Property;
 use App\Models\PropertyImage;
 use App\Models\PropertyType;
+use App\Models\Subscription;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -63,6 +65,17 @@ class DatabaseSeeder extends Seeder
             // 4. Create Agency entity linked to this user
             $agency = Agency::factory()->create([
                 'user_id' => $user->id,
+            ]);
+
+            // Real agencies get this via AgencyActivated -> StartTrialSubscription
+            // when they set their password; these demo accounts are created
+            // already-active, so they'd otherwise have no Subscription at all
+            // and GET /subscriptions/me would 404.
+            Subscription::create([
+                'agency_id' => $agency->id,
+                'status' => SubscriptionStatus::Trialing,
+                'starts_at' => $agency->activated_at,
+                'trial_ends_at' => $agency->activated_at->copy()->addDays(30),
             ]);
 
             // 5. Create 15 properties for each agency
