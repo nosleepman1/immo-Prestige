@@ -1,6 +1,22 @@
 import { createContext, useState, useEffect, useContext } from "react";
-import { useColorScheme } from "react-native";
+import { useColorScheme, Platform } from "react-native";
 import * as SecureStore from "expo-secure-store";
+
+// expo-secure-store has no web implementation; fall back to localStorage
+// there so theme persistence (and the dev error overlay) doesn't break on web.
+const ThemeStorage = {
+  async getItem(key: string): Promise<string | null> {
+    if (Platform.OS === "web") return globalThis.localStorage?.getItem(key) ?? null;
+    return SecureStore.getItemAsync(key);
+  },
+  async setItem(key: string, value: string): Promise<void> {
+    if (Platform.OS === "web") {
+      globalThis.localStorage?.setItem(key, value);
+      return;
+    }
+    await SecureStore.setItemAsync(key, value);
+  },
+};
 
 type ThemeType = "light" | "dark";
 
@@ -19,7 +35,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   // Au lancement : charge le thème sauvegardé, sinon utilise le système
   useEffect(() => {
     const loadTheme = async () => {
-      const saved = await SecureStore.getItemAsync("theme");
+      const saved = await ThemeStorage.getItem("theme");
       if (saved === "light" || saved === "dark") {
         setThemeState(saved);
       } else {
@@ -31,7 +47,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
 
   const setTheme = async (newTheme: ThemeType) => {
     setThemeState(newTheme);
-    await SecureStore.setItemAsync("theme", newTheme); // persiste le choix
+    await ThemeStorage.setItem("theme", newTheme); // persiste le choix
   };
 
   const toggleTheme = () => {
