@@ -1,10 +1,13 @@
 # dev.ps1 — lance tout l'environnement de développement ImmoPrestige en un
-# seul script : WSL (Postgres + Redis), puis le backend (API + queue + logs +
-# Reverb) et les 3 frontends (admin, agency, mobile), chacun dans sa propre
-# fenêtre PowerShell.
+# seul script : PostgreSQL (service Windows natif) + Redis (via WSL Ubuntu),
+# puis le backend (API + queue + logs + Reverb) et les 3 frontends (admin,
+# agency, mobile), chacun dans sa propre fenêtre PowerShell.
 #
-# Prérequis côté WSL (distro "Ubuntu") : PostgreSQL et Redis installés, avec
-# un rôle Postgres "postgres" / mot de passe "root" et une base "immo_prestige".
+# Prérequis :
+#   - PostgreSQL installé en natif sur Windows, tournant comme service
+#     (ex: "postgresql-x64-18"), rôle "postgres" / mot de passe "root",
+#     base "immo_prestige" déjà créée.
+#   - Redis installé dans la distro WSL "Ubuntu" (`sudo apt install redis-server`).
 # Ce script ne les installe pas — il se contente de démarrer les services et
 # de vérifier qu'ils répondent.
 #
@@ -26,31 +29,46 @@ function Start-DevWindow($title, $workDir, $command) {
     Write-Host "  démarré : $title" -ForegroundColor Green
 }
 
-# ── 1. WSL : Postgres + Redis ────────────────────────────────────────────────
+# ── 1. PostgreSQL (service Windows natif) ───────────────────────────────────
 
-Write-Step "Démarrage de WSL ($wslDistro) et des services Postgres / Redis"
+Write-Step "PostgreSQL (service Windows)"
+
+$pgService = Get-Service -Name "postgresql*" -ErrorAction SilentlyContinue | Select-Object -First 1
+if ($null -eq $pgService) {
+    Write-Host "  Aucun service 'postgresql*' trouvé — vérifiez votre installation." -ForegroundColor Yellow
+} elseif ($pgService.Status -ne "Running") {
+    Write-Host "  Service $($pgService.Name) arrêté — démarrage..." -ForegroundColor Yellow
+    Start-Service -Name $pgService.Name
+    Start-Sleep -Seconds 2
+    Write-Host "  $($pgService.Name) : $((Get-Service -Name $pgService.Name).Status)" -ForegroundColor Green
+} else {
+    Write-Host "  $($pgService.Name) : déjà démarré" -ForegroundColor Green
+}
+
+$pgPort = (Test-NetConnection -ComputerName 127.0.0.1 -Port 5432 -WarningAction SilentlyContinue).TcpTestSucceeded
+if ($pgPort) {
+    Write-Host "  Port 5432 : accessible" -ForegroundColor Green
+} else {
+    Write-Host "  Port 5432 : injoignable — vérifiez le service PostgreSQL" -ForegroundColor Yellow
+}
+
+# ── 2. Redis (WSL) ───────────────────────────────────────────────────────────
+
+Write-Step "Redis (WSL : $wslDistro)"
 
 # Une commande "wsl -d <distro> -- ..." démarre automatiquement la distro si
 # elle est arrêtée — pas besoin de la lancer séparément.
-wsl -d $wslDistro -u root -- bash -c "service postgresql start; service redis-server start" 2>&1 | Out-Null
-
-Start-Sleep -Seconds 2
-
-$pgReady = wsl -d $wslDistro -- bash -c "pg_isready -h 127.0.0.1 -p 5432 -U postgres 2>&1"
-if ($pgReady -match "accepting connections") {
-    Write-Host "  Postgres : OK" -ForegroundColor Green
-} else {
-    Write-Host "  Postgres : injoignable ($pgReady) — vérifiez l'installation dans WSL" -ForegroundColor Yellow
-}
+wsl -d $wslDistro -u root -- bash -c "service redis-server start" 2>&1 | Out-Null
+Start-Sleep -Seconds 1
 
 $redisReady = wsl -d $wslDistro -- bash -c "redis-cli ping 2>&1"
 if ($redisReady -match "PONG") {
-    Write-Host "  Redis    : OK" -ForegroundColor Green
+    Write-Host "  Redis : OK" -ForegroundColor Green
 } else {
-    Write-Host "  Redis    : injoignable ($redisReady) — vérifiez l'installation dans WSL" -ForegroundColor Yellow
+    Write-Host "  Redis : injoignable ($redisReady) — vérifiez l'installation dans WSL" -ForegroundColor Yellow
 }
 
-# ── 2. Backend : vérifie/complète le .env pour pointer vers Postgres (WSL) ──
+# ── 3. Backend : vérifie/complète le .env pour pointer vers Postgres ────────
 
 Write-Step "Vérification de backend/.env"
 
@@ -93,7 +111,7 @@ if (-not (Test-Path (Join-Path $backendDir "vendor"))) {
     Pop-Location
 }
 
-# ── 3. Fenêtres de développement ─────────────────────────────────────────────
+# ── 4. Fenêtres de développement ─────────────────────────────────────────────
 
 Write-Step "Lancement des serveurs"
 
