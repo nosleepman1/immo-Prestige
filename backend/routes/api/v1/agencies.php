@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('agency')->group(function () {
     // Public onboarding.
-    Route::post('/register', [AgencyController::class, 'register']);
+    Route::post('/register', [AgencyController::class, 'register'])->middleware('throttle:register');
     Route::post('/password', [AgencyController::class, 'setPassword']);
 
     // Own account (accessible even before the password is set).

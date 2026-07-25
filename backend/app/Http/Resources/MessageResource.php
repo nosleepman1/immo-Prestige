@@ -8,31 +8,17 @@ use Illuminate\Http\Resources\Json\JsonResource;
 class MessageResource extends JsonResource
 {
     /**
-     * Transform the resource into an array.
-     *
      * @return array<string, mixed>
      */
     public function toArray(Request $request): array
     {
         return [
             'id' => $this->id,
+            'conversation_id' => $this->conversation_id,
+            'sender' => $this->whenLoaded('sender', fn () => ['id' => $this->sender->id, 'name' => $this->sender->name]),
             'content' => $this->content,
+            'read_at' => $this->read_at,
             'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
-            
-            'sender' => $this->whenLoaded('sender', function() {
-                return [
-                    'id' => $this->sender->id,
-                    'name' => $this->sender->name
-                ];
-            }),
-            
-            'receiver' => $this->whenLoaded('receiver', function() {
-                return [
-                    'id' => $this->receiver->id,
-                    'name' => $this->receiver->name
-                ];
-            })
         ];
     }
 }

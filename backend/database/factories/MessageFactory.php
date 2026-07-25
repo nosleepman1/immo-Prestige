@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\Conversation;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -10,14 +12,20 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class MessageFactory extends Factory
 {
     /**
-     * Define the model's default state.
-     *
      * @return array<string, mixed>
      */
     public function definition(): array
     {
         return [
-            //
+            'conversation_id' => Conversation::factory(),
+            'sender_id' => User::factory(),
+            'content' => fake()->sentence(),
+            'read_at' => null,
         ];
+    }
+
+    public function read(): static
+    {
+        return $this->state(fn () => ['read_at' => now()]);
     }
 }
