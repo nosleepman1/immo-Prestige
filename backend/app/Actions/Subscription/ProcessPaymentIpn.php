@@ -9,6 +9,7 @@ use App\Models\Payment;
 use App\Models\Transaction;
 use App\Payments\Contracts\PaymentGateway;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * IPN handling. Every notification is journalled (even forged/unknown ones).
@@ -41,6 +42,10 @@ class ProcessPaymentIpn
             'payload' => $payload,
         ]);
 
+        if (! $signatureValid) {
+            Log::channel('business')->warning('PayDunya IPN with invalid signature', ['token' => $token]);
+        }
+
         if (! $signatureValid || ! $payment || $payment->isPaid()) {
             return;
         }
@@ -54,6 +59,12 @@ class ProcessPaymentIpn
 
         // Reject amount tampering.
         if ($confirmation->amount !== null && $confirmation->amount !== $payment->amount) {
+            Log::channel('business')->error('PayDunya IPN amount mismatch — possible tampering', [
+                'payment_id' => $payment->id,
+                'expected' => $payment->amount,
+                'confirmed' => $confirmation->amount,
+            ]);
+
             return;
         }
 

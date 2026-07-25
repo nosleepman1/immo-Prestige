@@ -105,6 +105,20 @@ Le seeder génère automatiquement les comptes d'agences suivants (mot de passe 
 - **Agence 2** : `aba@gmail.com`
 - Le seeder génère également **100 utilisateurs normaux** (rôle: `user`) ainsi que 15 propriétés par agence, accompagnées d'images, de likes et de commentaires.
 
+Pour peupler également les domaines ajoutés après ce seeder initial (compte admin, agence en attente de validation, abonnement d'essai, conversation de démo, signalement) :
+
+```bash
+php artisan db:seed --class=DemoDataSeeder
+```
+
+Crée notamment `admin@immo-prestige.test` (mot de passe `passer123`).
+
+### Documentation, supervision et conformité
+
+- **Documentation d'API** générée automatiquement (OpenAPI, via Scramble) à partir des routes/FormRequests/Resources — accessible sur `http://localhost:8000/docs/api` en local. Voir `docs/error-codes.md` pour la table complète des codes d'erreur métier (`{message, code}`).
+- **Healthcheck** enrichi (DB, cache, backlog de jobs échoués) sur `GET /api/health` — distinct du `/up` par défaut de Laravel qui ne vérifie que le démarrage de l'application.
+- **Export RGPD** des données personnelles sur `GET /api/v1/account/export` (authentifié). La suppression de compte reste un soft delete ; une commande planifiée (`accounts:anonymize`) anonymise les comptes supprimés depuis plus de 30 jours.
+
 ---
 
 ## 2. Frontend Web (React 19 + Vite 7)

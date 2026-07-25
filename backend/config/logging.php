@@ -1,5 +1,6 @@
 <?php
 
+use Monolog\Formatter\JsonFormatter;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
@@ -121,6 +122,17 @@ return [
         'null' => [
             'driver' => 'monolog',
             'handler' => NullHandler::class,
+        ],
+
+        // Structured JSON log for business-critical events: failed jobs, queue
+        // backlogs, invalid/tampered payment notifications. Kept separate from
+        // 'daily' so it can be shipped to a log aggregator without noise.
+        'business' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/business.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'days' => env('LOG_BUSINESS_DAYS', 30),
+            'formatter' => JsonFormatter::class,
         ],
 
         'emergency' => [
