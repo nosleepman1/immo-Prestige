@@ -104,4 +104,9 @@ class Agency extends Model
     {
         return (bool) $this->subscription()->first()?->isActive();
     }
+
+    public function conversations()
+    {
+        return $this->hasMany(Conversation::class);
+    }
 }
