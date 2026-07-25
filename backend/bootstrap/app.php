@@ -27,6 +27,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'password.set' => EnsurePasswordIsSet::class,
             'subscription.active' => EnsureActiveSubscription::class,
         ]);
+
+        // Default ceiling on every API route (see RateLimiter::for('api', ...));
+        // specific routes layer a tighter limiter (login/register/messages/reports).
+        $middleware->throttleApi();
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // Business exceptions render as { message, code } with their own status.
