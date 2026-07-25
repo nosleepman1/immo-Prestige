@@ -1,6 +1,7 @@
-import { Tabs } from "expo-router";
-import { View, StyleSheet, Platform } from "react-native";
+import { Tabs, Redirect } from "expo-router";
+import { View, StyleSheet, Platform, ActivityIndicator } from "react-native";
 import { Ionicons, Feather, MaterialCommunityIcons } from "@expo/vector-icons";
+import { useAuthStore } from "@/store/auth.store";
 
 const ACTIVE_COLOR = "#1a1a2e";
 const INACTIVE_COLOR = "#9ca3af";
@@ -15,12 +16,7 @@ function PropertiesIcon({ color }: { color: string }) {
 }
 
 function SendIcon({ color }: { color: string }) {
-  // Instagram-style send/messenger icon
   return <Feather name="send" size={24} color={color} />;
-}
-
-function AgencyIcon({ color }: { color: string }) {
-  return <MaterialCommunityIcons name="city-variant-outline" size={26} color={color} />;
 }
 
 function SettingsIcon({ color }: { color: string }) {
@@ -28,6 +24,21 @@ function SettingsIcon({ color }: { color: string }) {
 }
 
 export default function TabLayout() {
+  const hasHydrated = useAuthStore((s) => s.hasHydrated);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+
+  if (!hasHydrated) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator />
+      </View>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <Redirect href="/auth/login" />;
+  }
+
   return (
     <Tabs
       screenOptions={{
@@ -71,12 +82,6 @@ export default function TabLayout() {
               <SendIcon color={focused ? "#fff" : color} />
             </View>
           ),
-        }}
-      />
-      <Tabs.Screen
-        name="agency"
-        options={{
-          tabBarIcon: ({ color }) => <AgencyIcon color={color} />,
         }}
       />
       <Tabs.Screen

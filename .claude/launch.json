@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "admin",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "admin", "run", "dev", "--", "--port", "5173"],
+      "port": 5173
+    },
+    {
+      "name": "agency",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "agency", "run", "dev", "--", "--port", "5174"],
+      "port": 5174
+    },
+    {
+      "name": "mobile-web",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "mobile", "run", "web"],
+      "port": 8081
+    }
+  ]
+}
