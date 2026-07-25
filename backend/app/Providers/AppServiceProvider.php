@@ -10,9 +10,11 @@ use App\Models\Post;
 use App\Payments\Contracts\PaymentGateway;
 use App\Payments\FakePaymentGateway;
 use App\Payments\PayDunyaGateway;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -50,5 +52,9 @@ class AppServiceProvider extends ServiceProvider
             'comment_reply' => CommentReply::class,
             'post' => Post::class,
         ]);
+
+        RateLimiter::for('messages', fn ($request) => Limit::perMinute(20)->by($request->user()?->id ?: $request->ip()));
+
+        RateLimiter::for('register', fn ($request) => Limit::perHour(5)->by($request->ip()));
     }
 }
