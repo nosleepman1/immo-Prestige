@@ -28,5 +28,5 @@ Route::middleware(['auth:sanctum', 'password.set'])->group(function () {
     Route::post('/comments/{comment}/replies', [CommentReplyController::class, 'store']);
     Route::delete('/comment-replies/{commentReply}', [CommentReplyController::class, 'destroy']);
 
-    Route::post('/reports', [ReportController::class, 'store']);
+    Route::post('/reports', [ReportController::class, 'store'])->middleware('throttle:reports');
 });

@@ -7,7 +7,7 @@ Route::get('/user', [UserController::class, 'me'])->middleware('auth:sanctum');
 
 Route::prefix('auth')->group(function () {
     Route::post('/register', [UserController::class, 'store'])->middleware('throttle:register');
-    Route::post('/login', [UserController::class, 'login']);
+    Route::post('/login', [UserController::class, 'login'])->middleware('throttle:login');
     Route::post('/logout', [UserController::class, 'logout'])->middleware('auth:sanctum');
     Route::get('/verify/{id}/{hash}', [UserController::class, 'verify'])->name('verification.verify');
 
