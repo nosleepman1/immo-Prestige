@@ -80,29 +80,54 @@ if (-not (Test-Path $envPath)) {
     Write-Host "  .env cree depuis .env.example" -ForegroundColor Yellow
 }
 
-$envContent = Get-Content $envPath -Raw -Encoding UTF8
-$replacements = @{
-    'DB_CONNECTION=.*'  = 'DB_CONNECTION=pgsql'
-    'DB_HOST=.*'        = 'DB_HOST=127.0.0.1'
-    'DB_PORT=.*'        = 'DB_PORT=5432'
-    'DB_DATABASE=.*'    = 'DB_DATABASE=immo_prestige'
-    'DB_USERNAME=.*'    = 'DB_USERNAME=postgres'
-    'DB_PASSWORD=.*'    = 'DB_PASSWORD=root'
+# Certaines lignes DB_*/REDIS_*/QUEUE_* peuvent deja exister mais etre
+# commentees (ex: "# DB_HOST=127.0.0.1") - un simple -replace sur la valeur
+# les laisserait inactives. On force donc une ligne active "CLE=valeur" pour
+# chaque cle, qu'elle soit absente, commentee, ou deja presente.
+$desiredEnv = [ordered]@{
+    'DB_CONNECTION'        = 'pgsql'
+    'DB_HOST'              = '127.0.0.1'
+    'DB_PORT'              = '5432'
+    'DB_DATABASE'          = 'immo_prestige'
+    'DB_USERNAME'          = 'postgres'
+    'DB_PASSWORD'          = 'root'
+    'REDIS_CLIENT'         = 'predis'
+    'REDIS_HOST'           = '127.0.0.1'
+    'REDIS_PORT'           = '6379'
+    'QUEUE_CONNECTION'     = 'redis'
+    'CACHE_STORE'          = 'redis'
+    'BROADCAST_CONNECTION' = 'reverb'
 }
+
+$lines = Get-Content $envPath -Encoding UTF8
 $changed = $false
-foreach ($pattern in $replacements.Keys) {
-    if ($envContent -match $pattern) {
-        $newContent = $envContent -replace $pattern, $replacements[$pattern]
-        if ($newContent -ne $envContent) { $changed = $true }
-        $envContent = $newContent
+
+foreach ($key in $desiredEnv.Keys) {
+    $desiredLine = "$key=$($desiredEnv[$key])"
+    $linePattern = "^\s*#*\s*$key="
+    $matchIndex = -1
+    for ($i = 0; $i -lt $lines.Count; $i++) {
+        if ($lines[$i] -match $linePattern) { $matchIndex = $i; break }
+    }
+    if ($matchIndex -ge 0) {
+        if ($lines[$matchIndex] -ne $desiredLine) {
+            $lines[$matchIndex] = $desiredLine
+            $changed = $true
+        }
+    } else {
+        $lines += $desiredLine
+        $changed = $true
     }
 }
+
 if ($changed) {
-    Set-Content -Path $envPath -Value $envContent -NoNewline -Encoding utf8
-    Write-Host "  Identifiants Postgres (postgres/root) appliques dans .env" -ForegroundColor Green
+    Set-Content -Path $envPath -Value $lines -Encoding utf8
+    Write-Host "  Postgres (postgres/root) + Redis (queue/cache/broadcast) appliques dans .env" -ForegroundColor Green
 } else {
     Write-Host "  .env deja configure" -ForegroundColor Green
 }
+
+$envContent = Get-Content $envPath -Raw -Encoding UTF8
 
 if (-not (Test-Path (Join-Path $backendDir "vendor"))) {
     Write-Host "  vendor/ absent - installation des dependances Composer..." -ForegroundColor Yellow
@@ -111,13 +136,36 @@ if (-not (Test-Path (Join-Path $backendDir "vendor"))) {
     Pop-Location
 }
 
+$hasAppKey = (Get-Content $envPath -Encoding UTF8) | Where-Object { $_ -match "^APP_KEY=base64:" }
+if (-not $hasAppKey) {
+    Write-Host "  APP_KEY absente - generation..." -ForegroundColor Yellow
+    Push-Location $backendDir
+    php artisan key:generate --ansi
+    Pop-Location
+}
+
+# Une configuration mise en cache (bootstrap/cache/config.php, par ex. via un
+# ancien "artisan config:cache") ferait ignorer .env silencieusement - on
+# repart toujours d'un cache propre, et on applique les migrations en attente.
+Push-Location $backendDir
+php artisan config:clear --ansi
+php artisan migrate --ansi
+Pop-Location
+
 # -- 4. Fenetres de developpement ---------------------------------------------
 
 Write-Step "Lancement des serveurs"
 
-# Backend : API (php artisan serve) + queue worker + logs (pail), via le
-# script composer "dev" deja defini dans backend/composer.json.
-Start-DevWindow "Backend (API + Queue + Logs)" $backendDir "composer run dev"
+# Backend API.
+Start-DevWindow "Backend API (8000)" $backendDir "php artisan serve"
+
+# Queue worker (jobs : emails, media, notifications...).
+Start-DevWindow "Queue Worker" $backendDir "php artisan queue:listen --tries=1"
+
+# Logs : "php artisan pail" exige l'extension pcntl, absente des builds PHP
+# Windows - on tail simplement le fichier de log a la place.
+$logPath = Join-Path $backendDir "storage\logs\laravel.log"
+Start-DevWindow "Logs" $backendDir "if (-not (Test-Path '$logPath')) { New-Item -ItemType File -Path '$logPath' -Force | Out-Null }; Get-Content -Path '$logPath' -Wait -Tail 30"
 
 # Reverb : serveur WebSocket pour la messagerie temps reel.
 Start-DevWindow "Reverb (WebSockets)" $backendDir "php artisan reverb:start"
