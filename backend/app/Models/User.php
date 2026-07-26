@@ -75,6 +75,14 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->role === UserRole::Agency;
     }
 
+    /**
+     * A plain client account — the side that browses, applies and rents.
+     */
+    public function isUser(): bool
+    {
+        return $this->role === UserRole::User;
+    }
+
     public function passwordSetupTokens()
     {
         return $this->hasMany(PasswordSetupToken::class);
