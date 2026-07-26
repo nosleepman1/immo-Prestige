@@ -93,6 +93,19 @@ class Agency extends Model
         return $this->hasMany(Owner::class);
     }
 
+    /**
+     * The lease templates whose articles this agency has drafted.
+     */
+    public function contractTemplates()
+    {
+        return $this->hasMany(ContractTemplate::class);
+    }
+
+    public function leases()
+    {
+        return $this->hasMany(Lease::class);
+    }
+
     public function subscriptions()
     {
         return $this->hasMany(Subscription::class);

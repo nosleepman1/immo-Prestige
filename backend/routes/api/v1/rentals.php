@@ -1,6 +1,9 @@
 <?php
 
+use App\Http\Controllers\AgencyLeaseController;
 use App\Http\Controllers\AgencyRentalApplicationController;
+use App\Http\Controllers\ContractTemplateController;
+use App\Http\Controllers\LeaseController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OwnerController;
 use App\Http\Controllers\RentalApplicationController;
@@ -26,6 +29,25 @@ Route::prefix('agency')->middleware(['auth:sanctum', 'role:agency', 'password.se
         ->name('agency.rental-applications.reject');
     Route::post('/rental-applications/{application}/request-documents', [AgencyRentalApplicationController::class, 'requestDocuments'])
         ->name('agency.rental-applications.request-documents');
+
+    // Lease templates: the agency's own articles.
+    Route::get('/contract-variables', [ContractTemplateController::class, 'variables']);
+    Route::get('/contract-templates', [ContractTemplateController::class, 'index']);
+    Route::post('/contract-templates', [ContractTemplateController::class, 'store']);
+    Route::get('/contract-templates/{template}', [ContractTemplateController::class, 'show']);
+    Route::put('/contract-templates/{template}', [ContractTemplateController::class, 'update']);
+    Route::delete('/contract-templates/{template}', [ContractTemplateController::class, 'destroy']);
+    Route::post('/contract-templates/{template}/clauses', [ContractTemplateController::class, 'storeClause']);
+    Route::put('/contract-templates/{template}/clauses/order', [ContractTemplateController::class, 'reorderClauses']);
+    Route::put('/clauses/{clause}', [ContractTemplateController::class, 'updateClause']);
+    Route::delete('/clauses/{clause}', [ContractTemplateController::class, 'destroyClause']);
+
+    // Leases.
+    Route::post('/rental-applications/{application}/generate-lease', [AgencyLeaseController::class, 'generate']);
+    Route::get('/leases', [AgencyLeaseController::class, 'index']);
+    Route::get('/leases/{lease}', [AgencyLeaseController::class, 'show']);
+    Route::post('/leases/{lease}/validate-signature', [AgencyLeaseController::class, 'validateSignature']);
+    Route::post('/leases/{lease}/reject-signature', [AgencyLeaseController::class, 'rejectSignature']);
 });
 
 // ---------------------------------------------------------------------------
@@ -42,6 +64,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/rental-application-documents/{document}', [RentalApplicationDocumentController::class, 'download'])
         ->name('rental-application-documents.download');
     Route::delete('/rental-application-documents/{document}', [RentalApplicationDocumentController::class, 'destroy']);
+
+    // Leases, tenant side.
+    Route::get('/leases/mine', [LeaseController::class, 'mine']);
+    Route::get('/leases/{lease}', [LeaseController::class, 'show']);
+    Route::get('/leases/{lease}/contract', [LeaseController::class, 'downloadContract']);
+    Route::get('/leases/{lease}/signed-contract', [LeaseController::class, 'downloadSignedContract']);
+    Route::post('/leases/{lease}/validate', [LeaseController::class, 'validateTerms']);
+    Route::post('/leases/{lease}/signed-contract', [LeaseController::class, 'uploadSignature']);
 
     // Notification stream, shared by every role.
     Route::get('/notifications', [NotificationController::class, 'index']);
