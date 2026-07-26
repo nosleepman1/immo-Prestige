@@ -6,6 +6,7 @@ import { updateProperty } from '@/services/properties/updateProperty'
 import { deleteProperty } from '@/services/properties/deleteProperty'
 import { publishProperty } from '@/services/properties/publishProperty'
 import { queryKeys } from '@/lib/queryKeys'
+import { apiErrorMessage } from '@/lib/apiError'
 import type { PropertyFormValues } from '@/types/property'
 
 export function useCreateProperty() {
@@ -19,7 +20,9 @@ export function useCreateProperty() {
       queryClient.invalidateQueries({ queryKey: queryKeys.properties.mine })
       navigate(`/properties/${property.id}`)
     },
-    onError: () => toast.error('Impossible de créer ce bien.'),
+    // Surface what the server refused: "un bien mis en location doit porter un
+    // loyer" tells the agency what to fix, "impossible" does not.
+    onError: (error) => toast.error(apiErrorMessage(error, 'Impossible de créer ce bien.')),
   })
 }
 
@@ -33,7 +36,7 @@ export function useUpdateProperty(id: number) {
       queryClient.invalidateQueries({ queryKey: queryKeys.properties.mine })
       queryClient.invalidateQueries({ queryKey: queryKeys.properties.detail(id) })
     },
-    onError: () => toast.error('Impossible de mettre à jour ce bien.'),
+    onError: (error) => toast.error(apiErrorMessage(error, 'Impossible de mettre à jour ce bien.')),
   })
 }
 

@@ -5,6 +5,10 @@ export async function uploadPropertyImage(propertyId: number, file: File): Promi
   const form = new FormData()
   form.append('image', file)
 
-  const { data } = await API.post<{ data: PropertyImage }>(`/properties/${propertyId}/images`, form)
+  const { data } = await API.post<{ data: PropertyImage }>(`/properties/${propertyId}/images`, form, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  })
   return data.data
 }

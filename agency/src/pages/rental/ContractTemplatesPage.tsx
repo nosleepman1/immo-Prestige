@@ -1,7 +1,15 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ArrowDown, ArrowUp, Plus, Trash2 } from 'lucide-react'
+import {
+  FiArrowDown,
+  FiArrowUp,
+  FiPlus,
+  FiTrash2,
+  FiFileText,
+  FiStar,
+  FiInfo,
+} from 'react-icons/fi'
 import {
   useContractTemplate,
   useContractTemplates,
@@ -9,7 +17,6 @@ import {
   useTemplateMutations,
 } from '@/hooks/rental/useContractTemplates'
 import { clauseSchema, type ClauseFormSchemaValues } from '@/lib/schemas'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -19,91 +26,117 @@ import { Spinner } from '@/components/ui/spinner'
 
 /**
  * Where the agency writes the legal content of its leases. The platform owns
- * the document's structure and refuses unknown variables; it makes no judgement
- * on the clauses themselves, which the agency writes and re-reads.
+ * the document's structure and refuses unknown variables; it passes no
+ * judgement on the clauses themselves, which the agency writes and re-reads.
  */
-const ContractTemplatesPage = () => {
+const ContractTemplatesPage: React.FC = () => {
   const templates = useContractTemplates()
   const [selectedId, setSelectedId] = useState<number | null>(null)
   const [newName, setNewName] = useState('')
 
-  const activeId = selectedId ?? templates.data?.find((t) => t.is_default)?.id ?? templates.data?.[0]?.id ?? null
-  const template = useContractTemplate(activeId ?? NaN)
+  const activeId =
+    selectedId ?? templates.data?.find((t) => t.is_default)?.id ?? templates.data?.[0]?.id ?? null
   const mutations = useTemplateMutations(activeId ?? undefined)
+  const activeTemplate = templates.data?.find((t) => t.id === activeId)
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-6 space-y-6">
+    <div className="w-full max-w-5xl mx-auto space-y-6 animate-in fade-in-50 duration-500 pb-16">
       <div>
-        <h1 className="text-2xl font-semibold">Modèles de contrat</h1>
-        <p className="text-muted-foreground text-sm">
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900 font-heading">
+          Modèles de contrat
+        </h1>
+        <p className="text-slate-500 text-xs mt-0.5">
           Vos clauses de bail. La plateforme assemble le document ; elle ne fournit pas de conseil
           juridique — relisez vos articles avant de les utiliser.
         </p>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Vos modèles</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {templates.isLoading ? (
-            <Spinner className="size-5" />
-          ) : (
-            <div className="flex flex-wrap gap-2">
-              {templates.data?.map((item) => (
-                <Button
-                  key={item.id}
-                  size="sm"
-                  variant={item.id === activeId ? 'default' : 'outline'}
-                  onClick={() => setSelectedId(item.id)}
-                >
-                  {item.name}
-                  {item.is_default && <Badge variant="secondary" className="ml-2">Par défaut</Badge>}
-                </Button>
-              ))}
-            </div>
-          )}
+      <div className="bg-white border border-slate-200/80 rounded-2xl shadow-2xs p-6">
+        <h2 className="text-base font-bold text-slate-900 font-heading flex items-center gap-2 mb-4">
+          <FiFileText className="w-4 h-4 text-emerald-600" /> Vos modèles
+        </h2>
 
-          <div className="flex gap-2">
-            <Input
-              placeholder="Nom d'un nouveau modèle"
-              value={newName}
-              onChange={(event) => setNewName(event.target.value)}
-            />
-            <Button
-              disabled={!newName.trim() || mutations.create.isPending}
-              onClick={() =>
-                mutations.create.mutate(
-                  { name: newName },
-                  { onSuccess: (created) => { setSelectedId(created.id); setNewName('') } }
-                )
-              }
-            >
-              <Plus className="size-4 mr-1" /> Créer
-            </Button>
+        {templates.isLoading ? (
+          <Spinner className="size-6 text-emerald-600" />
+        ) : (
+          <div className="flex flex-wrap gap-2 mb-4">
+            {templates.data?.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => setSelectedId(item.id)}
+                className={`px-3 py-2 rounded-xl text-xs font-semibold border transition-colors inline-flex items-center gap-1.5 ${
+                  item.id === activeId
+                    ? 'bg-emerald-600 border-emerald-600 text-white shadow-sm shadow-emerald-600/20'
+                    : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+                }`}
+              >
+                {item.name}
+                {item.is_default && (
+                  <FiStar
+                    className={`w-3 h-3 ${item.id === activeId ? 'text-amber-300' : 'text-amber-500'}`}
+                  />
+                )}
+              </button>
+            ))}
           </div>
+        )}
 
-          {activeId && !templates.data?.find((t) => t.id === activeId)?.is_default && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => mutations.update.mutate({ id: activeId, is_default: true })}
-            >
-              Utiliser ce modèle par défaut
-            </Button>
-          )}
-        </CardContent>
-      </Card>
+        <div className="flex flex-col sm:flex-row gap-2">
+          <Input
+            placeholder="Nom d'un nouveau modèle — ex. Bail habitation meublé"
+            className="text-xs"
+            value={newName}
+            onChange={(event) => setNewName(event.target.value)}
+          />
+          <Button
+            disabled={!newName.trim() || mutations.create.isPending}
+            className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold shadow-sm shadow-emerald-600/20 shrink-0"
+            onClick={() =>
+              mutations.create.mutate(
+                { name: newName },
+                {
+                  onSuccess: (created) => {
+                    setSelectedId(created.id)
+                    setNewName('')
+                  },
+                }
+              )
+            }
+          >
+            <FiPlus className="w-4 h-4 mr-1.5" /> Créer
+          </Button>
+        </div>
 
-      {activeId && <ClauseEditor templateId={activeId} />}
+        {activeId && !activeTemplate?.is_default && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="text-xs mt-3"
+            onClick={() => mutations.update.mutate({ id: activeId, is_default: true })}
+          >
+            <FiStar className="w-3.5 h-3.5 mr-1.5" /> Utiliser ce modèle par défaut
+          </Button>
+        )}
+      </div>
+
       {!activeId && !templates.isLoading && (
-        <p className="text-sm text-muted-foreground text-center py-6">
-          Aucun modèle. Sans modèle, un bail sort avec la structure de la plateforme mais aucun
-          article particulier.
-        </p>
+        <div className="bg-white border border-slate-200 rounded-2xl p-12 text-center space-y-3">
+          <FiFileText className="w-10 h-10 text-slate-300 mx-auto" />
+          <p className="text-sm font-medium text-slate-600">Aucun modèle de contrat.</p>
+          <p className="text-xs text-slate-500 max-w-md mx-auto">
+            Sans modèle, un bail sort avec la structure de la plateforme — parties, bien, durée,
+            loyer — mais aucun article particulier de votre agence.
+          </p>
+        </div>
       )}
 
-      {template.data && <ClauseList templateId={activeId!} />}
+      {activeId && (
+        <>
+          <ClauseEditor templateId={activeId} />
+          <ClauseList templateId={activeId} />
+        </>
+      )}
     </div>
   )
 }
@@ -123,7 +156,7 @@ function ClauseEditor({ templateId }: { templateId: number }) {
   const onSubmit = handleSubmit((values) => {
     mutations.addClause.mutate(values, {
       onSuccess: () => reset(),
-      // 422 carries the offending variable name; it belongs on the field.
+      // The 422 names the offending variable; it belongs on the field.
       onError: (error: unknown) => {
         const response = (error as { response?: { data?: { errors?: Record<string, string[]> } } })
           .response
@@ -134,48 +167,62 @@ function ClauseEditor({ templateId }: { templateId: number }) {
   })
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">Ajouter un article</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <form onSubmit={onSubmit} className="space-y-4">
-          <div className="space-y-1.5">
-            <Label>Intitulé</Label>
-            <Input {...register('title')} placeholder="Obligations du preneur" />
-            {errors.title && <p className="text-sm text-destructive">{errors.title.message}</p>}
-          </div>
+    <div className="bg-white border border-slate-200/80 rounded-2xl shadow-2xs p-6">
+      <h2 className="text-base font-bold text-slate-900 font-heading flex items-center gap-2 mb-4">
+        <FiPlus className="w-4 h-4 text-emerald-600" /> Ajouter un article
+      </h2>
 
-          <div className="space-y-1.5">
-            <Label>Corps de l'article</Label>
-            <Textarea
-              rows={5}
-              {...register('body')}
-              placeholder="Le preneur règle {{bail.loyer}} le {{bail.jour_echeance}} de chaque mois."
-            />
-            {errors.body && <p className="text-sm text-destructive">{errors.body.message}</p>}
-          </div>
+      <form onSubmit={onSubmit} className="space-y-4">
+        <div className="space-y-1.5">
+          <Label className="text-xs font-semibold text-slate-700">Intitulé *</Label>
+          <Input className="text-xs" {...register('title')} placeholder="Obligations du preneur" />
+          {errors.title && (
+            <p className="text-[11px] font-medium text-rose-600">{errors.title.message}</p>
+          )}
+        </div>
 
-          <Button type="submit" disabled={mutations.addClause.isPending}>
-            {mutations.addClause.isPending ? 'Ajout...' : "Ajouter l'article"}
-          </Button>
-        </form>
+        <div className="space-y-1.5">
+          <Label className="text-xs font-semibold text-slate-700">Corps de l'article *</Label>
+          <Textarea
+            rows={5}
+            className="text-xs resize-y font-mono"
+            {...register('body')}
+            placeholder="Le preneur règle {{bail.loyer}} le {{bail.jour_echeance}} de chaque mois."
+          />
+          {errors.body && (
+            <p className="text-[11px] font-medium text-rose-600">{errors.body.message}</p>
+          )}
+        </div>
 
-        <div className="pt-4 border-t">
-          <div className="text-xs text-muted-foreground mb-2">
+        <Button
+          type="submit"
+          disabled={mutations.addClause.isPending}
+          className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold shadow-sm shadow-emerald-600/20"
+        >
+          {mutations.addClause.isPending ? 'Ajout...' : "Ajouter l'article"}
+        </Button>
+      </form>
+
+      <div className="mt-6 pt-5 border-t border-slate-100">
+        <div className="flex items-start gap-2 text-[11px] text-slate-500 mb-3">
+          <FiInfo className="w-3.5 h-3.5 shrink-0 mt-0.5 text-slate-400" />
+          <span>
             Variables disponibles — une variable inconnue arrête la génération du contrat plutôt que
             de laisser un trou dedans.
-          </div>
-          <div className="flex flex-wrap gap-1">
-            {variables.data?.map((variable) => (
-              <code key={variable} className="text-xs bg-muted px-1.5 py-0.5 rounded">
-                {`{{${variable}}}`}
-              </code>
-            ))}
-          </div>
+          </span>
         </div>
-      </CardContent>
-    </Card>
+        <div className="flex flex-wrap gap-1.5">
+          {variables.data?.map((variable) => (
+            <code
+              key={variable}
+              className="text-[11px] bg-slate-100 text-slate-700 px-2 py-1 rounded-lg font-mono border border-slate-200"
+            >
+              {`{{${variable}}}`}
+            </code>
+          ))}
+        </div>
+      </div>
+    </div>
   )
 }
 
@@ -194,54 +241,77 @@ function ClauseList({ templateId }: { templateId: number }) {
     mutations.reorder.mutate(next.map((clause) => clause.id))
   }
 
+  if (template.isLoading) {
+    return (
+      <div className="flex justify-center py-8">
+        <Spinner className="size-6 text-emerald-600" />
+      </div>
+    )
+  }
+
   if (!clauses.length) {
     return (
-      <Card>
-        <CardContent className="py-6 text-sm text-muted-foreground text-center">
-          Ce modèle ne contient encore aucun article.
-        </CardContent>
-      </Card>
+      <div className="bg-white border border-slate-200 rounded-2xl p-10 text-center">
+        <p className="text-xs text-slate-500">Ce modèle ne contient encore aucun article.</p>
+      </div>
     )
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">Articles ({clauses.length})</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <div className="bg-white border border-slate-200/80 rounded-2xl shadow-2xs p-6">
+      <h2 className="text-base font-bold text-slate-900 font-heading flex items-center gap-2 mb-4">
+        <FiFileText className="w-4 h-4 text-emerald-600" /> Articles
+        <Badge variant="outline" className="text-[11px] border-slate-200 bg-slate-50 font-semibold">
+          {clauses.length}
+        </Badge>
+      </h2>
+
+      <div className="space-y-3">
         {clauses.map((clause, index) => (
-          <div key={clause.id} className="border rounded-md p-4 space-y-2">
-            <div className="flex items-start justify-between gap-2">
-              <div className="font-medium text-sm">
-                Article {index + 1} — {clause.title}
+          <div
+            key={clause.id}
+            className="border border-slate-200 rounded-xl p-4 hover:border-slate-300 transition-colors"
+          >
+            <div className="flex items-start justify-between gap-3 mb-2">
+              <div className="text-xs font-bold text-slate-900">
+                <span className="text-emerald-600">Article {index + 1}</span> — {clause.title}
               </div>
-              <div className="flex gap-1">
-                <Button variant="ghost" size="sm" onClick={() => move(index, -1)} disabled={index === 0}>
-                  <ArrowUp className="size-4" />
+              <div className="flex gap-0.5 shrink-0">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 w-7 p-0 text-slate-400 hover:text-slate-700"
+                  onClick={() => move(index, -1)}
+                  disabled={index === 0}
+                >
+                  <FiArrowUp className="w-3.5 h-3.5" />
                 </Button>
                 <Button
                   variant="ghost"
                   size="sm"
+                  className="h-7 w-7 p-0 text-slate-400 hover:text-slate-700"
                   onClick={() => move(index, 1)}
                   disabled={index === clauses.length - 1}
                 >
-                  <ArrowDown className="size-4" />
+                  <FiArrowDown className="w-3.5 h-3.5" />
                 </Button>
                 <Button
                   variant="ghost"
                   size="sm"
+                  className="h-7 w-7 p-0 text-slate-400 hover:text-rose-600 hover:bg-rose-50"
                   onClick={() => mutations.removeClause.mutate(clause.id)}
                 >
-                  <Trash2 className="size-4 text-destructive" />
+                  <FiTrash2 className="w-3.5 h-3.5" />
                 </Button>
               </div>
             </div>
-            <p className="text-sm text-muted-foreground whitespace-pre-line">{clause.body}</p>
+            <p className="text-[11px] text-slate-600 whitespace-pre-line leading-relaxed font-mono">
+              {clause.body}
+            </p>
           </div>
         ))}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }
 
