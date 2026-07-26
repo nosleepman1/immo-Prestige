@@ -2,6 +2,9 @@
 
 namespace App\Actions\Subscription;
 
+use App\Actions\Rental\ActivateLease;
+use App\Actions\Rental\ApplyPaymentToInstallments;
+use App\Actions\Rental\NotifyPaymentReceived;
 use App\Actions\Verification\ActivateBadge;
 use App\Enums\PaymentPurpose;
 use App\Enums\PaymentStatus;
@@ -23,6 +26,9 @@ class ProcessPaymentIpn
         private PaymentGateway $gateway,
         private ActivateSubscription $activate,
         private ActivateBadge $activateBadge,
+        private ActivateLease $activateLease,
+        private ApplyPaymentToInstallments $applyToInstallments,
+        private NotifyPaymentReceived $notifyReceived,
     ) {}
 
     /**
@@ -80,9 +86,64 @@ class ProcessPaymentIpn
             match ($locked->purpose) {
                 PaymentPurpose::Subscription => $this->activate->handle($locked),
                 PaymentPurpose::VerificationBadge => $this->activateBadge->handle($locked),
+                PaymentPurpose::Deposit => $this->activateLease($locked),
+                PaymentPurpose::Rent => $this->settleInstallments($locked),
                 // Fail loud (and roll back the Paid mark) on an unhandled purpose.
                 default => throw new \LogicException("Unhandled payment purpose: {$locked->purpose->value}"),
             };
         });
+    }
+
+    /**
+     * The move-in payment cleared: the lease starts running (RG-L14).
+     */
+    private function activateLease(Payment $payment): void
+    {
+        $lease = $payment->lease()->first();
+
+        if ($lease === null) {
+            throw new \LogicException("Deposit payment {$payment->id} has no lease");
+        }
+
+        $this->activateLease->handle($lease, $payment);
+        $this->notifyReceived->handle($payment);
+    }
+
+    /**
+     * Rent cleared: spread it over the months the invoice was raised for.
+     *
+     * The share is clamped to what those months still owe. If another payment
+     * settled some of them meanwhile, the excess stays unimputed on this
+     * payment rather than being refused — the money did arrive, and refusing to
+     * record it would lose it. `unappliedAmount()` keeps that credit visible.
+     */
+    private function settleInstallments(Payment $payment): void
+    {
+        $installments = $payment->installments()->get();
+
+        if ($installments->isEmpty()) {
+            Log::channel('business')->warning('Rent payment confirmed with no target instalments', [
+                'payment_id' => $payment->id,
+            ]);
+
+            return;
+        }
+
+        $due = (int) $installments->sum(fn ($i) => $i->remainingDue());
+        $applicable = min($payment->unappliedAmount(), $due);
+
+        if ($applicable < $payment->unappliedAmount()) {
+            Log::channel('business')->warning('Rent payment exceeds what its instalments still owe', [
+                'payment_id' => $payment->id,
+                'paid' => $payment->amount,
+                'applicable' => $applicable,
+            ]);
+        }
+
+        if ($applicable > 0) {
+            $this->applyToInstallments->handle($payment, $installments, $applicable);
+        }
+
+        $this->notifyReceived->handle($payment);
     }
 }
