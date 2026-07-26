@@ -14,3 +14,10 @@ Broadcast::channel('conversation.{conversationId}', function (User $user, int $c
 
 // Public: post like counts carry no user identity, so no auth callback needed
 // beyond registering the channel name (posts.{postId}) client-side.
+
+// Private: personal notification stream. Laravel's Notifiable broadcasts on
+// App.Models.User.{id} by default; only that user may listen, never an admin —
+// a notification is addressed, not supervised.
+Broadcast::channel('App.Models.User.{userId}', function (User $user, int $userId) {
+    return $user->id === $userId;
+});
