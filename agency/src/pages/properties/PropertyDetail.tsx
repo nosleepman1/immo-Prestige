@@ -14,6 +14,19 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
 import { useNavigate } from 'react-router-dom'
+import { AVAILABILITY_LABELS, TRANSACTION_LABELS } from '@/types/property'
+
+const money = (amount: number, currency?: string) =>
+  `${new Intl.NumberFormat('fr-FR').format(amount)} ${currency ?? 'XOF'}`
+
+function Figure({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <div className="text-xs text-muted-foreground">{label}</div>
+      <div>{value}</div>
+    </div>
+  )
+}
 
 const PropertyDetail = () => {
   const { id } = useParams()
@@ -70,10 +83,12 @@ const PropertyDetail = () => {
         </CardHeader>
         <CardContent className="grid grid-cols-2 gap-3 text-sm">
           <div>
-            <div className="text-xs text-muted-foreground">Prix</div>
-            <div>
-              {new Intl.NumberFormat('fr-FR').format(property.price)} {property.devise?.code}
-            </div>
+            <div className="text-xs text-muted-foreground">Transaction</div>
+            <div>{TRANSACTION_LABELS[property.transaction_type]}</div>
+          </div>
+          <div>
+            <div className="text-xs text-muted-foreground">Disponibilité</div>
+            <div>{AVAILABILITY_LABELS[property.availability]}</div>
           </div>
           <div>
             <div className="text-xs text-muted-foreground">Superficie</div>
@@ -89,8 +104,60 @@ const PropertyDetail = () => {
             <div className="text-xs text-muted-foreground">Type</div>
             <div>{property.property_type?.name}</div>
           </div>
+          {property.owner && (
+            <div>
+              <div className="text-xs text-muted-foreground">Propriétaire</div>
+              <div>
+                {property.owner.full_name}
+                <span className="text-muted-foreground"> — {property.owner.phone}</span>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
+
+      {property.sale && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Conditions de vente</CardTitle>
+          </CardHeader>
+          <CardContent className="grid grid-cols-2 gap-3 text-sm">
+            <Figure label="Prix de vente" value={money(property.sale.price, property.devise?.code)} />
+            <Figure label="Négociable" value={property.sale.negotiable ? 'Oui' : 'Non'} />
+          </CardContent>
+        </Card>
+      )}
+
+      {property.rental && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Conditions de location</CardTitle>
+          </CardHeader>
+          <CardContent className="grid grid-cols-2 gap-3 text-sm">
+            <Figure label="Loyer mensuel" value={money(property.rental.rent_amount, property.devise?.code)} />
+            <Figure label="Charges" value={money(property.rental.charges_amount, property.devise?.code)} />
+            <Figure
+              label="Total mensuel"
+              value={money(property.rental.monthly_total, property.devise?.code)}
+            />
+            <Figure label="Dépôt de garantie" value={money(property.rental.deposit_amount, property.devise?.code)} />
+            <Figure label="Mois d'avance" value={String(property.rental.advance_months)} />
+            <Figure label="Durée minimale" value={`${property.rental.min_lease_months} mois`} />
+            <Figure
+              label="Coût d'entrée"
+              value={money(property.rental.move_in_cost, property.devise?.code)}
+            />
+            <Figure
+              label="Disponible à partir du"
+              value={
+                property.rental.available_from
+                  ? new Date(property.rental.available_from).toLocaleDateString('fr-FR')
+                  : 'Immédiatement'
+              }
+            />
+          </CardContent>
+        </Card>
+      )}
 
       <Card>
         <CardHeader className="flex-row items-center justify-between">

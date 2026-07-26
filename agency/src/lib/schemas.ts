@@ -55,21 +55,86 @@ export type SetPasswordFormValues = z.infer<typeof setPasswordSchema>
 
 // ─── Property schema (mirrors StorePropertyRequest) ──────────────────────────
 
-export const propertySchema = z.object({
-  property_type_id: z.coerce.number({ message: 'Le type de bien est requis' }),
-  devise_id: z.coerce.number({ message: 'La devise est requise' }),
-  name: z.string().min(1, 'Le titre est requis').max(255),
-  description: z.string().optional().or(z.literal('')),
-  surface: z.coerce.number().min(0, 'La superficie doit être positive'),
-  rooms: z.coerce.number().int().min(0, 'Le nombre de pièces doit être positif'),
-  bedrooms: z.coerce.number().int().min(0).optional(),
-  floor: z.coerce.number().int().optional(),
-  furnished: z.boolean().optional(),
-  price: z.coerce.number().min(0, 'Le prix doit être positif'),
-  country: z.string().min(3, 'Le pays est requis'),
-  region: z.string().min(1, 'La région est requise').max(100),
-  city: z.string().min(1, 'La ville est requise').max(100),
-  sold: z.boolean().optional(),
-})
+export const propertySchema = z
+  .object({
+    property_type_id: z.coerce.number({ message: 'Le type de bien est requis' }),
+    devise_id: z.coerce.number({ message: 'La devise est requise' }),
+    owner_id: z.coerce.number().optional(),
+    transaction_type: z.enum(['sale', 'rent', 'both'], {
+      message: 'Précisez si le bien est à vendre ou à louer',
+    }),
+    name: z.string().min(1, 'Le titre est requis').max(255),
+    description: z.string().optional().or(z.literal('')),
+    surface: z.coerce.number().min(0, 'La superficie doit être positive'),
+    rooms: z.coerce.number().int().min(0, 'Le nombre de pièces doit être positif'),
+    bedrooms: z.coerce.number().int().min(0).optional(),
+    floor: z.coerce.number().int().optional(),
+    furnished: z.boolean().optional(),
+    country: z.string().min(3, 'Le pays est requis'),
+    region: z.string().min(1, 'La région est requise').max(100),
+    city: z.string().min(1, 'La ville est requise').max(100),
+    sale: z
+      .object({
+        price: z.coerce.number().min(1, 'Le prix de vente est requis'),
+        negotiable: z.boolean().optional(),
+      })
+      .optional(),
+    rental: z
+      .object({
+        rent_amount: z.coerce.number().min(1, 'Le loyer est requis'),
+        charges_amount: z.coerce.number().min(0).optional(),
+        deposit_amount: z.coerce.number().min(0).optional(),
+        advance_months: z.coerce.number().int().min(1).max(12).optional(),
+        min_lease_months: z.coerce.number().int().min(1).max(120).optional(),
+        available_from: z.string().optional().or(z.literal('')),
+      })
+      .optional(),
+  })
+  // Mirrors the required_if/prohibited_if pair in StorePropertyRequest. The
+  // server remains the guarantee; this only spares a round trip.
+  .superRefine((values, ctx) => {
+    const needsSale = values.transaction_type !== 'rent'
+    const needsRental = values.transaction_type !== 'sale'
+
+    if (needsSale && !values.sale?.price) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['sale', 'price'],
+        message: 'Un bien mis en vente doit porter un prix de vente.',
+      })
+    }
+
+    if (needsRental && !values.rental?.rent_amount) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['rental', 'rent_amount'],
+        message: 'Un bien mis en location doit porter un loyer.',
+      })
+    }
+  })
 
 export type PropertyFormSchemaValues = z.infer<typeof propertySchema>
+
+// ─── Owner schema (mirrors StoreOwnerRequest) ────────────────────────────────
+
+export const ownerSchema = z.object({
+  last_name: z.string().min(1, 'Le nom est requis').max(255),
+  first_name: z.string().max(255).optional().or(z.literal('')),
+  phone: z.string().min(1, 'Le téléphone est requis').max(255),
+  email: z.string().email('Adresse email invalide').optional().or(z.literal('')),
+  address: z.string().max(255).optional().or(z.literal('')),
+  id_document_number: z.string().max(255).optional().or(z.literal('')),
+  notes: z.string().optional().or(z.literal('')),
+})
+
+export type OwnerFormSchemaValues = z.infer<typeof ownerSchema>
+
+// ─── Contract clause schema (mirrors StoreContractClauseRequest) ─────────────
+
+export const clauseSchema = z.object({
+  title: z.string().min(1, "L'intitulé est requis").max(255),
+  body: z.string().min(1, 'Le corps de la clause est requis').max(20000),
+  is_required: z.boolean().optional(),
+})
+
+export type ClauseFormSchemaValues = z.infer<typeof clauseSchema>

@@ -13,4 +13,14 @@ export const queryKeys = {
     list: ['conversations'] as const,
     messages: (conversationId: number) => ['conversations', conversationId, 'messages'] as const,
   },
+  rentalApplications: {
+    mine: ['rental-applications', 'mine'] as const,
+    detail: (id: number) => ['rental-applications', 'detail', id] as const,
+  },
+  leases: {
+    mine: ['leases', 'mine'] as const,
+    detail: (id: number) => ['leases', 'detail', id] as const,
+    installments: (leaseId: number) => ['leases', leaseId, 'installments'] as const,
+  },
+  notifications: ['notifications'] as const,
 }

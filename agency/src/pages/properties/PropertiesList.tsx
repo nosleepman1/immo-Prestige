@@ -5,12 +5,28 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
+import {
+  AVAILABILITY_LABELS,
+  STATUS_LABELS,
+  TRANSACTION_LABELS,
+  headlinePrice,
+  type PropertyAvailability,
+} from '@/types/property'
 
 const STATUS_VARIANT: Record<string, 'secondary' | 'default' | 'outline'> = {
   draft: 'secondary',
   published: 'default',
   archived: 'outline',
 }
+
+const AVAILABILITY_VARIANT: Record<PropertyAvailability, 'default' | 'secondary' | 'outline'> = {
+  available: 'default',
+  reserved: 'secondary',
+  sold: 'outline',
+  rented: 'outline',
+}
+
+const formatAmount = (amount: number) => new Intl.NumberFormat('fr-FR').format(amount)
 
 const PropertiesList = () => {
   const { data: properties, isLoading } = useMyProperties()
@@ -41,28 +57,54 @@ const PropertiesList = () => {
             <TableRow>
               <TableHead>Bien</TableHead>
               <TableHead>Ville</TableHead>
+              <TableHead>Transaction</TableHead>
               <TableHead>Prix</TableHead>
+              <TableHead>Disponibilité</TableHead>
               <TableHead>Statut</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {properties.map((property) => (
-              <TableRow key={property.id}>
-                <TableCell>
-                  <Link to={`/properties/${property.id}`} className="font-medium hover:underline">
-                    {property.name}
-                  </Link>
-                  <div className="text-xs text-muted-foreground">{property.property_type?.name}</div>
-                </TableCell>
-                <TableCell>{property.city}</TableCell>
-                <TableCell>
-                  {new Intl.NumberFormat('fr-FR').format(property.price)} {property.devise?.code}
-                </TableCell>
-                <TableCell>
-                  <Badge variant={STATUS_VARIANT[property.status]}>{property.status}</Badge>
-                </TableCell>
-              </TableRow>
-            ))}
+            {properties.map((property) => {
+              const headline = headlinePrice(property)
+
+              return (
+                <TableRow key={property.id}>
+                  <TableCell>
+                    <Link to={`/properties/${property.id}`} className="font-medium hover:underline">
+                      {property.name}
+                    </Link>
+                    <div className="text-xs text-muted-foreground">
+                      {property.property_type?.name}
+                      {property.owner ? ` — ${property.owner.full_name}` : ''}
+                    </div>
+                  </TableCell>
+                  <TableCell>{property.city}</TableCell>
+                  <TableCell className="text-sm">
+                    {TRANSACTION_LABELS[property.transaction_type]}
+                  </TableCell>
+                  <TableCell>
+                    {headline ? (
+                      <>
+                        {formatAmount(headline.amount)} {property.devise?.code}
+                        <span className="text-muted-foreground">{headline.suffix}</span>
+                      </>
+                    ) : (
+                      <span className="text-muted-foreground text-sm">—</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={AVAILABILITY_VARIANT[property.availability]}>
+                      {AVAILABILITY_LABELS[property.availability]}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={STATUS_VARIANT[property.status]}>
+                      {STATUS_LABELS[property.status]}
+                    </Badge>
+                  </TableCell>
+                </TableRow>
+              )
+            })}
           </TableBody>
         </Table>
       )}
