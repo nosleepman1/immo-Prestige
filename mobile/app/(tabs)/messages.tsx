@@ -1,12 +1,31 @@
 import { View, Text, TouchableOpacity, FlatList, StyleSheet, ActivityIndicator } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { useAuthStore } from "@/store/auth.store";
 import { useConversations } from "@/hooks/messaging/useConversations";
 import type { Conversation } from "@/types/messaging";
 
 export default function MessagesScreen() {
   const router = useRouter();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const { data: conversations, isLoading } = useConversations();
+
+  if (!isAuthenticated) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.title}>Messages</Text>
+        </View>
+        <View style={styles.empty}>
+          <Ionicons name="chatbubbles-outline" size={40} color="#d1d5db" />
+          <Text style={styles.emptyText}>Connectez-vous pour voir vos messages.</Text>
+          <TouchableOpacity style={styles.loginBtn} onPress={() => router.push("/auth/login")}>
+            <Text style={styles.loginBtnText}>Se connecter</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
 
   const renderItem = ({ item }: { item: Conversation }) => (
     <TouchableOpacity style={styles.row} onPress={() => router.push(`/messages/${item.id}`)}>
@@ -89,6 +108,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
   },
   badgeText: { color: "#fff", fontSize: 11, fontWeight: "700" },
-  empty: { alignItems: "center", marginTop: 80, gap: 10 },
-  emptyText: { color: "#9ca3af", fontSize: 14 },
+  empty: { alignItems: "center", marginTop: 80, gap: 10, paddingHorizontal: 32 },
+  emptyText: { color: "#9ca3af", fontSize: 14, textAlign: "center" },
+  loginBtn: {
+    marginTop: 8,
+    backgroundColor: "#1a1a2e",
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 10,
+  },
+  loginBtnText: { color: "#fff", fontSize: 14, fontWeight: "600" },
 });

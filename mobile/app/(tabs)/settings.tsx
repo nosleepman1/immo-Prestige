@@ -1,13 +1,34 @@
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator } from "react-native";
+import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuthStore } from "@/store/auth.store";
 import { useLogout } from "@/hooks/auth/useLogout";
 import { useExportAccount } from "@/hooks/account/useExportAccount";
 
 export default function SettingsScreen() {
+  const router = useRouter();
   const user = useAuthStore((s) => s.user);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const logout = useLogout();
   const exportAccount = useExportAccount();
+
+  if (!isAuthenticated) {
+    return (
+      <View style={[styles.container, styles.guestContainer]}>
+        <View style={styles.guestAvatar}>
+          <Ionicons name="person-outline" size={32} color="#6366f1" />
+        </View>
+        <Text style={styles.guestTitle}>Vous n'êtes pas connecté</Text>
+        <Text style={styles.guestSubtitle}>Connectez-vous pour gérer votre compte.</Text>
+        <TouchableOpacity style={styles.primaryBtn} onPress={() => router.push("/auth/login")}>
+          <Text style={styles.primaryBtnText}>Se connecter</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.secondaryBtn} onPress={() => router.push("/auth/register")}>
+          <Text style={styles.secondaryBtnText}>Créer un compte</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -119,4 +140,40 @@ const styles = StyleSheet.create({
     borderColor: "#fee2e2",
   },
   logoutText: { fontSize: 15, fontWeight: "600", color: "#ef4444" },
+
+  guestContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 32,
+  },
+  guestAvatar: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: "#ede9fe",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  guestTitle: { fontSize: 18, fontWeight: "700", color: "#1a1a2e" },
+  guestSubtitle: { fontSize: 14, color: "#9ca3af", marginTop: 6, textAlign: "center" },
+  primaryBtn: {
+    marginTop: 24,
+    backgroundColor: "#1a1a2e",
+    paddingHorizontal: 32,
+    paddingVertical: 14,
+    borderRadius: 14,
+    width: "100%",
+    alignItems: "center",
+  },
+  primaryBtnText: { color: "#fff", fontSize: 15, fontWeight: "600" },
+  secondaryBtn: {
+    marginTop: 12,
+    paddingHorizontal: 32,
+    paddingVertical: 14,
+    borderRadius: 14,
+    width: "100%",
+    alignItems: "center",
+  },
+  secondaryBtnText: { color: "#1a1a2e", fontSize: 15, fontWeight: "600" },
 });

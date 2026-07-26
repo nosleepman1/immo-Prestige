@@ -4,6 +4,7 @@ import { Ionicons, Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
 import { useToggleLike } from "@/hooks/social/useToggleLike";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
 import type { Post } from "@/types/social";
 
 function formatPrice(price: number) {
@@ -19,6 +20,7 @@ export default function PostCard({
 }) {
   const router = useRouter();
   const toggleLike = useToggleLike();
+  const requireAuth = useRequireAuth();
   const property = post.property;
 
   const coverImage =
@@ -73,7 +75,10 @@ export default function PostCard({
 
       <View style={styles.actions}>
         <View style={styles.actionsLeft}>
-          <TouchableOpacity onPress={() => toggleLike.mutate(post.id)} style={styles.actionBtn}>
+          <TouchableOpacity
+            onPress={() => requireAuth() && toggleLike.mutate(post.id)}
+            style={styles.actionBtn}
+          >
             <Ionicons
               name={post.is_liked_by_user ? "heart" : "heart-outline"}
               size={26}

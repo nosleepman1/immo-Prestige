@@ -3,6 +3,7 @@ import { useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useProperty } from "@/hooks/properties/useProperty";
 import { useStartConversation } from "@/hooks/messaging/useStartConversation";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
 
 function formatPrice(price: number) {
   return new Intl.NumberFormat("fr-FR").format(price);
@@ -13,6 +14,7 @@ export default function PropertyDetailScreen() {
   const propertyId = Number(id);
   const { data: property, isLoading } = useProperty(propertyId);
   const startConversation = useStartConversation();
+  const requireAuth = useRequireAuth();
 
   if (isLoading) {
     return (
@@ -78,6 +80,7 @@ export default function PropertyDetailScreen() {
             style={styles.contactBtn}
             onPress={() =>
               property.agency &&
+              requireAuth() &&
               startConversation.mutate({ agencyId: property.agency.id, propertyId: property.id })
             }
             disabled={startConversation.isPending}

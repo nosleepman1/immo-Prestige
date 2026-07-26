@@ -1,13 +1,12 @@
 import { useCallback, useRef, useState } from "react";
 import { FlatList, ActivityIndicator, View } from "react-native";
-import type BottomSheet from "@gorhom/bottom-sheet";
 import PostCard from "@/components/PostCard";
-import CommentsBottomSheet from "@/components/CommentsBottomSheet";
+import CommentsBottomSheet, { CommentsBottomSheetHandle } from "@/components/CommentsBottomSheet";
 import { usePostsFeed } from "@/hooks/social/usePostsFeed";
 
 export default function HomeScreen() {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = usePostsFeed();
-  const sheetRef = useRef<BottomSheet>(null);
+  const sheetRef = useRef<CommentsBottomSheetHandle>(null);
   const [activePostId, setActivePostId] = useState<number | null>(null);
 
   const posts = data?.pages.flatMap((page) => page.data) ?? [];

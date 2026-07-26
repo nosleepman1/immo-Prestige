@@ -1,0 +1,15 @@
+# Caches de build des outils front
+.vite/
+*/.vite/
+node_modules/
+
+# Environnements
+.env
+.env.local
+
+# Systeme
+.DS_Store
+Thumbs.db
+
+# Sorties temporaires
+*.log
