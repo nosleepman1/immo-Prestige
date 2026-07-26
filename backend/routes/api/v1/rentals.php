@@ -1,9 +1,11 @@
 <?php
 
+use App\Http\Controllers\AgencyInstallmentController;
 use App\Http\Controllers\AgencyLeaseController;
 use App\Http\Controllers\AgencyRentalApplicationController;
 use App\Http\Controllers\ContractTemplateController;
 use App\Http\Controllers\LeaseController;
+use App\Http\Controllers\LeaseInstallmentController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OwnerController;
 use App\Http\Controllers\RentalApplicationController;
@@ -48,6 +50,11 @@ Route::prefix('agency')->middleware(['auth:sanctum', 'role:agency', 'password.se
     Route::get('/leases/{lease}', [AgencyLeaseController::class, 'show']);
     Route::post('/leases/{lease}/validate-signature', [AgencyLeaseController::class, 'validateSignature']);
     Route::post('/leases/{lease}/reject-signature', [AgencyLeaseController::class, 'rejectSignature']);
+
+    // Ledger.
+    Route::get('/installments', [AgencyInstallmentController::class, 'index']);
+    Route::post('/leases/{lease}/record-cash-payment', [AgencyInstallmentController::class, 'recordCash']);
+    Route::post('/leases/{lease}/record-cash-initial', [AgencyInstallmentController::class, 'recordCashInitial']);
 });
 
 // ---------------------------------------------------------------------------
@@ -72,6 +79,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/leases/{lease}/signed-contract', [LeaseController::class, 'downloadSignedContract']);
     Route::post('/leases/{lease}/validate', [LeaseController::class, 'validateTerms']);
     Route::post('/leases/{lease}/signed-contract', [LeaseController::class, 'uploadSignature']);
+
+    // Ledger, tenant side.
+    Route::get('/leases/{lease}/installments', [LeaseInstallmentController::class, 'index']);
+    Route::post('/leases/{lease}/initial-payment/checkout', [LeaseInstallmentController::class, 'checkoutInitial']);
+    Route::post('/leases/{lease}/installments/checkout', [LeaseInstallmentController::class, 'checkout']);
+    Route::get('/installments/{installment}/receipt', [LeaseInstallmentController::class, 'receipt']);
 
     // Notification stream, shared by every role.
     Route::get('/notifications', [NotificationController::class, 'index']);
