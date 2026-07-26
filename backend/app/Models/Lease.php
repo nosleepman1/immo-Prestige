@@ -91,6 +91,16 @@ class Lease extends Model
         return $this->belongsTo(ContractTemplate::class, 'contract_template_id');
     }
 
+    public function installments()
+    {
+        return $this->hasMany(LeaseInstallment::class);
+    }
+
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
+
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('status', LeaseStatus::Active->value);
