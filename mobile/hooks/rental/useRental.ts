@@ -12,10 +12,13 @@ import {
   markAllNotificationsRead,
   markNotificationRead,
   submitRentalApplication,
+  uploadApplicationDocument,
   uploadSignedContract,
   validateLeaseTerms,
 } from '@/services/rental/rental'
 import { queryKeys } from '@/lib/queryKeys'
+import type { PickedFile } from './useDocumentPicker'
+import type { RentalDocumentType } from '@/types/rental'
 
 export function useMyApplications() {
   return useQuery({ queryKey: queryKeys.rentalApplications.mine, queryFn: listMyApplications })
@@ -36,6 +39,19 @@ export function useSubmitApplication() {
     mutationFn: submitRentalApplication,
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: queryKeys.rentalApplications.mine }),
+  })
+}
+
+export function useUploadApplicationDocument(applicationId: number) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ file, type }: { file: PickedFile; type: RentalDocumentType }) =>
+      uploadApplicationDocument(applicationId, file, type),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.rentalApplications.detail(applicationId) })
+      queryClient.invalidateQueries({ queryKey: queryKeys.rentalApplications.mine })
+    },
   })
 }
 

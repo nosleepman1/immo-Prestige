@@ -1,8 +1,20 @@
+import { useState } from "react";
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from "react-native";
 import { useLocalSearchParams, useRouter, Stack } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { useCancelApplication, useMyApplication } from "@/hooks/rental/useRental";
-import { APPLICATION_STATUS_LABELS, type RentalApplicationStatus } from "@/types/rental";
+import {
+  useCancelApplication,
+  useMyApplication,
+  useUploadApplicationDocument,
+} from "@/hooks/rental/useRental";
+import { useDocumentPicker } from "@/hooks/rental/useDocumentPicker";
+import { apiErrorMessage } from "@/lib/apiError";
+import {
+  APPLICATION_STATUS_LABELS,
+  DOCUMENT_TYPE_LABELS,
+  type RentalApplicationStatus,
+  type RentalDocumentType,
+} from "@/types/rental";
 
 const STATUS_COLOR: Record<RentalApplicationStatus, string> = {
   submitted: "#d97706",
@@ -30,6 +42,9 @@ export default function ApplicationDetailScreen() {
 
   const { data: application, isLoading, isError, refetch } = useMyApplication(applicationId);
   const cancel = useCancelApplication();
+  const upload = useUploadApplicationDocument(applicationId);
+  const pickDocument = useDocumentPicker();
+  const [documentType, setDocumentType] = useState<RentalDocumentType>("identity_document");
 
   if (isLoading) {
     return (
@@ -52,6 +67,8 @@ export default function ApplicationDetailScreen() {
   }
 
   const canCancel = CANCELLABLE.includes(application.status);
+  // The server refuses a document on a decided application; do not offer it.
+  const canAttach = CANCELLABLE.includes(application.status);
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ padding: 16, paddingBottom: 40 }}>
@@ -119,6 +136,47 @@ export default function ApplicationDetailScreen() {
               <Text style={styles.documentSize}>{Math.round(document.size_bytes / 1024)} Ko</Text>
             </View>
           ))
+        )}
+
+        {canAttach && (
+          <>
+            <View style={styles.typeRow}>
+              {(Object.keys(DOCUMENT_TYPE_LABELS) as RentalDocumentType[]).map((type) => (
+                <TouchableOpacity
+                  key={type}
+                  style={[styles.typeChip, documentType === type && styles.typeChipActive]}
+                  onPress={() => setDocumentType(type)}
+                >
+                  <Text
+                    style={[styles.typeChipText, documentType === type && styles.typeChipTextActive]}
+                  >
+                    {DOCUMENT_TYPE_LABELS[type]}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <TouchableOpacity
+              style={styles.attachBtn}
+              disabled={upload.isPending}
+              onPress={async () => {
+                const file = await pickDocument()
+                // A cancelled picker is not a failure: say nothing.
+                if (file) upload.mutate({ file, type: documentType })
+              }}
+            >
+              <Ionicons name="cloud-upload-outline" size={18} color="#4f46e5" />
+              <Text style={styles.attachBtnText}>
+                {upload.isPending ? "Envoi..." : "Joindre un document (PDF ou photo)"}
+              </Text>
+            </TouchableOpacity>
+
+            {upload.isError && (
+              <Text style={styles.uploadError}>
+                {apiErrorMessage(upload.error, "Ce document n'a pas pu être envoyé.")}
+              </Text>
+            )}
+          </>
         )}
       </View>
 
@@ -226,4 +284,28 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   cancelBtnText: { color: "#dc2626", fontSize: 14, fontWeight: "600" },
+  typeRow: { flexDirection: "row", flexWrap: "wrap", gap: 6, marginTop: 12 },
+  typeChip: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 20,
+    backgroundColor: "#f3f4f6",
+  },
+  typeChipActive: { backgroundColor: "#4f46e5" },
+  typeChipText: { fontSize: 11, fontWeight: "600", color: "#6b7280" },
+  typeChipTextActive: { color: "#fff" },
+  attachBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    borderWidth: 1,
+    borderColor: "#c7d2fe",
+    borderStyle: "dashed",
+    paddingVertical: 12,
+    borderRadius: 12,
+    marginTop: 10,
+  },
+  attachBtnText: { color: "#4f46e5", fontSize: 13, fontWeight: "600" },
+  uploadError: { fontSize: 12, color: "#dc2626", marginTop: 8 },
 });

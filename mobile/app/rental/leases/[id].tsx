@@ -11,6 +11,7 @@ import {
 import { useLocalSearchParams, Stack } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useLeaseActions, useLeaseInstallments, useMyLease } from "@/hooks/rental/useRental";
+import { useDocumentPicker } from "@/hooks/rental/useDocumentPicker";
 import { apiErrorMessage } from "@/lib/apiError";
 import type { InstallmentStatus } from "@/types/rental";
 
@@ -32,6 +33,7 @@ export default function LeaseDetailScreen() {
   const { data: lease, isLoading, isError, refetch } = useMyLease(leaseId);
   const installments = useLeaseInstallments(leaseId);
   const actions = useLeaseActions(leaseId);
+  const pickDocument = useDocumentPicker();
   const [selected, setSelected] = useState<number[]>([]);
 
   const selectedTotal = useMemo(
@@ -134,6 +136,40 @@ export default function LeaseDetailScreen() {
           {lease.has_signed_contract && !lease.signature_rejection_reason && (
             <Text style={styles.waitingText}>
               Document reçu — l'agence le contrôle, vous serez prévenu.
+            </Text>
+          )}
+
+          <TouchableOpacity
+            style={styles.secondaryBtn}
+            onPress={() =>
+              Linking.openURL(`${process.env.EXPO_PUBLIC_API_URL}/leases/${lease.id}/contract`)
+            }
+          >
+            <Ionicons name="document-text-outline" size={16} color="#4f46e5" />
+            <Text style={styles.secondaryBtnText}>Ouvrir le contrat à imprimer</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.primaryBtn}
+            disabled={actions.uploadSignature.isPending}
+            onPress={async () => {
+              const file = await pickDocument();
+              // A cancelled picker is not a failure: say nothing.
+              if (file) actions.uploadSignature.mutate(file);
+            }}
+          >
+            <Text style={styles.primaryBtnText}>
+              {actions.uploadSignature.isPending
+                ? "Envoi..."
+                : lease.has_signed_contract
+                  ? "Renvoyer un document corrigé"
+                  : "Envoyer le contrat signé"}
+            </Text>
+          </TouchableOpacity>
+
+          {actions.uploadSignature.isError && (
+            <Text style={styles.uploadError}>
+              {apiErrorMessage(actions.uploadSignature.error, "Ce document n'a pas pu être envoyé.")}
             </Text>
           )}
         </View>
@@ -325,6 +361,7 @@ const styles = StyleSheet.create({
   warnBox: { backgroundColor: "#fef3c7", borderRadius: 10, padding: 10, marginTop: 10 },
   warnText: { fontSize: 12, color: "#92400e" },
   waitingText: { fontSize: 12, color: "#059669", fontWeight: "600", marginTop: 10 },
+  uploadError: { fontSize: 12, color: "#dc2626", marginTop: 8 },
   footnote: { fontSize: 11, color: "#9ca3af", marginTop: 8, textAlign: "center" },
   installment: {
     flexDirection: "row",
