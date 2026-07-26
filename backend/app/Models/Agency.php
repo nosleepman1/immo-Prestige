@@ -85,6 +85,14 @@ class Agency extends Model
         return $this->hasMany(AgencyDocument::class);
     }
 
+    /**
+     * The property owners this agency holds a mandate for.
+     */
+    public function owners()
+    {
+        return $this->hasMany(Owner::class);
+    }
+
     public function subscriptions()
     {
         return $this->hasMany(Subscription::class);

@@ -7,6 +7,7 @@ use App\Models\Agency;
 use App\Models\Comment;
 use App\Models\Devise;
 use App\Models\Like;
+use App\Models\Owner;
 use App\Models\Post;
 use App\Models\Property;
 use App\Models\PropertyImage;
@@ -78,10 +79,21 @@ class DatabaseSeeder extends Seeder
                 'trial_ends_at' => $agency->activated_at->copy()->addDays(30),
             ]);
 
-            // 5. Create 15 properties for each agency
+            // 5. A handful of owners the agency holds a mandate for.
+            $owners = Owner::factory()->count(3)->create(['agency_id' => $agency->id]);
+
+            // 6. Create 15 properties for each agency, mixing the two markets:
+            // roughly half for sale, a third to rent, the rest offered both ways.
             for($j = 0; $j < 15; $j++) {
-                $property = Property::factory()->create([
+                $factory = match ($j % 6) {
+                    0, 1, 2 => Property::factory()->forSale(),
+                    3, 4 => Property::factory()->forRent(),
+                    default => Property::factory()->forBoth(),
+                };
+
+                $property = $factory->create([
                     'agency_id' => $agency->id,
+                    'owner_id' => $owners->random()->id,
                     'property_type_id' => $propertyTypes->random()->id,
                     'devise_id' => $devises->random()->id,
                 ]);
