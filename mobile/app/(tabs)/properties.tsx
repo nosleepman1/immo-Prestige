@@ -3,7 +3,7 @@ import { View, Text, Image, TouchableOpacity, FlatList, StyleSheet, TextInput, A
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { usePropertiesSearch } from "@/hooks/properties/usePropertiesSearch";
-import type { Property } from "@/types/property";
+import { headlinePrice, type Property } from "@/types/property";
 
 function formatPrice(price: number) {
   return new Intl.NumberFormat("fr-FR").format(price);
@@ -20,6 +20,7 @@ export default function PropertiesScreen() {
 
   const renderItem = ({ item }: { item: Property }) => {
     const cover = item.images.find((img) => img.is_cover)?.url ?? item.images[0]?.url;
+    const headline = headlinePrice(item);
     return (
       <TouchableOpacity style={styles.card} onPress={() => router.push(`/properties/${item.id}`)} activeOpacity={0.9}>
         {cover ? <Image source={{ uri: cover }} style={styles.image} /> : <View style={styles.imagePlaceholder} />}
@@ -30,9 +31,12 @@ export default function PropertiesScreen() {
           <Text style={styles.cardSubtitle}>
             {item.city}, {item.country}
           </Text>
-          <Text style={styles.cardPrice}>
-            {formatPrice(item.price)} {item.devise?.code}
-          </Text>
+          {headline ? (
+            <Text style={styles.cardPrice}>
+              {formatPrice(headline.amount)} {item.devise?.code}
+              <Text style={styles.cardPriceSuffix}>{headline.suffix}</Text>
+            </Text>
+          ) : null}
         </View>
       </TouchableOpacity>
     );
@@ -99,5 +103,6 @@ const styles = StyleSheet.create({
   cardTitle: { fontSize: 15, fontWeight: "700", color: "#111827" },
   cardSubtitle: { fontSize: 12, color: "#9ca3af", marginTop: 2 },
   cardPrice: { fontSize: 15, fontWeight: "800", color: "#4f46e5", marginTop: 6 },
+  cardPriceSuffix: { fontSize: 12, fontWeight: "600", color: "#6b7280" },
   empty: { textAlign: "center", color: "#9ca3af", marginTop: 40 },
 });

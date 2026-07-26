@@ -6,6 +6,7 @@ import { fr } from "date-fns/locale";
 import { useToggleLike } from "@/hooks/social/useToggleLike";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import type { Post } from "@/types/social";
+import { AVAILABILITY_LABELS, headlinePrice } from "@/types/property";
 
 function formatPrice(price: number) {
   return new Intl.NumberFormat("fr-FR").format(price);
@@ -22,6 +23,7 @@ export default function PostCard({
   const toggleLike = useToggleLike();
   const requireAuth = useRequireAuth();
   const property = post.property;
+  const headline = headlinePrice(property);
 
   const coverImage =
     property?.images?.find((img) => img.is_cover)?.url ||
@@ -65,9 +67,11 @@ export default function PostCard({
       >
         <View style={styles.imageWrap}>
           <Image source={{ uri: coverImage }} style={styles.image} resizeMode="cover" />
-          {property?.sold && (
+          {property && property.availability !== "available" && (
             <View style={styles.soldBadge}>
-              <Text style={styles.soldText}>VENDU</Text>
+              <Text style={styles.soldText}>
+                {AVAILABILITY_LABELS[property.availability].toUpperCase()}
+              </Text>
             </View>
           )}
         </View>
@@ -97,9 +101,12 @@ export default function PostCard({
           </TouchableOpacity>
         </View>
 
-        <Text style={styles.price}>
-          {property ? formatPrice(property.price) : ""} {property?.devise?.code}
-        </Text>
+        {headline && (
+          <Text style={styles.price}>
+            {formatPrice(headline.amount)} {property?.devise?.code}
+            <Text style={styles.priceSuffix}>{headline.suffix}</Text>
+          </Text>
+        )}
       </View>
 
       <View style={styles.details}>
@@ -179,6 +186,7 @@ const styles = StyleSheet.create({
   actionBtn: { flexDirection: "row", alignItems: "center", gap: 5 },
   actionCount: { fontSize: 13, fontWeight: "600", color: "#374151" },
   price: { fontSize: 16, fontWeight: "800", color: "#4f46e5" },
+  priceSuffix: { fontSize: 11, fontWeight: "600", color: "#6b7280" },
 
   details: { paddingHorizontal: 12, paddingBottom: 14 },
   detailsRow: { flexDirection: "row", gap: 8, marginBottom: 8 },
