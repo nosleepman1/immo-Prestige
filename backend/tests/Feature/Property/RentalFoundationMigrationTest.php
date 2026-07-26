@@ -17,19 +17,32 @@ class RentalFoundationMigrationTest extends TestCase
 {
     use RefreshDatabase;
 
-    private const LOT_10_STEPS = 4;
+    /**
+     * Rewinds one step at a time until the whole lot-10 refactor is undone,
+     * rather than counting a fixed number of steps: every lot added after this
+     * one would otherwise shift the count and make this test rewind too little.
+     *
+     * `property_sale_details` is the deepest of the four, so its absence is the
+     * signal that the legacy schema is fully back.
+     */
+    private function rollbackToLegacySchema(): void
+    {
+        for ($i = 0; $i < 30 && Schema::hasTable('property_sale_details'); $i++) {
+            Artisan::call('migrate:rollback', ['--step' => 1]);
+        }
+
+        $this->assertTrue(Schema::hasColumn('properties', 'price'), 'rollback did not restore the legacy schema');
+    }
 
     /**
-     * Rewinds to the pre-lot-10 schema and inserts legacy rows the way the old
-     * code wrote them: a decimal price, a `sold` boolean, no specialisation.
+     * Inserts legacy rows the way the old code wrote them: a decimal price, a
+     * `sold` boolean, no specialisation.
      *
      * @return array<int, int> inserted property ids, in insertion order
      */
     private function seedLegacyProperties(): array
     {
-        Artisan::call('migrate:rollback', ['--step' => self::LOT_10_STEPS]);
-
-        $this->assertTrue(Schema::hasColumn('properties', 'price'), 'rollback did not restore the legacy schema');
+        $this->rollbackToLegacySchema();
 
         $agencyUser = DB::table('users')->insertGetId([
             'name' => 'Agence Test', 'email' => 'agence@test.local',
@@ -110,9 +123,8 @@ class RentalFoundationMigrationTest extends TestCase
         [$plain, $soldOne, $rounded] = $this->seedLegacyProperties();
         Artisan::call('migrate');
 
-        Artisan::call('migrate:rollback', ['--step' => self::LOT_10_STEPS]);
+        $this->rollbackToLegacySchema();
 
-        $this->assertTrue(Schema::hasColumn('properties', 'price'));
         $this->assertTrue(Schema::hasColumn('properties', 'sold'));
         $this->assertFalse(Schema::hasTable('property_sale_details'));
 
