@@ -55,5 +55,16 @@ class PublishProperty
         if ($property->images()->count() === 0) {
             throw new IncompletePropertyListingException('au moins une photo est requise');
         }
+
+        // A listing whose specialisation is missing would be published without
+        // a price or without a rent. Validation normally prevents it; this is
+        // the last gate before the public sees it.
+        if ($property->transaction_type->requiresSaleDetails() && ! $property->saleDetail()->exists()) {
+            throw new IncompletePropertyListingException('un prix de vente est requis');
+        }
+
+        if ($property->transaction_type->requiresRentalDetails() && ! $property->rentalDetail()->exists()) {
+            throw new IncompletePropertyListingException('un loyer est requis');
+        }
     }
 }

@@ -33,16 +33,21 @@ class PropertyController extends Controller
      */
     public function show(Request $request, Property $property): PropertyResource
     {
-        $property->load(['propertyType', 'agency', 'devise', 'images']);
+        $property->load(['propertyType', 'agency', 'devise', 'images', 'saleDetail', 'rentalDetail']);
 
         // Route is public (no auth middleware): read the token guard explicitly
         // so a Bearer-authenticated owner/admin is recognised.
         $user = $request->user('sanctum');
 
-        $visible = $property->isPublished()
-            || ($user && ($user->isAdmin() || (int) $property->agency?->user_id === $user->id));
+        $isAgency = $user && (int) $property->agency?->user_id === $user->id;
+        $visible = $property->isPublished() || ($user && ($user->isAdmin() || $isAgency));
 
         abort_unless($visible, 404);
+
+        // The owner is agency-internal and never surfaces on a public listing.
+        if ($isAgency || $user?->isAdmin()) {
+            $property->load('owner');
+        }
 
         return new PropertyResource($property);
     }
@@ -55,7 +60,9 @@ class PropertyController extends Controller
         $agency = Agency::whereBelongsTo($request->user())->firstOrFail();
 
         return PropertyResource::collection(
-            $agency->properties()->with(['propertyType', 'devise', 'images'])->latest()->paginate(15)
+            $agency->properties()
+                ->with(['propertyType', 'devise', 'images', 'saleDetail', 'rentalDetail', 'owner'])
+                ->latest()->paginate(15)
         );
     }
 
@@ -66,7 +73,7 @@ class PropertyController extends Controller
         $agency = Agency::whereBelongsTo($request->user())->firstOrFail();
         $property = $createProperty->handle($agency, $request->validated());
 
-        return PropertyResource::make($property->load(['propertyType', 'devise']))
+        return PropertyResource::make($property->load(['propertyType', 'devise', 'saleDetail', 'rentalDetail']))
             ->response()
             ->setStatusCode(201);
     }
