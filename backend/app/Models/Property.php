@@ -2,10 +2,14 @@
 
 namespace App\Models;
 
+use App\Enums\PropertyAvailability;
 use App\Enums\PropertyStatus;
+use App\Enums\TransactionType;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Property extends Model
@@ -16,7 +20,9 @@ class Property extends Model
     protected $fillable = [
         'property_type_id',
         'agency_id',
+        'owner_id',
         'devise_id',
+        'transaction_type',
         'name',
         'description',
         'surface',
@@ -24,21 +30,20 @@ class Property extends Model
         'bedrooms',
         'floor',
         'furnished',
-        'price',
         'country',
         'region',
         'city',
         'longitude',
         'latitude',
-        'sold',
+        'availability',
         'status',
     ];
 
     protected $casts = [
         'furnished' => 'boolean',
-        'sold' => 'boolean',
         'status' => PropertyStatus::class,
-        'price' => 'decimal:2',
+        'transaction_type' => TransactionType::class,
+        'availability' => PropertyAvailability::class,
         'rooms' => 'integer',
         'bedrooms' => 'integer',
         'longitude' => 'decimal:6',
@@ -50,11 +55,33 @@ class Property extends Model
         return $query->where('status', PropertyStatus::Published->value);
     }
 
+    /**
+     * Listings still open to an offer or a rental application.
+     */
+    public function scopeOpen(Builder $query): Builder
+    {
+        return $query->where('availability', PropertyAvailability::Available->value);
+    }
+
+    /**
+     * Listings offered for the given transaction, `both` matching either side.
+     */
+    public function scopeForTransaction(Builder $query, TransactionType $type): Builder
+    {
+        return $type === TransactionType::Both
+            ? $query->where('transaction_type', TransactionType::Both->value)
+            : $query->whereIn('transaction_type', [$type->value, TransactionType::Both->value]);
+    }
+
     public function isPublished(): bool
     {
         return $this->status === PropertyStatus::Published;
     }
 
+    public function isRentable(): bool
+    {
+        return $this->transaction_type->requiresRentalDetails();
+    }
 
     public function propertyType()
     {
@@ -64,6 +91,21 @@ class Property extends Model
     public function agency()
     {
         return $this->belongsTo(Agency::class);
+    }
+
+    public function owner(): BelongsTo
+    {
+        return $this->belongsTo(Owner::class);
+    }
+
+    public function saleDetail(): HasOne
+    {
+        return $this->hasOne(PropertySaleDetail::class);
+    }
+
+    public function rentalDetail(): HasOne
+    {
+        return $this->hasOne(PropertyRentalDetail::class);
     }
 
     public function devise()

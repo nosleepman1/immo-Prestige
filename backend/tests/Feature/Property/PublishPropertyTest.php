@@ -28,7 +28,7 @@ class PublishPropertyTest extends TestCase
 
     private function completeDraft(Agency $agency): Property
     {
-        $property = Property::factory()->draft()->create([
+        $property = Property::factory()->draft()->forSale()->create([
             'agency_id' => $agency->id,
             'description' => 'Une belle villa avec piscine.',
         ]);

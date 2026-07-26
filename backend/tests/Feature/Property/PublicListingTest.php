@@ -23,9 +23,9 @@ class PublicListingTest extends TestCase
 
     public function test_the_listing_filters_by_city_and_price(): void
     {
-        Property::factory()->published()->create(['city' => 'Dakar', 'price' => 100000]);
-        Property::factory()->published()->create(['city' => 'Dakar', 'price' => 900000]);
-        Property::factory()->published()->create(['city' => 'Thies', 'price' => 100000]);
+        Property::factory()->published()->forSale(100000)->create(['city' => 'Dakar']);
+        Property::factory()->published()->forSale(900000)->create(['city' => 'Dakar']);
+        Property::factory()->published()->forSale(100000)->create(['city' => 'Thies']);
 
         $this->getJson('/api/v1/properties?city=Dakar&price_max=200000')
             ->assertOk()

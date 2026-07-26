@@ -21,7 +21,8 @@ class CreatePropertyTest extends TestCase
             'name' => 'Villa Almadies',
             'surface' => 250,
             'rooms' => 6,
-            'price' => 750000,
+            'transaction_type' => 'sale',
+            'sale' => ['price' => 750000],
             'country' => 'Sénégal',
             'region' => 'Dakar',
             'city' => 'Dakar',
@@ -33,16 +34,27 @@ class CreatePropertyTest extends TestCase
         $owner = User::factory()->agency()->create();
         $agency = Agency::factory()->create(['user_id' => $owner->id]);
 
-        $this->actingAs($owner, 'sanctum')
+        $response = $this->actingAs($owner, 'sanctum')
             ->postJson('/api/v1/properties', $this->payload())
             ->assertCreated()
-            ->assertJsonPath('data.status', 'draft');
+            ->assertJsonPath('data.status', 'draft')
+            ->assertJsonPath('data.availability', 'available')
+            ->assertJsonPath('data.sale.price', 750000);
 
         $this->assertDatabaseHas('properties', [
             'agency_id' => $agency->id,
             'name' => 'Villa Almadies',
             'status' => 'draft',
+            'transaction_type' => 'sale',
+            'availability' => 'available',
         ]);
+
+        // The specialisation row is written in the same transaction as the trunk.
+        $this->assertDatabaseHas('property_sale_details', [
+            'property_id' => $response->json('data.id'),
+            'price' => 750000,
+        ]);
+        $this->assertDatabaseCount('property_rental_details', 0);
     }
 
     public function test_creation_validates_the_payload(): void
@@ -51,9 +63,9 @@ class CreatePropertyTest extends TestCase
         Agency::factory()->create(['user_id' => $owner->id]);
 
         $this->actingAs($owner, 'sanctum')
-            ->postJson('/api/v1/properties', $this->payload(['name' => '', 'price' => -1]))
+            ->postJson('/api/v1/properties', $this->payload(['name' => '', 'sale' => ['price' => -1]]))
             ->assertStatus(422)
-            ->assertJsonValidationErrors(['name', 'price']);
+            ->assertJsonValidationErrors(['name', 'sale.price']);
     }
 
     public function test_a_normal_user_cannot_create_a_property(): void

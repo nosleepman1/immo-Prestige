@@ -53,9 +53,9 @@ class UpdatePropertyTest extends TestCase
         $property = Property::factory()->create(['agency_id' => $agency->id]);
 
         $this->actingAs($owner, 'sanctum')
-            ->putJson("/api/v1/properties/{$property->id}", ['price' => -5])
+            ->putJson("/api/v1/properties/{$property->id}", ['sale' => ['price' => -5]])
             ->assertStatus(422)
-            ->assertJsonValidationErrors(['price']);
+            ->assertJsonValidationErrors(['sale.price']);
     }
 
     public function test_update_rejects_out_of_range_coordinates(): void
