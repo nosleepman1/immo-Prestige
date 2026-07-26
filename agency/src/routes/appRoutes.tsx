@@ -11,6 +11,13 @@ import EngagementPage from '@/pages/social/EngagementPage'
 import ConversationsList from '@/pages/messaging/ConversationsList'
 import ConversationThread from '@/pages/messaging/ConversationThread'
 import AccountPage from '@/pages/account/AccountPage'
+import OwnersPage from '@/pages/rental/OwnersPage'
+import ApplicationsList from '@/pages/rental/ApplicationsList'
+import ApplicationDetail from '@/pages/rental/ApplicationDetail'
+import LeasesList from '@/pages/rental/LeasesList'
+import LeaseDetail from '@/pages/rental/LeaseDetail'
+import LedgerPage from '@/pages/rental/LedgerPage'
+import ContractTemplatesPage from '@/pages/rental/ContractTemplatesPage'
 import PrivateRoutes from './privateRoutes'
 
 const AppRoutes = () => {
@@ -26,6 +33,15 @@ const AppRoutes = () => {
         <Route path="/messages" element={<ConversationsList />} />
         <Route path="/messages/:id" element={<ConversationThread />} />
         <Route path="/account" element={<AccountPage />} />
+
+        {/* Location */}
+        <Route path="/owners" element={<OwnersPage />} />
+        <Route path="/rental-applications" element={<ApplicationsList />} />
+        <Route path="/rental-applications/:id" element={<ApplicationDetail />} />
+        <Route path="/leases" element={<LeasesList />} />
+        <Route path="/leases/:id" element={<LeaseDetail />} />
+        <Route path="/installments" element={<LedgerPage />} />
+        <Route path="/contract-templates" element={<ContractTemplatesPage />} />
       </Route>
 
       <Route path="/login" element={<Login />} />

@@ -8,8 +8,12 @@ import { cn } from '@/lib/utils'
 const LINKS = [
   { to: '/', label: 'Tableau de bord' },
   { to: '/properties', label: 'Mes biens' },
+  { to: '/rental-applications', label: 'Demandes' },
+  { to: '/leases', label: 'Baux' },
+  { to: '/installments', label: 'Échéances' },
+  { to: '/owners', label: 'Propriétaires' },
+  { to: '/contract-templates', label: 'Contrats' },
   { to: '/subscription', label: 'Abonnement' },
-  { to: '/engagement', label: 'Engagement' },
   { to: '/messages', label: 'Messagerie' },
   { to: '/account', label: 'Mon compte' },
 ]
