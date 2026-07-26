@@ -1,4 +1,4 @@
-import { Tabs, Redirect } from "expo-router";
+import { Tabs } from "expo-router";
 import { View, StyleSheet, Platform, ActivityIndicator } from "react-native";
 import { Ionicons, Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useAuthStore } from "@/store/auth.store";
@@ -25,18 +25,17 @@ function SettingsIcon({ color }: { color: string }) {
 
 export default function TabLayout() {
   const hasHydrated = useAuthStore((s) => s.hasHydrated);
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
+  // Guests can browse the feed and properties tabs freely (public endpoints);
+  // messages/settings show their own login prompt for unauthenticated users,
+  // and protected actions (like, comment, contact agency) redirect on demand
+  // via useRequireAuth — no blanket redirect here.
   if (!hasHydrated) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <ActivityIndicator />
       </View>
     );
-  }
-
-  if (!isAuthenticated) {
-    return <Redirect href="/auth/login" />;
   }
 
   return (

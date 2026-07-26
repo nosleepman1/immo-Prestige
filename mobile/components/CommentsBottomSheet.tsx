@@ -1,4 +1,4 @@
-import { forwardRef, useCallback, useMemo, useState } from "react";
+import { forwardRef, useCallback, useImperativeHandle, useMemo, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -7,8 +7,13 @@ import {
   StyleSheet,
   ActivityIndicator,
   Alert,
+  Modal,
+  Animated,
+  PanResponder,
+  Dimensions,
+  FlatList,
+  Keyboard,
 } from "react-native";
-import BottomSheet, { BottomSheetFlatList, BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -21,6 +26,7 @@ import {
   useDeleteReply,
 } from "@/hooks/social/useComments";
 import { useCreateReport } from "@/hooks/social/useCreateReport";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
 import type { Comment, CommentReply } from "@/types/social";
 
 interface Props {
@@ -28,13 +34,32 @@ interface Props {
   onClose: () => void;
 }
 
+export interface CommentsBottomSheetHandle {
+  snapToIndex: (index: number) => void;
+}
+
+const SCREEN_HEIGHT = Dimensions.get("window").height;
+const SHEET_HEIGHT = SCREEN_HEIGHT * 0.9;
+const MID_RATIO = 0.55;
+const EXPANDED_TRANSLATE = 0;
+const MID_TRANSLATE = SHEET_HEIGHT - SCREEN_HEIGHT * MID_RATIO;
+const CLOSED_TRANSLATE = SHEET_HEIGHT;
+const CLOSE_DRAG_THRESHOLD = SHEET_HEIGHT * 0.3;
+
 /**
- * Instagram-style comments: a bottom sheet that opens from the bottom and can
- * be dragged up to roughly the middle of the screen (snapPoints below),
- * rather than a full-page navigation.
+ * Instagram-style comments: a bottom sheet that slides up from the bottom and
+ * can be dragged to snap between a mid position and an expanded one, or
+ * dragged down past a threshold to close. Built on RN's core Animated +
+ * PanResponder (no reanimated/@gorhom/bottom-sheet) because reanimated's
+ * useAnimatedRef currently crashes under New Architecture on Expo Go 54 —
+ * see software-mansion/react-native-reanimated#9172 and
+ * gorhom/react-native-bottom-sheet#2528 (both unresolved upstream).
  */
-const CommentsBottomSheet = forwardRef<BottomSheet, Props>(({ postId, onClose }, ref) => {
-  const snapPoints = useMemo(() => ["55%", "90%"], []);
+const CommentsBottomSheet = forwardRef<CommentsBottomSheetHandle, Props>(({ postId, onClose }, ref) => {
+  const [visible, setVisible] = useState(false);
+  const translateY = useRef(new Animated.Value(CLOSED_TRANSLATE)).current;
+  const lastTranslate = useRef(CLOSED_TRANSLATE);
+
   const userId = useAuthStore((s) => s.user?.id);
   const { data: comments, isLoading } = useComments(postId ?? NaN);
   const createComment = useCreateComment(postId ?? NaN);
@@ -42,19 +67,81 @@ const CommentsBottomSheet = forwardRef<BottomSheet, Props>(({ postId, onClose },
   const createReply = useCreateReply(postId ?? NaN);
   const deleteReply = useDeleteReply(postId ?? NaN);
   const createReport = useCreateReport();
+  const requireAuth = useRequireAuth();
 
   const [text, setText] = useState("");
   const [replyingTo, setReplyingTo] = useState<number | null>(null);
 
-  const renderBackdrop = useCallback(
-    (props: React.ComponentProps<typeof BottomSheetBackdrop>) => (
-      <BottomSheetBackdrop {...props} appearsOnIndex={0} disappearsOnIndex={-1} pressBehavior="close" />
-    ),
-    []
+  const animateTo = useCallback(
+    (value: number, onDone?: () => void) => {
+      lastTranslate.current = value;
+      Animated.spring(translateY, {
+        toValue: value,
+        useNativeDriver: true,
+        bounciness: 4,
+      }).start(() => onDone?.());
+    },
+    [translateY]
   );
+
+  const handleClose = useCallback(() => {
+    Keyboard.dismiss();
+    animateTo(CLOSED_TRANSLATE, () => {
+      setVisible(false);
+      onClose();
+    });
+  }, [animateTo, onClose]);
+
+  useImperativeHandle(ref, () => ({
+    snapToIndex: (index: number) => {
+      setVisible(true);
+      const target = index >= 1 ? EXPANDED_TRANSLATE : MID_TRANSLATE;
+      // Start off-screen the first time this becomes visible.
+      translateY.setValue(CLOSED_TRANSLATE);
+      requestAnimationFrame(() => animateTo(target));
+    },
+  }));
+
+  const panResponder = useMemo(
+    () =>
+      PanResponder.create({
+        onStartShouldSetPanResponder: () => true,
+        onMoveShouldSetPanResponder: (_, gesture) => Math.abs(gesture.dy) > 4,
+        onPanResponderGrant: () => {
+          translateY.setOffset(lastTranslate.current);
+          translateY.setValue(0);
+        },
+        onPanResponderMove: (_, gesture) => {
+          if (gesture.dy < 0 && lastTranslate.current + gesture.dy < EXPANDED_TRANSLATE) return;
+          translateY.setValue(gesture.dy);
+        },
+        onPanResponderRelease: (_, gesture) => {
+          translateY.flattenOffset();
+          const current = lastTranslate.current + gesture.dy;
+
+          if (current > CLOSE_DRAG_THRESHOLD + MID_TRANSLATE || gesture.vy > 1.2) {
+            handleClose();
+            return;
+          }
+          if (current < MID_TRANSLATE / 2 || gesture.vy < -1.2) {
+            animateTo(EXPANDED_TRANSLATE);
+            return;
+          }
+          animateTo(MID_TRANSLATE);
+        },
+      }),
+    [animateTo, handleClose, translateY]
+  );
+
+  const backdropOpacity = translateY.interpolate({
+    inputRange: [EXPANDED_TRANSLATE, CLOSED_TRANSLATE],
+    outputRange: [0.5, 0],
+    extrapolate: "clamp",
+  });
 
   const handleSubmit = () => {
     if (!text.trim()) return;
+    if (!requireAuth()) return;
     if (replyingTo) {
       createReply.mutate({ commentId: replyingTo, content: text });
     } else {
@@ -65,6 +152,7 @@ const CommentsBottomSheet = forwardRef<BottomSheet, Props>(({ postId, onClose },
   };
 
   const confirmReport = (type: "comment" | "comment_reply", id: number) => {
+    if (!requireAuth()) return;
     Alert.alert("Signaler", "Voulez-vous signaler ce contenu ?", [
       { text: "Annuler", style: "cancel" },
       {
@@ -125,7 +213,7 @@ const CommentsBottomSheet = forwardRef<BottomSheet, Props>(({ postId, onClose },
         </View>
         <Text style={styles.commentContent}>{comment.content}</Text>
         <View style={styles.commentRow}>
-          <TouchableOpacity onPress={() => setReplyingTo(comment.id)}>
+          <TouchableOpacity onPress={() => requireAuth() && setReplyingTo(comment.id)}>
             <Text style={styles.replyBtn}>Répondre</Text>
           </TouchableOpacity>
           {comment.user?.id === userId ? (
@@ -143,56 +231,63 @@ const CommentsBottomSheet = forwardRef<BottomSheet, Props>(({ postId, onClose },
     </View>
   );
 
+  if (!visible) return null;
+
   return (
-    <BottomSheet
-      ref={ref}
-      index={-1}
-      snapPoints={snapPoints}
-      enablePanDownToClose
-      onClose={onClose}
-      backdropComponent={renderBackdrop}
-      handleIndicatorStyle={styles.handle}
-    >
-      <View style={styles.sheetHeader}>
-        <Text style={styles.sheetTitle}>Commentaires</Text>
-      </View>
+    <Modal visible={visible} transparent animationType="none" onRequestClose={handleClose}>
+      <View style={StyleSheet.absoluteFill}>
+        <TouchableOpacity style={StyleSheet.absoluteFill} activeOpacity={1} onPress={handleClose}>
+          <Animated.View style={[styles.backdrop, { opacity: backdropOpacity }]} />
+        </TouchableOpacity>
 
-      {isLoading ? (
-        <ActivityIndicator style={{ marginTop: 24 }} />
-      ) : (
-        <BottomSheetFlatList
-          data={comments ?? []}
-          keyExtractor={(item) => String(item.id)}
-          renderItem={renderComment}
-          contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 8, paddingBottom: 16 }}
-          ListEmptyComponent={
-            <Text style={styles.noComments}>Aucun commentaire.{"\n"}Soyez le premier à commenter !</Text>
-          }
-        />
-      )}
+        <Animated.View style={[styles.sheet, { transform: [{ translateY }] }]}>
+          <View {...panResponder.panHandlers}>
+            <View style={styles.handleWrap}>
+              <View style={styles.handle} />
+            </View>
+            <View style={styles.sheetHeader}>
+              <Text style={styles.sheetTitle}>Commentaires</Text>
+            </View>
+          </View>
 
-      <View style={styles.inputWrap}>
-        {replyingTo && (
-          <TouchableOpacity onPress={() => setReplyingTo(null)} style={styles.cancelReply}>
-            <Text style={styles.cancelReplyText}>Annuler la réponse ✕</Text>
-          </TouchableOpacity>
-        )}
-        <View style={styles.inputRow}>
-          <TextInput
-            style={styles.input}
-            placeholder={replyingTo ? "Écrire une réponse..." : "Ajouter un commentaire..."}
-            placeholderTextColor="#9ca3af"
-            value={text}
-            onChangeText={setText}
-          />
-          {text.trim().length > 0 && (
-            <TouchableOpacity onPress={handleSubmit} style={styles.sendBtn}>
-              <Feather name="send" size={20} color="#1a1a2e" />
-            </TouchableOpacity>
+          {isLoading ? (
+            <ActivityIndicator style={{ marginTop: 24 }} />
+          ) : (
+            <FlatList
+              data={comments ?? []}
+              keyExtractor={(item) => String(item.id)}
+              renderItem={renderComment}
+              contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 8, paddingBottom: 16 }}
+              ListEmptyComponent={
+                <Text style={styles.noComments}>Aucun commentaire.{"\n"}Soyez le premier à commenter !</Text>
+              }
+            />
           )}
-        </View>
+
+          <View style={styles.inputWrap}>
+            {replyingTo && (
+              <TouchableOpacity onPress={() => setReplyingTo(null)} style={styles.cancelReply}>
+                <Text style={styles.cancelReplyText}>Annuler la réponse ✕</Text>
+              </TouchableOpacity>
+            )}
+            <View style={styles.inputRow}>
+              <TextInput
+                style={styles.input}
+                placeholder={replyingTo ? "Écrire une réponse..." : "Ajouter un commentaire..."}
+                placeholderTextColor="#9ca3af"
+                value={text}
+                onChangeText={setText}
+              />
+              {text.trim().length > 0 && (
+                <TouchableOpacity onPress={handleSubmit} style={styles.sendBtn}>
+                  <Feather name="send" size={20} color="#1a1a2e" />
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
+        </Animated.View>
       </View>
-    </BottomSheet>
+    </Modal>
   );
 });
 
@@ -200,7 +295,20 @@ CommentsBottomSheet.displayName = "CommentsBottomSheet";
 export default CommentsBottomSheet;
 
 const styles = StyleSheet.create({
-  handle: { backgroundColor: "#d1d5db" },
+  backdrop: { flex: 1, backgroundColor: "#000" },
+  sheet: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: SHEET_HEIGHT,
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    overflow: "hidden",
+  },
+  handleWrap: { alignItems: "center", paddingTop: 8, paddingBottom: 4 },
+  handle: { width: 36, height: 4, borderRadius: 2, backgroundColor: "#d1d5db" },
   sheetHeader: {
     alignItems: "center",
     paddingBottom: 12,

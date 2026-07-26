@@ -36,6 +36,12 @@ export default function LoginScreen() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
+          {router.canGoBack() && (
+            <TouchableOpacity style={styles.closeBtn} onPress={() => router.back()}>
+              <Ionicons name="close" size={24} color="#1a1a2e" />
+            </TouchableOpacity>
+          )}
+
           <View style={styles.header}>
             <View style={styles.logoWrap}>
               <Ionicons name="business" size={32} color="#ffffff" />
@@ -109,6 +115,8 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: "#f0f4ff" },
   flex: { flex: 1 },
   scroll: { flexGrow: 1, paddingHorizontal: 24, paddingBottom: 40 },
+
+  closeBtn: { alignSelf: "flex-start", marginTop: 16, padding: 4 },
 
   header: { alignItems: "center", marginTop: 52, marginBottom: 32 },
   logoWrap: {
