@@ -11,6 +11,7 @@ Route::prefix('agency')->group(function () {
     // Own account (accessible even before the password is set).
     Route::middleware(['auth:sanctum', 'role:agency'])->group(function () {
         Route::get('/me', [AgencyController::class, 'me']);
+        Route::get('/stats', [AgencyController::class, 'stats']);
         Route::post('/resubmit', [AgencyController::class, 'resubmit']);
     });
 

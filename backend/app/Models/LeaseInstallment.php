@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\InstallmentStatus;
+use App\Models\Concerns\HasYearlyReference;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -12,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class LeaseInstallment extends Model
 {
     /** @use HasFactory<\Database\Factories\LeaseInstallmentFactory> */
-    use HasFactory;
+    use HasFactory, HasYearlyReference;
 
     protected $fillable = [
         'lease_id',
@@ -104,13 +105,8 @@ class LeaseInstallment extends Model
         ]);
     }
 
-    /**
-     * Sequential, year-scoped reference: QUIT-2026-00001.
-     */
-    public static function nextReference(): string
+    public static function referencePrefix(): string
     {
-        $year = now()->year;
-
-        return sprintf('QUIT-%d-%05d', $year, static::whereYear('created_at', $year)->count() + 1);
+        return 'QUIT';
     }
 }
