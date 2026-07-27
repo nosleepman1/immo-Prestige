@@ -2,13 +2,14 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Loader2, Mail, Lock, Eye, EyeOff, Building2 } from 'lucide-react'
+import { Loader2, Mail, Lock, Eye, EyeOff, Building2, FileCheck2, CalendarCheck2, MessageSquare } from 'lucide-react'
 import { useState } from 'react'
 import { loginSchema, type LoginFormValues } from '@/lib/schemas'
 import useLogin from '@/hooks/auth/useLogin'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import AuthBrandPanel from '@/components/auth/AuthBrandPanel'
 
 const container = {
   hidden: { opacity: 0, y: 24 },
@@ -23,6 +24,25 @@ const item = {
   hidden: { opacity: 0, y: 16 },
   show: { opacity: 1, y: 0 },
 }
+
+/** What the space actually does — three claims, not a feature list. */
+const HIGHLIGHTS = [
+  {
+    icon: <FileCheck2 className="size-4" />,
+    title: 'Du dossier au bail signé',
+    description: 'Instruisez les demandes, générez le contrat depuis vos propres clauses.',
+  },
+  {
+    icon: <CalendarCheck2 className="size-4" />,
+    title: 'Loyers et quittances',
+    description: 'Échéancier automatique, encaissement espèces tracé, quittance en un clic.',
+  },
+  {
+    icon: <MessageSquare className="size-4" />,
+    title: 'Vos clients au bout du fil',
+    description: 'Messagerie en temps réel et notifications sur chaque étape.',
+  },
+]
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false)
@@ -44,18 +64,28 @@ const Login = () => {
   const isLoading = loading || isSubmitting
 
   return (
-    <div className="auth-page-bg">
-      <div className="auth-orb auth-orb-1" />
-      <div className="auth-orb auth-orb-2" />
+    <div className="auth-split">
+      <AuthBrandPanel
+        badge={<Building2 className="size-5" />}
+        name="ImmoPrestige"
+        title="Votre agence, tenue au jour le jour."
+        lead="Vos annonces, vos baux et vos loyers dans un seul espace — de la mise en ligne à la quittance."
+        highlights={HIGHLIGHTS}
+        footer="© 2026 ImmoPrestige — espace réservé aux agences accréditées."
+      />
 
-      <motion.div className="auth-card" variants={container} initial="hidden" animate="show">
-        <motion.div variants={item} className="auth-header">
-          <div className="auth-logo">
-            <Building2 className="size-5 text-primary" />
-          </div>
-          <h1 className="auth-title">Espace Agence</h1>
-          <p className="auth-subtitle">Gérez vos annonces, votre abonnement et votre messagerie</p>
-        </motion.div>
+      <div className="auth-panel">
+        <div className="auth-orb auth-orb-1" />
+        <div className="auth-orb auth-orb-2" />
+
+        <motion.div className="auth-panel-inner" variants={container} initial="hidden" animate="show">
+          <motion.div variants={item} className="auth-header">
+            <div className="auth-logo lg:hidden">
+              <Building2 className="size-5 text-primary" />
+            </div>
+            <h1 className="auth-title">Espace Agence</h1>
+            <p className="auth-subtitle">Connectez-vous pour reprendre où vous en étiez</p>
+          </motion.div>
 
         <motion.form
           variants={item}
@@ -130,13 +160,14 @@ const Login = () => {
           </Button>
         </motion.form>
 
-        <motion.p variants={item} className="auth-footer">
-          Votre agence n'est pas encore inscrite ?{' '}
-          <Link to="/register" className="auth-link font-semibold">
-            Déposer un dossier
-          </Link>
-        </motion.p>
-      </motion.div>
+          <motion.p variants={item} className="auth-footer">
+            Votre agence n'est pas encore inscrite ?{' '}
+            <Link to="/register" className="auth-link font-semibold">
+              Déposer un dossier
+            </Link>
+          </motion.p>
+        </motion.div>
+      </div>
     </div>
   )
 }

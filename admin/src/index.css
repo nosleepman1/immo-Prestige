@@ -91,6 +91,9 @@
   --auth-card-border: oklch(0.91 0 0);
   --auth-orb-1: oklch(0.72 0.2 160 / 0.18);
   --auth-orb-2: oklch(0.72 0.18 180 / 0.14);
+  --auth-brand-from: oklch(0.975 0.012 165);
+  --auth-brand-to: oklch(0.955 0.02 180);
+  --auth-grid-line: oklch(0.55 0.18 160 / 0.07);
 }
 
 /* ─── Dark Theme ─────────────────────────────────────────────────────────────── */
@@ -135,6 +138,9 @@
   --auth-card-border: oklch(1 0 0 / 8%);
   --auth-orb-1: oklch(0.6 0.22 265 / 0.2);
   --auth-orb-2: oklch(0.6 0.2 200 / 0.15);
+  --auth-brand-from: oklch(0.12 0.02 170);
+  --auth-brand-to: oklch(0.1 0.015 195);
+  --auth-grid-line: oklch(0.72 0.16 165 / 0.09);
 }
 
 /* ─── Base ───────────────────────────────────────────────────────────────────── */
@@ -188,6 +194,72 @@
   @keyframes float-orb-2 {
     0%, 100% { transform: translate(0, 0) scale(1); }
     50% { transform: translate(-30px, -40px) scale(1.08); }
+  }
+
+  /* ── Split layout ────────────────────────────────────────────────────────
+     Brand panel on the left, form on the right. Below lg the panel is hidden
+     rather than stacked: on a phone it would push the form below the fold,
+     making people scroll to reach the only thing they came for. */
+  .auth-split {
+    @apply relative min-h-screen w-full grid lg:grid-cols-2 overflow-hidden;
+    background: linear-gradient(135deg, var(--auth-bg-from) 0%, var(--auth-bg-via) 50%, var(--auth-bg-to) 100%);
+  }
+
+  .auth-brand {
+    @apply relative hidden lg:flex flex-col justify-between p-12 xl:p-16 overflow-hidden;
+    background:
+      radial-gradient(120% 90% at 15% 10%, oklch(0.55 0.18 160 / 0.14) 0%, transparent 60%),
+      linear-gradient(160deg, var(--auth-brand-from) 0%, var(--auth-brand-to) 100%);
+    border-right: 1px solid var(--auth-card-border);
+  }
+
+  /* Faint grid, so the panel reads as a surface rather than a flat wash. */
+  .auth-brand::before {
+    content: '';
+    @apply absolute inset-0 pointer-events-none;
+    background-image:
+      linear-gradient(var(--auth-grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--auth-grid-line) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(90% 70% at 30% 30%, black 0%, transparent 75%);
+  }
+
+  .auth-brand-content {
+    @apply relative z-10 flex flex-col gap-8 max-w-lg;
+  }
+  .auth-brand-mark {
+    @apply inline-flex items-center gap-3 text-base font-bold tracking-tight;
+  }
+  .auth-brand-badge {
+    @apply size-11 rounded-2xl flex items-center justify-center text-white shrink-0;
+    background: linear-gradient(135deg, oklch(0.55 0.18 160), oklch(0.62 0.14 185));
+    box-shadow: 0 8px 24px oklch(0.55 0.18 160 / 0.28);
+  }
+  .auth-brand-title {
+    @apply text-4xl xl:text-5xl font-bold tracking-tight leading-[1.08] text-foreground;
+  }
+  .auth-brand-lead {
+    @apply text-base text-muted-foreground leading-relaxed;
+  }
+  .auth-brand-list {
+    @apply flex flex-col gap-4 mt-2;
+  }
+  .auth-brand-item {
+    @apply flex items-start gap-3 text-sm text-foreground/80;
+  }
+  .auth-brand-item-icon {
+    @apply size-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0;
+  }
+  .auth-brand-footer {
+    @apply relative z-10 text-xs text-muted-foreground;
+  }
+
+  /* Right column: the form, centred in its own half. */
+  .auth-panel {
+    @apply relative z-10 flex items-center justify-center p-6 sm:p-10;
+  }
+  .auth-panel-inner {
+    @apply w-full max-w-sm flex flex-col gap-5;
   }
 
   /* Glass card */
