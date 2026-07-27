@@ -4,6 +4,7 @@ use App\Http\Controllers\AgencyInstallmentController;
 use App\Http\Controllers\AgencyLeaseController;
 use App\Http\Controllers\AgencyMaintenanceController;
 use App\Http\Controllers\AgencyRentalApplicationController;
+use App\Http\Controllers\AgencyRentalDashboardController;
 use App\Http\Controllers\ContractTemplateController;
 use App\Http\Controllers\LeaseController;
 use App\Http\Controllers\LeaseInstallmentController;
@@ -60,6 +61,9 @@ Route::middleware(['auth:sanctum', 'role:agency', 'password.set'])->prefix('agen
     Route::get('/installments', [AgencyInstallmentController::class, 'index']);
     Route::post('/leases/{lease}/record-cash-payment', [AgencyInstallmentController::class, 'recordCash']);
     Route::post('/leases/{lease}/record-cash-initial', [AgencyInstallmentController::class, 'recordCashInitial']);
+
+    // What the agency does today.
+    Route::get('/dashboard/rental', AgencyRentalDashboardController::class);
 
     // Maintenance queue.
     Route::get('/tickets', [AgencyMaintenanceController::class, 'index']);
