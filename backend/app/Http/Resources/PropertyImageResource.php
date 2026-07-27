@@ -17,9 +17,21 @@ class PropertyImageResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'url' => Storage::disk('public')->url($this->image_path),
+            'url' => $this->resolveUrl(),
             'is_cover' => $this->is_cover,
             'position' => $this->position,
         ];
+    }
+
+    /**
+     * Demo data seeds remote placeholder images by full URL. Prefixing those
+     * with the storage path produced ".../storage/https://picsum.photos/...",
+     * which resolves to nothing — every listing looked image-less.
+     */
+    private function resolveUrl(): string
+    {
+        return str_starts_with($this->image_path, 'http')
+            ? $this->image_path
+            : Storage::disk('public')->url($this->image_path);
     }
 }
