@@ -19,6 +19,10 @@ function SendIcon({ color }: { color: string }) {
   return <Feather name="send" size={24} color={color} />;
 }
 
+function RentalIcon({ color }: { color: string }) {
+  return <MaterialCommunityIcons name="file-document-outline" size={26} color={color} />;
+}
+
 function SettingsIcon({ color }: { color: string }) {
   return <Ionicons name="settings-outline" size={26} color={color} />;
 }
@@ -81,6 +85,12 @@ export default function TabLayout() {
               <SendIcon color={focused ? "#fff" : color} />
             </View>
           ),
+        }}
+      />
+      <Tabs.Screen
+        name="rental"
+        options={{
+          tabBarIcon: ({ color }) => <RentalIcon color={color} />,
         }}
       />
       <Tabs.Screen

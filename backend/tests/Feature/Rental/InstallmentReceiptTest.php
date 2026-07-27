@@ -81,8 +81,9 @@ class InstallmentReceiptTest extends TestCase
     {
         Storage::fake('local');
         [, $tenant, $installment] = $this->settledMonth();
+        // No reference passed: the model assigns it on save, which is the only
+        // moment it can see what has already been handed out.
         $installment->lease->installments()->create([
-            'reference' => LeaseInstallment::nextReference(),
             'period_start' => today()->addMonth()->startOfMonth()->toDateString(),
             'period_end' => today()->addMonth()->endOfMonth()->toDateString(),
             'due_date' => today()->addMonth()->startOfMonth()->addDays(4)->toDateString(),

@@ -15,7 +15,10 @@ export function useUploadPropertyImage(propertyId: number) {
       toast.success('Image ajoutée.')
       queryClient.invalidateQueries({ queryKey: queryKeys.properties.detail(propertyId) })
     },
-    onError: () => toast.error('Impossible d\'ajouter cette image.'),
+    onError: (error: any) => {
+      const msg = error.response?.data?.message || 'Impossible d\'ajouter cette image (format ou taille non supporté).'
+      toast.error(msg)
+    },
   })
 }
 

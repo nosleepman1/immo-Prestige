@@ -24,7 +24,6 @@ class LeaseInstallmentFactory extends Factory
 
         return [
             'lease_id' => Lease::factory(),
-            'reference' => fn () => LeaseInstallment::nextReference(),
             'period_start' => $start->toDateString(),
             'period_end' => $start->copy()->addMonth()->subDay()->toDateString(),
             'due_date' => $start->copy()->day(5)->toDateString(),

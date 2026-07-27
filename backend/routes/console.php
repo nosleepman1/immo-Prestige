@@ -23,3 +23,7 @@ Schedule::command('accounts:anonymize')->dailyAt('03:00');
 Schedule::command('rentals:generate-installments')->dailyAt('04:00');
 Schedule::command('rentals:notify-due-soon')->dailyAt('08:00');
 Schedule::command('rentals:mark-late')->dailyAt('08:30');
+// Last: a lease ending today still owed its final month this morning, and
+// freeing the property before that month was ruled on would hide an arrear
+// behind a fresh listing.
+Schedule::command('rentals:expire-leases')->dailyAt('09:00');

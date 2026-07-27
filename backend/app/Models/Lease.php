@@ -96,6 +96,11 @@ class Lease extends Model
         return $this->hasMany(LeaseInstallment::class);
     }
 
+    public function maintenanceTickets()
+    {
+        return $this->hasMany(MaintenanceTicket::class);
+    }
+
     public function payments()
     {
         return $this->hasMany(Payment::class);

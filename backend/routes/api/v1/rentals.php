@@ -2,10 +2,13 @@
 
 use App\Http\Controllers\AgencyInstallmentController;
 use App\Http\Controllers\AgencyLeaseController;
+use App\Http\Controllers\AgencyMaintenanceController;
 use App\Http\Controllers\AgencyRentalApplicationController;
+use App\Http\Controllers\AgencyRentalDashboardController;
 use App\Http\Controllers\ContractTemplateController;
 use App\Http\Controllers\LeaseController;
 use App\Http\Controllers\LeaseInstallmentController;
+use App\Http\Controllers\MaintenanceTicketController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OwnerController;
 use App\Http\Controllers\RentalApplicationController;
@@ -17,14 +20,17 @@ use Illuminate\Support\Facades\Route;
 // group sits behind the agency role, and the policies scope each record to its
 // own agency.
 // ---------------------------------------------------------------------------
-Route::prefix('agency')->middleware(['auth:sanctum', 'role:agency', 'password.set'])->group(function () {
+Route::middleware(['auth:sanctum', 'role:agency'])->prefix('agency')->group(function () {
+    Route::get('/rental-applications', [AgencyRentalApplicationController::class, 'index']);
+});
+
+Route::middleware(['auth:sanctum', 'role:agency', 'password.set'])->prefix('agency')->group(function () {
     Route::get('/owners', [OwnerController::class, 'index']);
     Route::post('/owners', [OwnerController::class, 'store']);
     Route::get('/owners/{owner}', [OwnerController::class, 'show']);
     Route::put('/owners/{owner}', [OwnerController::class, 'update']);
     Route::delete('/owners/{owner}', [OwnerController::class, 'destroy']);
 
-    Route::get('/rental-applications', [AgencyRentalApplicationController::class, 'index']);
     Route::get('/rental-applications/{application}', [AgencyRentalApplicationController::class, 'show']);
     Route::post('/rental-applications/{application}/accept', [AgencyRentalApplicationController::class, 'accept']);
     Route::post('/rental-applications/{application}/reject', [AgencyRentalApplicationController::class, 'reject'])
@@ -55,6 +61,16 @@ Route::prefix('agency')->middleware(['auth:sanctum', 'role:agency', 'password.se
     Route::get('/installments', [AgencyInstallmentController::class, 'index']);
     Route::post('/leases/{lease}/record-cash-payment', [AgencyInstallmentController::class, 'recordCash']);
     Route::post('/leases/{lease}/record-cash-initial', [AgencyInstallmentController::class, 'recordCashInitial']);
+
+    // What the agency does today.
+    Route::get('/dashboard/rental', AgencyRentalDashboardController::class);
+
+    // Maintenance queue.
+    Route::get('/tickets', [AgencyMaintenanceController::class, 'index']);
+    Route::get('/tickets/{ticket}', [AgencyMaintenanceController::class, 'show']);
+    Route::patch('/tickets/{ticket}/status', [AgencyMaintenanceController::class, 'updateStatus']);
+    Route::post('/tickets/{ticket}/messages', [MaintenanceTicketController::class, 'storeMessage']);
+    Route::post('/tickets/{ticket}/images', [MaintenanceTicketController::class, 'storeImage']);
 });
 
 // ---------------------------------------------------------------------------
@@ -85,6 +101,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/leases/{lease}/initial-payment/checkout', [LeaseInstallmentController::class, 'checkoutInitial']);
     Route::post('/leases/{lease}/installments/checkout', [LeaseInstallmentController::class, 'checkout']);
     Route::get('/installments/{installment}/receipt', [LeaseInstallmentController::class, 'receipt']);
+
+    // Maintenance, tenant side.
+    Route::get('/leases/{lease}/tickets', [MaintenanceTicketController::class, 'index']);
+    Route::post('/leases/{lease}/tickets', [MaintenanceTicketController::class, 'store']);
+    Route::get('/tickets/{ticket}', [MaintenanceTicketController::class, 'show']);
+    Route::post('/tickets/{ticket}/messages', [MaintenanceTicketController::class, 'storeMessage']);
+    Route::post('/tickets/{ticket}/images', [MaintenanceTicketController::class, 'storeImage']);
 
     // Notification stream, shared by every role.
     Route::get('/notifications', [NotificationController::class, 'index']);

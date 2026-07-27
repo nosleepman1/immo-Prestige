@@ -56,41 +56,41 @@
   --card-foreground: oklch(0.12 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.12 0 0);
-  --primary: oklch(0.55 0.22 265);
+  --primary: oklch(0.55 0.18 160);
   --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.96 0 0);
-  --secondary-foreground: oklch(0.2 0 0);
+  --secondary: oklch(0.96 0.02 160);
+  --secondary-foreground: oklch(0.2 0.1 160);
   --muted: oklch(0.96 0 0);
   --muted-foreground: oklch(0.52 0 0);
-  --accent: oklch(0.96 0 0);
-  --accent-foreground: oklch(0.2 0 0);
+  --accent: oklch(0.96 0.02 160);
+  --accent-foreground: oklch(0.2 0.1 160);
   --destructive: oklch(0.6 0.24 27);
   --border: oklch(0.91 0 0);
   --input: oklch(0.91 0 0);
-  --ring: oklch(0.55 0.22 265);
-  --chart-1: oklch(0.6 0.18 265);
-  --chart-2: oklch(0.65 0.19 200);
+  --ring: oklch(0.55 0.18 160);
+  --chart-1: oklch(0.55 0.18 160);
+  --chart-2: oklch(0.65 0.19 180);
   --chart-3: oklch(0.7 0.16 145);
   --chart-4: oklch(0.6 0.2 30);
   --chart-5: oklch(0.55 0.19 320);
   --radius: 0.75rem;
   --sidebar: oklch(0.98 0 0);
   --sidebar-foreground: oklch(0.12 0 0);
-  --sidebar-primary: oklch(0.55 0.22 265);
+  --sidebar-primary: oklch(0.55 0.18 160);
   --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.96 0 0);
-  --sidebar-accent-foreground: oklch(0.2 0 0);
+  --sidebar-accent: oklch(0.96 0.02 160);
+  --sidebar-accent-foreground: oklch(0.2 0.1 160);
   --sidebar-border: oklch(0.91 0 0);
-  --sidebar-ring: oklch(0.55 0.22 265);
+  --sidebar-ring: oklch(0.55 0.18 160);
 
   /* Auth page specific */
-  --auth-bg-from: oklch(0.97 0.02 265);
+  --auth-bg-from: oklch(0.97 0.02 160);
   --auth-bg-via: oklch(0.985 0 0);
-  --auth-bg-to: oklch(0.97 0.015 200);
+  --auth-bg-to: oklch(0.97 0.015 180);
   --auth-card-bg: oklch(1 0 0 / 0.9);
   --auth-card-border: oklch(0.91 0 0);
-  --auth-orb-1: oklch(0.72 0.2 265 / 0.18);
-  --auth-orb-2: oklch(0.72 0.18 200 / 0.14);
+  --auth-orb-1: oklch(0.72 0.2 160 / 0.18);
+  --auth-orb-2: oklch(0.72 0.18 180 / 0.14);
 }
 
 /* ─── Dark Theme ─────────────────────────────────────────────────────────────── */

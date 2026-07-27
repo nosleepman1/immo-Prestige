@@ -112,3 +112,17 @@ export interface AppNotification {
   read_at: string | null
   created_at: string
 }
+
+/** Mirrors the backend RentalDocumentType enum. */
+export type RentalDocumentType =
+  | 'identity_document'
+  | 'proof_of_income'
+  | 'employment_letter'
+  | 'other'
+
+export const DOCUMENT_TYPE_LABELS: Record<RentalDocumentType, string> = {
+  identity_document: "Pièce d'identité",
+  proof_of_income: 'Justificatif de revenus',
+  employment_letter: 'Attestation de travail',
+  other: 'Autre document',
+}
