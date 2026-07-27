@@ -12,6 +12,7 @@ import {
 import { useAuthStore } from '@/store/auth.store'
 import { useLogout } from '@/hooks/auth/useLogout'
 import { cn } from '@/lib/utils'
+import ThemeToggle from '@/components/ui/theme-toggle'
 
 interface NavGroup {
   groupName: string
@@ -160,7 +161,17 @@ export const SidebarLayout: React.FC<{ children: React.ReactNode }> = ({ childre
           ))}
         </div>
 
-        <div className="p-3 border-t border-slate-100 bg-slate-50/50 shrink-0">
+        <div className="p-3 border-t border-slate-100 bg-slate-50/50 shrink-0 space-y-3">
+          {/* Full picker once the sidebar is open; a single flip when collapsed,
+              where three labels would not fit. */}
+          {isHovered || isMobileOpen ? (
+            <ThemeToggle />
+          ) : (
+            <div className="hidden md:flex justify-center">
+              <ThemeToggle compact />
+            </div>
+          )}
+
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-full bg-slate-800 text-white flex items-center justify-center font-bold text-sm shrink-0">
               {user?.name?.[0]?.toUpperCase() || 'A'}
