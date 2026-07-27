@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import AuthBrandPanel from '@/components/auth/AuthBrandPanel'
+import ThemeToggle from '@/components/ui/theme-toggle'
 
 const container = {
   hidden: { opacity: 0, y: 24 },
@@ -75,6 +76,11 @@ const Login = () => {
       />
 
       <div className="auth-panel">
+        {/* No sidebar here, so the picker lives in the corner of the form half. */}
+        <div className="absolute top-5 right-5 z-20">
+          <ThemeToggle compact />
+        </div>
+
         <div className="auth-orb auth-orb-1" />
         <div className="auth-orb auth-orb-2" />
 
