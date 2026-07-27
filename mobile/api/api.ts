@@ -9,6 +9,10 @@ const API = axios.create({
   headers: {
     'Content-Type': 'application/json',
     Accept: 'application/json',
+    // ngrok's free tier answers an HTML interstitial to anything that looks
+    // like a browser; without this the app parses a warning page as JSON.
+    // Ignored by every other host, so it costs nothing in production.
+    'ngrok-skip-browser-warning': '1',
   },
 })
 
