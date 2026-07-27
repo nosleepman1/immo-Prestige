@@ -91,50 +91,59 @@
   --auth-card-border: oklch(0.91 0 0);
   --auth-orb-1: oklch(0.72 0.2 160 / 0.18);
   --auth-orb-2: oklch(0.72 0.18 180 / 0.14);
+  --auth-brand-from: oklch(0.975 0.012 165);
+  --auth-brand-to: oklch(0.955 0.02 180);
+  --auth-grid-line: oklch(0.55 0.18 160 / 0.07);
 }
 
 /* ─── Dark Theme ─────────────────────────────────────────────────────────────── */
+/* Dark surfaces carry a faint green cast (hue 165) rather than the blue they
+   started with: the identity is emerald, and a blue-grey shell under emerald
+   accents reads as two products glued together. */
 .dark {
-  --background: oklch(0.1 0.01 265);
+  --background: oklch(0.105 0.012 170);
   --foreground: oklch(0.97 0 0);
-  --card: oklch(0.14 0.015 265);
+  --card: oklch(0.145 0.014 170);
   --card-foreground: oklch(0.97 0 0);
-  --popover: oklch(0.14 0.015 265);
+  --popover: oklch(0.145 0.014 170);
   --popover-foreground: oklch(0.97 0 0);
-  --primary: oklch(0.68 0.22 265);
-  --primary-foreground: oklch(0.1 0 0);
-  --secondary: oklch(0.2 0.01 265);
+  --primary: oklch(0.72 0.16 165);
+  --primary-foreground: oklch(0.12 0.02 170);
+  --secondary: oklch(0.2 0.012 170);
   --secondary-foreground: oklch(0.97 0 0);
-  --muted: oklch(0.2 0.01 265);
-  --muted-foreground: oklch(0.6 0 0);
-  --accent: oklch(0.2 0.01 265);
+  --muted: oklch(0.2 0.012 170);
+  --muted-foreground: oklch(0.66 0.01 170);
+  --accent: oklch(0.22 0.02 170);
   --accent-foreground: oklch(0.97 0 0);
   --destructive: oklch(0.68 0.22 27);
-  --border: oklch(1 0 0 / 8%);
+  --border: oklch(1 0 0 / 9%);
   --input: oklch(1 0 0 / 12%);
-  --ring: oklch(0.68 0.22 265);
-  --chart-1: oklch(0.68 0.2 265);
+  --ring: oklch(0.72 0.16 165);
+  --chart-1: oklch(0.72 0.16 165);
   --chart-2: oklch(0.72 0.18 200);
   --chart-3: oklch(0.74 0.16 145);
   --chart-4: oklch(0.68 0.2 30);
   --chart-5: oklch(0.65 0.2 320);
-  --sidebar: oklch(0.12 0.012 265);
+  --sidebar: oklch(0.125 0.013 170);
   --sidebar-foreground: oklch(0.97 0 0);
-  --sidebar-primary: oklch(0.68 0.22 265);
-  --sidebar-primary-foreground: oklch(0.1 0 0);
-  --sidebar-accent: oklch(0.2 0.01 265);
+  --sidebar-primary: oklch(0.72 0.16 165);
+  --sidebar-primary-foreground: oklch(0.12 0.02 170);
+  --sidebar-accent: oklch(0.2 0.012 170);
   --sidebar-accent-foreground: oklch(0.97 0 0);
-  --sidebar-border: oklch(1 0 0 / 8%);
-  --sidebar-ring: oklch(0.68 0.22 265);
+  --sidebar-border: oklch(1 0 0 / 9%);
+  --sidebar-ring: oklch(0.72 0.16 165);
 
   /* Auth page specific */
-  --auth-bg-from: oklch(0.08 0.02 265);
-  --auth-bg-via: oklch(0.1 0.01 265);
-  --auth-bg-to: oklch(0.08 0.015 200);
-  --auth-card-bg: oklch(0.13 0.015 265 / 0.95);
-  --auth-card-border: oklch(1 0 0 / 8%);
-  --auth-orb-1: oklch(0.6 0.22 265 / 0.2);
-  --auth-orb-2: oklch(0.6 0.2 200 / 0.15);
+  --auth-bg-from: oklch(0.085 0.018 168);
+  --auth-bg-via: oklch(0.105 0.012 175);
+  --auth-bg-to: oklch(0.085 0.015 195);
+  --auth-card-bg: oklch(0.135 0.014 170 / 0.95);
+  --auth-card-border: oklch(1 0 0 / 9%);
+  --auth-orb-1: oklch(0.6 0.2 165 / 0.22);
+  --auth-orb-2: oklch(0.6 0.18 195 / 0.15);
+  --auth-brand-from: oklch(0.12 0.02 170);
+  --auth-brand-to: oklch(0.1 0.015 195);
+  --auth-grid-line: oklch(0.72 0.16 165 / 0.09);
 }
 
 /* ─── Base ───────────────────────────────────────────────────────────────────── */
@@ -188,6 +197,72 @@
   @keyframes float-orb-2 {
     0%, 100% { transform: translate(0, 0) scale(1); }
     50% { transform: translate(-30px, -40px) scale(1.08); }
+  }
+
+  /* ── Split layout ────────────────────────────────────────────────────────
+     Brand panel on the left, form on the right. Below lg the panel is hidden
+     rather than stacked: on a phone it would push the form below the fold,
+     making people scroll to reach the only thing they came for. */
+  .auth-split {
+    @apply relative min-h-screen w-full grid lg:grid-cols-2 overflow-hidden;
+    background: linear-gradient(135deg, var(--auth-bg-from) 0%, var(--auth-bg-via) 50%, var(--auth-bg-to) 100%);
+  }
+
+  .auth-brand {
+    @apply relative hidden lg:flex flex-col justify-between p-12 xl:p-16 overflow-hidden;
+    background:
+      radial-gradient(120% 90% at 15% 10%, oklch(0.55 0.18 160 / 0.14) 0%, transparent 60%),
+      linear-gradient(160deg, var(--auth-brand-from) 0%, var(--auth-brand-to) 100%);
+    border-right: 1px solid var(--auth-card-border);
+  }
+
+  /* Faint grid, so the panel reads as a surface rather than a flat wash. */
+  .auth-brand::before {
+    content: '';
+    @apply absolute inset-0 pointer-events-none;
+    background-image:
+      linear-gradient(var(--auth-grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--auth-grid-line) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(90% 70% at 30% 30%, black 0%, transparent 75%);
+  }
+
+  .auth-brand-content {
+    @apply relative z-10 flex flex-col gap-8 max-w-lg;
+  }
+  .auth-brand-mark {
+    @apply inline-flex items-center gap-3 text-base font-bold tracking-tight;
+  }
+  .auth-brand-badge {
+    @apply size-11 rounded-2xl flex items-center justify-center text-white shrink-0;
+    background: linear-gradient(135deg, oklch(0.55 0.18 160), oklch(0.62 0.14 185));
+    box-shadow: 0 8px 24px oklch(0.55 0.18 160 / 0.28);
+  }
+  .auth-brand-title {
+    @apply text-4xl xl:text-5xl font-bold tracking-tight leading-[1.08] text-foreground;
+  }
+  .auth-brand-lead {
+    @apply text-base text-muted-foreground leading-relaxed;
+  }
+  .auth-brand-list {
+    @apply flex flex-col gap-4 mt-2;
+  }
+  .auth-brand-item {
+    @apply flex items-start gap-3 text-sm text-foreground/80;
+  }
+  .auth-brand-item-icon {
+    @apply size-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0;
+  }
+  .auth-brand-footer {
+    @apply relative z-10 text-xs text-muted-foreground;
+  }
+
+  /* Right column: the form, centred in its own half. */
+  .auth-panel {
+    @apply relative z-10 flex items-center justify-center p-6 sm:p-10;
+  }
+  .auth-panel-inner {
+    @apply w-full max-w-sm flex flex-col gap-5;
   }
 
   /* Glass card */
@@ -317,4 +392,63 @@
   .auth-link {
     @apply text-primary hover:text-primary/80 transition-colors underline-offset-2 hover:underline;
   }
+}
+/* ─── Dark mode for hand-written surfaces ─────────────────────────────────────
+   ADR: the screens are styled with literal Tailwind colours (bg-white,
+   border-slate-200, text-slate-900…) rather than semantic tokens — roughly 640
+   occurrences across the two apps.
+
+   Raison: rewriting them all to bg-card/text-foreground is a large, error-prone
+   sweep, and every screen written afterwards would have to remember the
+   convention. Remapping the literals under .dark makes dark mode correct today
+   and keeps working as pages are added with the same habits.
+
+   Cost, stated plainly: `bg-white` here means "a card surface", never "white".
+   Anything that must stay white in dark mode needs an explicit dark: variant.
+   Date: 2026-07-27
+   ──────────────────────────────────────────────────────────────────────────── */
+@layer utilities {
+  .dark .bg-white { background-color: var(--card); }
+  .dark .bg-slate-50,
+  .dark .bg-slate-50\/50,
+  .dark .bg-slate-50\/80 { background-color: color-mix(in oklab, var(--card) 82%, white 4%); }
+  .dark .bg-slate-100 { background-color: var(--muted); }
+  .dark .bg-\[\#F8FAFC\] { background-color: var(--background); }
+
+  .dark .text-slate-900 { color: var(--foreground); }
+  .dark .text-slate-800 { color: color-mix(in oklab, var(--foreground) 92%, transparent); }
+  .dark .text-slate-700 { color: color-mix(in oklab, var(--foreground) 84%, transparent); }
+  .dark .text-slate-600 { color: color-mix(in oklab, var(--foreground) 72%, transparent); }
+  .dark .text-slate-500 { color: var(--muted-foreground); }
+  .dark .text-slate-400 { color: color-mix(in oklab, var(--muted-foreground) 82%, transparent); }
+  .dark .text-slate-300 { color: color-mix(in oklab, var(--muted-foreground) 62%, transparent); }
+
+  .dark .border-slate-100,
+  .dark .border-slate-200,
+  .dark .border-slate-200\/70,
+  .dark .border-slate-200\/80,
+  .dark .border-slate-300 { border-color: var(--border); }
+  .dark .divide-slate-100 > * + * { border-color: var(--border); }
+
+  /* Status pills: the light tints turn to muted, readable washes rather than
+     the near-white blocks a straight inversion would give. */
+  .dark .bg-emerald-50 { background-color: oklch(0.72 0.16 165 / 0.14); }
+  .dark .bg-amber-50 { background-color: oklch(0.75 0.15 75 / 0.14); }
+  .dark .bg-rose-50 { background-color: oklch(0.68 0.2 20 / 0.14); }
+  .dark .bg-sky-50 { background-color: oklch(0.7 0.15 230 / 0.14); }
+  .dark .bg-blue-50 { background-color: oklch(0.68 0.16 250 / 0.14); }
+  .dark .bg-emerald-100 { background-color: oklch(0.72 0.16 165 / 0.2); }
+  .dark .bg-amber-100 { background-color: oklch(0.75 0.15 75 / 0.2); }
+
+  .dark .text-emerald-700, .dark .text-emerald-800 { color: oklch(0.8 0.14 165); }
+  .dark .text-amber-700, .dark .text-amber-800, .dark .text-amber-900 { color: oklch(0.84 0.13 80); }
+  .dark .text-rose-600, .dark .text-rose-800 { color: oklch(0.76 0.16 22); }
+  .dark .text-sky-700, .dark .text-sky-800 { color: oklch(0.79 0.13 230); }
+  .dark .text-blue-600, .dark .text-blue-700 { color: oklch(0.78 0.14 250); }
+
+  .dark .border-emerald-100, .dark .border-emerald-200 { border-color: oklch(0.72 0.16 165 / 0.28); }
+  .dark .border-amber-100, .dark .border-amber-200 { border-color: oklch(0.75 0.15 75 / 0.28); }
+  .dark .border-rose-100, .dark .border-rose-200 { border-color: oklch(0.68 0.2 20 / 0.28); }
+  .dark .border-sky-100, .dark .border-sky-200 { border-color: oklch(0.7 0.15 230 / 0.28); }
+  .dark .border-c7d2fe, .dark .border-slate-200\/60 { border-color: var(--border); }
 }

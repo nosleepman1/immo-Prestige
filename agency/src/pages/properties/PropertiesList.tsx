@@ -14,7 +14,9 @@ import {
   FiChevronRight,
   FiHome,
   FiAlertTriangle,
-  FiLoader
+  FiLoader,
+  FiGrid,
+  FiList
 } from 'react-icons/fi'
 import { useMyProperties } from '@/hooks/properties/useMyProperties'
 import { useUpdateProperty, useDeleteProperty } from '@/hooks/properties/usePropertyMutations'
@@ -35,6 +37,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import PropertyCard from './PropertyCard'
 import {
   STATUS_LABELS,
   TRANSACTION_LABELS,
@@ -60,6 +63,10 @@ const PropertiesList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [currentPage, setCurrentPage] = useState(1)
+  // Cards by default: an agent recognises their own property by its photo, not
+  // by reading a title in a row. The table stays a click away for scanning many
+  // listings at once.
+  const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid')
 
   // Modal States
   const [editingProperty, setEditingProperty] = useState<Property | null>(null)
@@ -137,6 +144,31 @@ const PropertiesList: React.FC = () => {
               <SelectItem value="archived">Archivés</SelectItem>
             </SelectContent>
           </Select>
+
+          <div className="flex items-center gap-0.5 bg-slate-100 rounded-xl p-0.5 shrink-0">
+            <button
+              type="button"
+              onClick={() => setViewMode('grid')}
+              title="Affichage en cartes"
+              aria-pressed={viewMode === 'grid'}
+              className={`p-1.5 rounded-lg transition-colors ${
+                viewMode === 'grid' ? 'bg-white text-emerald-700 shadow-2xs' : 'text-slate-400 hover:text-slate-600'
+              }`}
+            >
+              <FiGrid className="w-4 h-4" />
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('table')}
+              title="Affichage en tableau"
+              aria-pressed={viewMode === 'table'}
+              className={`p-1.5 rounded-lg transition-colors ${
+                viewMode === 'table' ? 'bg-white text-emerald-700 shadow-2xs' : 'text-slate-400 hover:text-slate-600'
+              }`}
+            >
+              <FiList className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </div>
 
@@ -150,6 +182,47 @@ const PropertiesList: React.FC = () => {
         <div className="bg-white border border-slate-200 rounded-2xl p-12 text-center space-y-3">
           <FiHome className="w-10 h-10 text-slate-300 mx-auto" />
           <p className="text-sm font-medium text-slate-600">Aucun bien ne correspond à votre recherche.</p>
+        </div>
+      ) : viewMode === 'grid' ? (
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+            {paginatedProperties.map((property) => (
+              <PropertyCard
+                key={property.id}
+                property={property}
+                onEdit={setEditingProperty}
+                onDelete={setDeletingProperty}
+              />
+            ))}
+          </div>
+
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between px-5 py-4 bg-white border border-slate-200/80 rounded-2xl shadow-2xs">
+              <span className="text-xs text-slate-500 font-medium">
+                Page {currentPage} sur {totalPages} — {filteredProperties.length} biens au total
+              </span>
+              <div className="flex items-center gap-1.5">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="text-xs"
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+                >
+                  <FiChevronLeft className="w-3.5 h-3.5 mr-1" /> Précédent
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="text-xs"
+                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+                >
+                  Suivant <FiChevronRight className="w-3.5 h-3.5 ml-1" />
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       ) : (
         <div className="bg-white border border-slate-200/80 rounded-2xl shadow-2xs overflow-hidden">

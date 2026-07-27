@@ -1,13 +1,15 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { motion } from 'framer-motion'
-import { Loader2, Mail, Lock, Eye, EyeOff, ShieldCheck } from 'lucide-react'
+import { Loader2, Mail, Lock, Eye, EyeOff, ShieldCheck, BadgeCheck, Flag, Activity } from 'lucide-react'
 import { useState } from 'react'
 import { loginSchema, type LoginFormValues } from '@/lib/schemas'
 import useLogin from '@/hooks/auth/useLogin'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import AuthBrandPanel from '@/components/auth/AuthBrandPanel'
+import ThemeToggle from '@/components/ui/theme-toggle'
 
 // ─── Animation Variants ───────────────────────────────────────────────────────
 
@@ -24,6 +26,25 @@ const item = {
   hidden: { opacity: 0, y: 16 },
   show: { opacity: 1, y: 0 },
 }
+
+/** The three things this back-office is for. */
+const HIGHLIGHTS = [
+  {
+    icon: <BadgeCheck className="size-4" />,
+    title: 'Accréditation des agences',
+    description: "Examinez les dossiers, acceptez ou refusez avec un motif qui parvient au gérant.",
+  },
+  {
+    icon: <Flag className="size-4" />,
+    title: 'Modération',
+    description: 'Arbitrez les signalements sur les publications, commentaires et réponses.',
+  },
+  {
+    icon: <Activity className="size-4" />,
+    title: 'Santé du service',
+    description: 'Base, cache, file d\'attente et stockage vérifiés en continu.',
+  },
+]
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -47,18 +68,33 @@ const Login = () => {
   const isLoading = loading || isSubmitting
 
   return (
-    <div className="auth-page-bg">
-      <div className="auth-orb auth-orb-1" />
-      <div className="auth-orb auth-orb-2" />
+    <div className="auth-split">
+      <AuthBrandPanel
+        badge={<ShieldCheck className="size-5" />}
+        name="ImmoPrestige"
+        title="La plateforme, vue depuis le poste de contrôle."
+        lead="Accréditez les agences, arbitrez les signalements, surveillez la santé du service."
+        highlights={HIGHLIGHTS}
+        footer="© 2026 ImmoPrestige — accès strictement réservé aux administrateurs."
+      />
 
-      <motion.div className="auth-card" variants={container} initial="hidden" animate="show">
-        <motion.div variants={item} className="auth-header">
-          <div className="auth-logo">
-            <ShieldCheck className="size-5 text-primary" />
-          </div>
-          <h1 className="auth-title">ImmoPrestige Admin</h1>
-          <p className="auth-subtitle">Back-office réservé aux administrateurs de la plateforme</p>
-        </motion.div>
+      <div className="auth-panel">
+        {/* No sidebar here, so the picker lives in the corner of the form half. */}
+        <div className="absolute top-5 right-5 z-20">
+          <ThemeToggle compact />
+        </div>
+
+        <div className="auth-orb auth-orb-1" />
+        <div className="auth-orb auth-orb-2" />
+
+        <motion.div className="auth-panel-inner" variants={container} initial="hidden" animate="show">
+          <motion.div variants={item} className="auth-header">
+            <div className="auth-logo lg:hidden">
+              <ShieldCheck className="size-5 text-primary" />
+            </div>
+            <h1 className="auth-title">Super administrateur</h1>
+            <p className="auth-subtitle">Back-office de la plateforme</p>
+          </motion.div>
 
         <motion.form
           variants={item}
@@ -131,8 +167,9 @@ const Login = () => {
               'Se connecter'
             )}
           </Button>
-        </motion.form>
-      </motion.div>
+          </motion.form>
+        </motion.div>
+      </div>
     </div>
   )
 }
