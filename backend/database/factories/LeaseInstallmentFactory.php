@@ -16,9 +16,18 @@ class LeaseInstallmentFactory extends Factory
     /**
      * @return array<string, mixed>
      */
+    /**
+     * Months are handed out in sequence rather than drawn at random.
+     *
+     * (lease_id, period_start) is unique, so two random draws could land on the
+     * same month and blow up an insert — a test that passes or fails depending
+     * on the seed is worse than one that always fails.
+     */
+    private static int $monthOffset = 0;
+
     public function definition(): array
     {
-        $start = Carbon::parse(fake()->dateTimeBetween('-3 months', '+2 months')->format('Y-m-01'));
+        $start = today()->startOfMonth()->subMonth()->addMonths(self::$monthOffset++);
         $rent = 150_000;
         $charges = 10_000;
 

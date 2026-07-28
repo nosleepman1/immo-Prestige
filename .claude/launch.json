@@ -17,6 +17,19 @@
       "port": 8000
     },
     {
+      "name": "reverb",
+      "runtimeExecutable": "php",
+      "runtimeArgs": [
+        "backend/artisan",
+        "reverb:start",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8080"
+      ],
+      "port": 8080
+    },
+    {
       "name": "admin",
       "runtimeExecutable": "npm",
       "runtimeArgs": [
