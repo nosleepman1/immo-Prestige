@@ -46,14 +46,18 @@ class RentalDashboardTest extends TestCase
         [$user, $agency] = $this->agency();
         $lease = $this->activeLease($agency);
 
-        LeaseInstallment::factory()->create([
+        // Distinct months: the factory draws a random one, and (lease, period)
+        // is unique — two draws can collide and the test would pass by luck.
+        LeaseInstallment::factory()->forPeriod(today()->startOfMonth()->toDateString())->create([
             'lease_id' => $lease->id, 'total_amount' => 160_000, 'paid_amount' => 0,
         ]);
-        LeaseInstallment::factory()->create([
+        LeaseInstallment::factory()->forPeriod(today()->startOfMonth()->addMonth()->toDateString())->create([
             'lease_id' => $lease->id, 'total_amount' => 160_000, 'paid_amount' => 60_000,
             'status' => InstallmentStatus::PartiallyPaid,
         ]);
-        LeaseInstallment::factory()->settled()->create(['lease_id' => $lease->id]);
+        LeaseInstallment::factory()->settled()
+            ->forPeriod(today()->startOfMonth()->addMonths(2)->toDateString())
+            ->create(['lease_id' => $lease->id]);
 
         $this->actingAs($user, 'sanctum')
             ->getJson('/api/v1/agency/dashboard/rental')
@@ -68,12 +72,12 @@ class RentalDashboardTest extends TestCase
         [$user, $agency] = $this->agency();
         $lease = $this->activeLease($agency);
 
-        LeaseInstallment::factory()->overdue()->create([
-            'lease_id' => $lease->id, 'total_amount' => 160_000, 'paid_amount' => 0,
-        ]);
-        LeaseInstallment::factory()->create([
-            'lease_id' => $lease->id, 'total_amount' => 160_000, 'paid_amount' => 0,
-        ]);
+        LeaseInstallment::factory()->overdue()
+            ->forPeriod(today()->startOfMonth()->subMonth()->toDateString())
+            ->create(['lease_id' => $lease->id, 'total_amount' => 160_000, 'paid_amount' => 0]);
+        LeaseInstallment::factory()
+            ->forPeriod(today()->startOfMonth()->toDateString())
+            ->create(['lease_id' => $lease->id, 'total_amount' => 160_000, 'paid_amount' => 0]);
 
         $this->actingAs($user, 'sanctum')
             ->getJson('/api/v1/agency/dashboard/rental')
