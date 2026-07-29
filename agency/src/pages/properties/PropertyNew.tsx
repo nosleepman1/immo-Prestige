@@ -32,7 +32,16 @@ const PropertyNew = () => {
     formState: { errors },
   } = useForm<PropertyFormSchemaValues>({
     resolver: zodResolver(propertySchema),
-    defaultValues: { transaction_type: 'sale', country: 'Sénégal' },
+    defaultValues: {
+      transaction_type: 'sale',
+      country: 'Sénégal',
+      rental: {
+        charges_amount: 0,
+        deposit_amount: 0,
+        advance_months: 1,
+        min_lease_months: 12,
+      },
+    },
   })
 
   const transactionType = useWatch({ control, name: 'transaction_type' })
@@ -40,10 +49,26 @@ const PropertyNew = () => {
   const showRental = transactionType !== 'sale'
 
   const onSubmit = handleSubmit((values) => {
+    const rentalPayload = showRental && values.rental ? {
+      rent_amount: Number(values.rental.rent_amount),
+      charges_amount: values.rental.charges_amount != null ? Number(values.rental.charges_amount) : 0,
+      deposit_amount: values.rental.deposit_amount != null ? Number(values.rental.deposit_amount) : 0,
+      advance_months: values.rental.advance_months != null ? Number(values.rental.advance_months) : 1,
+      min_lease_months: values.rental.min_lease_months != null ? Number(values.rental.min_lease_months) : 12,
+      available_from: values.rental.available_from ? values.rental.available_from : undefined,
+    } : undefined
+
+    const salePayload = showSale && values.sale ? {
+      price: Number(values.sale.price),
+      negotiable: Boolean(values.sale.negotiable),
+    } : undefined
+
     createProperty.mutate({
       ...values,
-      sale: showSale ? values.sale : undefined,
-      rental: showRental ? values.rental : undefined,
+      owner_id: values.owner_id ? Number(values.owner_id) : undefined,
+      bedrooms: values.bedrooms ? Number(values.bedrooms) : undefined,
+      sale: salePayload,
+      rental: rentalPayload,
     })
   })
 

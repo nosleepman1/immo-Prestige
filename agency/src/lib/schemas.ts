@@ -53,39 +53,43 @@ export const setPasswordSchema = z
 
 export type SetPasswordFormValues = z.infer<typeof setPasswordSchema>
 
-// ─── Property schema (mirrors StorePropertyRequest) ──────────────────────────
+const coerceOptionalNumber = (minVal = 0) =>
+  z.preprocess(
+    (val) => (val === '' || val === undefined || val === null || Number.isNaN(Number(val)) ? undefined : Number(val)),
+    z.number().min(minVal).optional()
+  )
 
 export const propertySchema = z
   .object({
     property_type_id: z.coerce.number({ message: 'Le type de bien est requis' }),
     devise_id: z.coerce.number({ message: 'La devise est requise' }),
-    owner_id: z.coerce.number().optional(),
+    owner_id: coerceOptionalNumber(),
     transaction_type: z.enum(['sale', 'rent', 'both'], {
       message: 'Précisez si le bien est à vendre ou à louer',
     }),
     name: z.string().min(1, 'Le titre est requis').max(255),
     description: z.string().optional().or(z.literal('')),
-    surface: z.coerce.number().min(0, 'La superficie doit être positive'),
-    rooms: z.coerce.number().int().min(0, 'Le nombre de pièces doit être positif'),
-    bedrooms: z.coerce.number().int().min(0).optional(),
-    floor: z.coerce.number().int().optional(),
+    surface: z.coerce.number({ message: 'La superficie doit être un nombre' }).min(0, 'La superficie doit être positive'),
+    rooms: z.coerce.number({ message: 'Le nombre de pièces est requis' }).int().min(0, 'Le nombre de pièces doit être positif'),
+    bedrooms: coerceOptionalNumber(0),
+    floor: coerceOptionalNumber(),
     furnished: z.boolean().optional(),
     country: z.string().min(3, 'Le pays est requis'),
     region: z.string().min(1, 'La région est requise').max(100),
     city: z.string().min(1, 'La ville est requise').max(100),
     sale: z
       .object({
-        price: z.coerce.number().min(1, 'Le prix de vente est requis'),
+        price: z.coerce.number({ message: 'Le prix de vente est requis' }).min(1, 'Le prix de vente est requis'),
         negotiable: z.boolean().optional(),
       })
       .optional(),
     rental: z
       .object({
-        rent_amount: z.coerce.number().min(1, 'Le loyer est requis'),
-        charges_amount: z.coerce.number().min(0).optional(),
-        deposit_amount: z.coerce.number().min(0).optional(),
-        advance_months: z.coerce.number().int().min(1).max(12).optional(),
-        min_lease_months: z.coerce.number().int().min(1).max(120).optional(),
+        rent_amount: z.coerce.number({ message: 'Le loyer est requis' }).min(1, 'Le loyer est requis'),
+        charges_amount: coerceOptionalNumber(0),
+        deposit_amount: coerceOptionalNumber(0),
+        advance_months: coerceOptionalNumber(1),
+        min_lease_months: coerceOptionalNumber(1),
         available_from: z.string().optional().or(z.literal('')),
       })
       .optional(),
