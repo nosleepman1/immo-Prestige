@@ -25,6 +25,7 @@ class RegisterAgency
     public function handle(RegisterAgencyData $data, array $documents): Agency
     {
         $agency = DB::transaction(function () use ($data, $documents) {
+           
             $user = User::create([
                 'name' => $data->managerName,
                 'email' => $data->email,

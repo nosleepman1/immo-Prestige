@@ -27,6 +27,10 @@ export async function registerAgency(payload: RegisterAgencyPayload): Promise<Re
     if (value !== undefined && value !== null) form.append(key, value as string | Blob)
   })
 
-  const { data } = await API.post<{ data: RegisterAgencyResult }>('/agency/register', form)
+  const { data } = await API.post<{ data: RegisterAgencyResult }>('/agency/register', form, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  })
   return data.data
 }

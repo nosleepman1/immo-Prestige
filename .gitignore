@@ -2,14 +2,27 @@
 .vite/
 */.vite/
 node_modules/
+dist/
+*/dist/
 
 # Environnements
 .env
 .env.local
+.env.*.local
 
 # Systeme
 .DS_Store
 Thumbs.db
+
+# Fichiers verrous crees par Word et PowerPoint a l'ouverture d'un document
+~$*
+
+# Documents et livrables de soutenance : conserves en local, hors du depot.
+# Le memoire pese 20 Mo et les captures 15 Mo ; un depot de code n'a pas a les
+# porter, et chaque clone les telechargerait.
+DOCS/
+*.pptx
+*.potx
 
 # Sorties temporaires
 *.log
