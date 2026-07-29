@@ -4,8 +4,15 @@ import API, { API_URL } from '@/api/api'
 
 const ROOT_URL = API_URL.replace(/\/api\/v1\/?$/, '')
 
+// In React Native / Metro, `pusher-js` or `laravel-echo` may be imported as an ES module object `{ default: Constructor }`.
+// Extract the actual callable constructor before assigning it to `global.Pusher`.
+const PusherClient =
+  typeof Pusher === 'function'
+    ? Pusher
+    : (Pusher as unknown as { default: typeof Pusher })?.default || Pusher
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-;(global as any).Pusher = Pusher
+;(global as any).Pusher = PusherClient
 
 let echoInstance: Echo<'reverb'> | null = null
 
@@ -41,6 +48,7 @@ function authorizer(channel: { name: string }) {
 }
 
 const connectionConfig = {
+  Pusher: PusherClient,
   key: process.env.EXPO_PUBLIC_REVERB_APP_KEY,
   wsHost: process.env.EXPO_PUBLIC_REVERB_HOST || 'localhost',
   wsPort: Number(process.env.EXPO_PUBLIC_REVERB_PORT) || 8080,
@@ -53,12 +61,17 @@ const connectionConfig = {
 export function getEcho(): Echo<'reverb'> {
   if (echoInstance) return echoInstance
 
+  const EchoConstructor =
+    typeof Echo === 'function'
+      ? Echo
+      : (Echo as unknown as { default: typeof Echo })?.default || Echo
+
   try {
-    echoInstance = new Echo({ broadcaster: 'reverb', ...connectionConfig })
+    echoInstance = new EchoConstructor({ broadcaster: 'reverb', ...connectionConfig })
   } catch {
     // The reverb connector's constructor checks fail on the React Native
     // bundled runtime; pusher-js speaks the same protocol.
-    echoInstance = new Echo({
+    echoInstance = new EchoConstructor({
       broadcaster: 'pusher',
       cluster: '',
       ...connectionConfig,
